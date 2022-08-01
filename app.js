@@ -3,7 +3,7 @@ const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const adminRouter=require('./src/routes/adminRouter')
-const dbCon = require("./src/config/connection");
+const dbCon = require("./src/config/connections/connection");
 const cors = require("cors");
 app.use(
   bodyParser.urlencoded({
