@@ -1,55 +1,53 @@
-const Joi = require("joi");
-const bcrypt = require("bcrypt");
-const User=require('../config/model/user')
-const {
-    comparePassword
-} = require("../utils/utilService");
+const User = require("../config/model/user");
+const { comparePassword } = require("../utils/utilService");
+const JWTService = require("../utils/JWTService");
 module.exports = {
-    login: async function (req, res) {  
-        try {
-            const schema = Joi.object({
-            email: Joi.string().email().required(),
-            password: Joi.string().required(),
-          });
-      
-           const {
-            email,
-            password
-          } = await schema.validateAsync(req.body);
-
-
-          // const user = await User.findOne({
-          //   email,
-          // });
-    
-          // if (!user) {
-          //   return res.status(404).send({
-          //     data: [],
-          //     message: "No user found..!",
-          //     success: false,
-          //   });
-          // }    
-          // let passwdMatch = await comparePassword(password, user.password);    
-          // if (!passwdMatch) {
-          //   return  res.status(404).send({
-          //     data: [],
-          //     message: "Password didn't matched..!",
-          //     success: false,
-          //   });            
-          // }
-    
-          // const token = await JWTService.issuer({ user: user.id }, "10 day");
-          //    return  res.status(200).send({
-          //   data: [token],
-          //   message: "Success..!",
-          //   success: true,
-          // });  
-        } catch (err) {
-          return  res.status(404).send({
-            data: [],
-            message: "Failed to login..!",
-            success: false,
-          });           
+  login: async function (req, res) {
+    try {
+      const { email, password } = req.body;
+      const user = await User.findOne({
+        email: email,
+      });
+      if (!user) {
+        return res.status(404).send({
+          data: [],
+          message: "Invalid User..!",
+          success: false,
+        });
+      }
+      const passwordMatch = await comparePassword(password, user.password);
+      if (!passwordMatch) {
+        return res.status(404).send({
+          data: [],
+          message: "password do not match..!",
+          success: false,
+        });
+      }
+      const token = await JWTService.issuer({ email: user.email }, "10 day");
+      const login = await User.updateOne(
+        {
+          email: email,
+        },
+        {
+          $set: {
+            token: token,
+          },
         }
-      },
-}
+      );
+      const newUser = await User.findOne({
+        email: email,
+      });
+      return res.status(200).send({
+        data: [newUser],
+        message: "Successfully Login..!",
+        success: true,
+      });
+    } catch (error) {
+      return res.status(404).send({
+        data: [],
+        message: error,
+        status: false,
+      });
+    }
+  },
+};

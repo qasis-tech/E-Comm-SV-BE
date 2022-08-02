@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const SECRET = " QUASIS_TECH";
+const SECRET = "QUASIS_TECH";
 module.exports = {
   issuer(payload, expiredIn) {
     return jwt.sign(payload, SECRET, { expiresIn: expiredIn });

@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const expressValidator=require('express-validator')
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const adminRouter=require('./src/routes/adminRouter')
