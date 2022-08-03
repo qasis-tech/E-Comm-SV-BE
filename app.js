@@ -14,6 +14,7 @@ app.use(
     extended: false,
   })
 );
+
 app.use(bodyParser.json());
 app.use("/", adminRouter);
 const port = process.env.PORT || 7000;

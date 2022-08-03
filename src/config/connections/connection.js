@@ -1,11 +1,12 @@
 const mongoose = require("mongoose");
-const dbConfig = require("./dbconfig");
+require("dotenv").config();
+
 mongoose
-  .connect(dbConfig.url, {
+  .connect(process.env.DB_BASE_URL, {
     useNewUrlParser: true,
   })
   .then(() => {
-    console.log("running...");
+    console.log("DB Connected...!");
   })
   .catch((err) => {
     console.log("Could not connect to the database. Exiting now...", err);
