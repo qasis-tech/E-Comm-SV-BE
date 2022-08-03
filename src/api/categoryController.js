@@ -57,7 +57,7 @@ module.exports = {
                 return res.status(404).send({
                   data: [],
                   message: "Failed to add categories..!",
-                  success: true,
+                  success: false,
                 });
               }
               return res.status(200).send({
