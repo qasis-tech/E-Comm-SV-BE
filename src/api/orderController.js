@@ -5,59 +5,51 @@ const User = require("../config/model/user");
 module.exports = {
   addOrder: async (req, res) => {
     try {
-      // const {productId}=req.body
-      // const newOrder=await Order.create({
-      // productId:productId,
-      // userId: userId,
-      // status:"pending"
-      //   })
-      //     if (!newOrder) {
-      //       return res.status(404).send({
-      //         data: [],
-      //         message: "Failed to place order..!",
-      //         success: false,
-      //       });
-      //     }
-      //     return res.status(200).send({
-      //       data: [newOrder],
-      //       message: "Successfully placed order..!",
-      //       success: true,
-      //     });
-const pArray=[]
-      req.body.productId.forEach((pid) => {
-        const did = pid.id;
-        console.log("pid", did);
-      Product.find({ _id: { $in: did } }, function (err, items) {
-            
-          //array of object creation  
-          pArray.push(items)     
-        });
-        });
-       setTimeout(()=>{
-        console.log('pArray',pArray)
-       },1000)     
-            
-      if (!productDetails) {
-        return res.status(404).send({
-          data: [],
-          message: "No product details found..!",
-          success: false,
-        });
-      }
-      const userDetails = await User.findOne({
-        _id: userId,
-      });
-      if (!userDetails) {
-        return res.status(404).send({
-          data: [],
-          message: "No user details found..!",
-          success: false,
-        });
-      }
-      return res.status(200).send({
-        data: [{ productList: productDetails }, { userDetails: userDetails }],
-        message: "Successfully fetched details..!",
-        success: true,
+      await User.find(
+        {
+          _id: req.body.userId,
+        },
+        { name: 1, mobileNumber: 1, email: 1, pinCode: 1 }
+      ).then((userDetails) => {
+        if (!userDetails) {
+          return res.status(404).send({
+            data: [],
+            message: "Failed to fetch user details..!",
+            success: false,
+          });
+        }
+        const productDetails = req.body.productId.map((item) => item.id);
+        Product.find(
+          { _id: { $in: productDetails } },
+          async function (err, items) {
+            const products = req.body.productId;
+            items.forEach((data) => {
+              products.forEach((aa) => {
+                if (aa.id === data.id) {
+                  data.unit = aa.unit;
+                  data.quantity = aa.quantity;
+                }
+              });
+            });
+            const newOrder = await Order.create({
+              product: [{ productList: items }],
+              user: userDetails[0],
+              status: "pending",
+            });
+            if (!newOrder) {
+              return res.status(404).send({
+                data: [],
+                message: "Failed to place order..!",
+                success: false,
+              });
+            }
+            return res.status(200).send({
+              data: [newOrder],
+              message: "Successfully placed order..!",
+              success: true,
+            });
+          }
+        );
       });
     } catch (error) {
       return res.status(404).send({
