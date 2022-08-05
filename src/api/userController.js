@@ -1,27 +1,66 @@
 const User = require("../config/model/user");
-const UtilService=require('../utils/utilService')
-const clientID =
-  "756091233237-qdi6vep1g8h25n2o6dmcp6n3vv7t41fi.apps.googleusercontent.com";
-const {
-  OAuth2Client
-} = require("google-auth-library");
-const client = new OAuth2Client(clientID);
+const UtilService = require("../utils/utilService");
+const JWTService = require("../utils/JWTService");
 module.exports = {
+  login: async function (req, res) {
+    try {
+      const { email, password } = req.body;
+      const user = await User.findOne({
+        email: email,
+      });
+      if (!user) {
+        return res.status(404).send({
+          message: "Invalid User..!",
+          success: false,
+        });
+      }
+      const passwordMatch = await comparePassword(password, user.password);
+      if (!passwordMatch) {
+        return res.status(404).send({
+          message: "password do not match..!",
+          success: false,
+        });
+      }
+      const token = await JWTService.issuer({ email: user.email }, "10 day");
+      const login = await User.updateOne(
+        {
+          email: email,
+        },
+        {
+          $set: {
+            token: token,
+          },
+        }
+      );
+      const newUser = await User.findOne({
+        email: email,
+      });
+      return res.status(200).send({
+        data: newUser,
+        message: "Successfully Login..!",
+        success: true,
+      });
+    } catch (error) {
+      return res.status(404).send({
+        message: error,
+        status: false,
+      });
+    }
+  },
   addUser: async (req, res) => {
     try {
-      const { email,password } = req.body;
+      const { email, password } = req.body;
       const oldUser = await User.findOne({
         email: email,
       });
       if (oldUser) {
         return res.status(404).send({
-          data: [],
           message: "Emailid already exists..!",
           success: false,
         });
       } else {
         const encryptedPassword = await UtilService.hashPassword(password);
-        const newUser = await User.create({           
+        const newUser = await User.create({
           name: req.body.name,
           mobileNumber: req.body.mobileNumber,
           email: req.body.email,
@@ -34,71 +73,71 @@ module.exports = {
         });
         if (!newUser) {
           return res.status(404).send({
-            data: [],
             message: "Failed to create your account..!",
             success: false,
           });
         }
         return res.status(200).send({
-          data: [newUser],
+          data: newUser,
           message: "Successfully created your account..!",
           success: true,
         });
       }
     } catch (error) {
       return res.status(404).send({
-        data: [error],
         message: "error",
         status: false,
       });
     }
   },
-
   googleAuth: async (req, res) => {
-    const {
-      email,
-      name,
-      id,
-      photoUrl
-    } = req.body;
-    console.log("Req Body", req.body);
-    // const ticket = await client.verifyIdToken({
-    //   idToken: token,
-    //   audience: clientID,
-    // });
-    // const googleData = ticket.getPayload();
-    // let email = googleData.email;
-    // let name = googleData.name;
     try {
+      const { email, name, photoUrl } = req.body;
       const user = await User.findOne({
         email,
       });
-    //   console.log("Userrr", user);
       if (!user) {
         await User.create({
           email,
           name,
-          google_id: id,
-          profile_pic: photoUrl,
-          user_type: 3,
+          profilePic: photoUrl,
+          role: "user",
         });
         const user = await User.findOne({
           email,
         });
-        res.send(user);
+        return res.status(200).send({
+          data: user,
+          message: "Successfully created your account..!",
+          success: true,
+        });
       } else {
-        // const token = await JWTService.issuer({ user: user.id }, "1 day");
-        // return res.ok({ token: token });
-        return res.send(user);
+        const token = await JWTService.issuer({ email: user.email }, "1 day");
+        const login = await User.updateOne(
+          {
+            email: email,
+          },
+          {
+            $set: {
+              token: token,
+            },
+          }
+        );
+        const newUser = await User.findOne({
+          email: email,
+        });
+        return res.status(200).send({
+          data: newUser,
+          message: "Successfully Login..!",
+          success: true,
+        });
       }
     } catch (error) {
       console.log("Error", error.details);
       return res.status(404).send({
-        data: [error],
         message: "error",
         status: false,
       });
     }
   },
-
 };

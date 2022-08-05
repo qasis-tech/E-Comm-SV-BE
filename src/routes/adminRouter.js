@@ -1,26 +1,31 @@
 var express = require("express");
 const router = express.Router();
-const { check, validationResult } = require('express-validator');
 const userController = require("../api/userController");
-const loginController = require("../api/loginController");
 const categoryController = require("../api/categoryController");
 const productController = require("../api/productController");
 const orderController = require("../api/orderController");
+const stockController = require("../api/stockController");
 const { validate,signupvalidate } = require("../utils/validation");
 const validation = require("../utils/validationSchema");
 router.get("/", function (req, res, next) {
   res.send("welcome to adminPanel");
 });
 router.post("/signup",userController.addUser);
-router.get("/google",userController.googleAuth);
-router.post("/login", validate(validation.signin), loginController.login);
+router.post("/google",validate(validation.googleAuth),userController.googleAuth);
+router.post("/login", validate(validation.signin), userController.login);
 router.post("/category",categoryController.addCategory);
 router.get("/category",categoryController.viewCategory);
 router.put("/category/:id",categoryController.editCategory);
-router.post("/product",productController.addProduct);
+router.post("/category",categoryController.addCategory);
+router.post("/searchCategory",categoryController.searchCategory);
 router.get("/product",productController.viewProduct);
 router.put("/product/:id",productController.editProduct);
+router.post("/searchProduct",productController.searchProduct);
 router.post("/order",orderController.addOrder);
-router.get("/order",orderController.viewOrder);
-
+router.get("/order",orderController.viewTotalOrder);
+router.post("/filter",orderController.filterOrder);
+router.post("/searchOrder",orderController.searchOrder);
+router.post("/stock",stockController.addStock);
+router.get("/stock",stockController.viewStock);
+router.post("/searchStock",stockController.searchStock);
 module.exports = router;

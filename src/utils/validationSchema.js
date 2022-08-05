@@ -19,6 +19,9 @@ exports.usersignup = Joi.object().keys({
     email: Joi.string().email().lowercase().required(),
     password: Joi.string().required(),
 });
-
-
+exports.googleAuth = Joi.object().keys({
+    email: Joi.string().email().lowercase().required(),
+    name: Joi.string().required(),
+    photoUrl: Joi.string().required(),
+});
 

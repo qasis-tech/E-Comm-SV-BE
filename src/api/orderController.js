@@ -13,7 +13,6 @@ module.exports = {
       ).then((userDetails) => {
         if (!userDetails) {
           return res.status(404).send({
-            data: [],
             message: "Failed to fetch user details..!",
             success: false,
           });
@@ -38,13 +37,12 @@ module.exports = {
             });
             if (!newOrder) {
               return res.status(404).send({
-                data: [],
                 message: "Failed to place order..!",
                 success: false,
               });
             }
             return res.status(200).send({
-              data: [newOrder],
+              data: newOrder,
               message: "Successfully placed order..!",
               success: true,
             });
@@ -53,42 +51,111 @@ module.exports = {
       });
     } catch (error) {
       return res.status(404).send({
-        data: [error],
         message: "error",
         status: false,
       });
     }
   },
-  viewOrder: async (req, res) => {
+  viewTotalOrder: async (req, res) => {
     try {
-      const pData = await Order.aggregate([
-        {
-          $lookup: {
-            from: "products",
-            localField: "orders",
-            foreignField: "id",
-            as: "productDetails",
-          },
-        },
-      ]);
-      if (!pData) {
-        return res.status(404).send({
-          data: [],
-          message: "can't fetch data",
-          status: false,
+      await Order.find().then((orders) => {
+        if (orders.length === 0) {
+          return res.status(200).send({
+            message: "No orders yet..!",
+            success: true,
+          });
+        }
+        Order.find({
+          status: "pending",
+        }).then((pendingOrders) => {
+          Order.find({
+            status: "completed",
+          }).then((completedOrders) => {
+            res.status(200).send({
+              data: orders,
+              shorthanddetails: {
+                totalorders: orders,
+                pendingOrders: pendingOrders,
+                completedOrders: completedOrders,
+              },
+              message: "Successfully fetched orders..!",
+              success: true,
+            });
+          });
         });
-      }
-      return res.status(200).send({
-        data: [pData],
-        message: "success",
-        status: true,
       });
     } catch (error) {
       return res.status(404).send({
-        data: [error],
         message: "error",
         status: false,
       });
     }
   },
+  filterOrder: async (req, res) => {
+    try {
+      const { startDate, endDate } = req.body;
+      if (startDate === "" || endDate === "") {
+        return res.status(400).send({
+          message: "Please ensure you pick two dates",
+          success: "false",
+        });
+      }
+      await Order.find({
+        createdAt: {
+          $gte: new Date(new Date(startDate).setHours(00, 00, 00)),
+          $lt: new Date(new Date(endDate).setHours(23, 59, 59)),
+        },
+      })
+        .sort({ createdAt: "asc" })
+        .then((orderList) => {
+          if (orderList.length === 0) {
+            return res.status(200).send({
+              message: "No orders yet..!",
+              success: true,
+            });
+          }
+          res.status(200).send({
+            data: orderList,
+            message: "Successfully fetched orders..!",
+            success: true,
+          });
+        });
+    } catch (error) {
+      return res.status(404).send({
+        message: "error",
+        status: false,
+      });
+    }
+  },
+  searchOrder: async (req, res) => {
+    try {
+      if(req.body.search==="")
+      {
+        return res.status(404).send({
+          message: "Search field required..!",
+          success: false,
+        });
+      }
+      await Order.find({ 
+        product: {$regex: req.body.search}})
+            .then((orders) => {
+            if(orders.length===0){
+              return res.status(200).send({
+                message: "No order found..!",
+                success: true,
+              });
+            }
+        return res.status(200).send({
+          data: orders,
+          message: "Successfully fetched orders..!",
+          success: true,
+        });
+      });
+    } catch (error) {
+      return res.status(404).send({
+        message: "error",
+        status: false,
+      });
+    }
+  }, 
 };

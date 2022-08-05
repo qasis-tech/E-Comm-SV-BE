@@ -21,7 +21,6 @@ module.exports = {
       await fileUpload(req, res, (err) => {
         if (err) {
           return res.status(404).send({
-            data: [err],
             message: "Error in image uploading..!",
             success: false,
           });
@@ -52,7 +51,7 @@ module.exports = {
           });
           newProduct.save().then((product) => {
             return res.status(200).send({
-              data: [product],
+              data: product,
               message: "Successfully Added Products..!",
               success: true,
             });
@@ -61,7 +60,6 @@ module.exports = {
       });
     } catch (error) {
       return res.status(404).send({
-        data: [error],
         message: "error",
         status: false,
       });
@@ -71,14 +69,13 @@ module.exports = {
     try {
       await Product.find().then((products) => {
         return res.status(200).send({
-          data: [products],
+          data: products,
           message: "Successfully fetched all Products..!",
           success: true,
         });
       });
     } catch (error) {
       return res.status(404).send({
-        data: [error],
         message: "error",
         status: false,
       });
@@ -90,7 +87,6 @@ module.exports = {
       await fileUpload(req, res, (err) => {
         if (err) {
           return res.status(404).send({
-            data: [err],
             message: "Error in image uploading..!",
             success: false,
           });
@@ -128,7 +124,7 @@ module.exports = {
           ).then((newProducts) => {
             if (newProducts) {
               return res.status(200).send({
-                data: [newProducts],
+                data: newProducts,
                 message: "Successfully updated Products..!",
                 success: true,
               });
@@ -136,7 +132,6 @@ module.exports = {
           });
         } else {
           return res.status(404).send({
-            data: [],
             message: "Cannot find product with id " + req.params.id,
             success: false,
           });
@@ -144,10 +139,40 @@ module.exports = {
       });
     } catch (error) {
       return res.status(404).send({
-        data: [error],
         message: "error",
         status: false,
       });
     }
   },
+  searchProduct: async (req, res) => {
+    try {
+      if(req.body.search==="")
+      {
+        return res.status(404).send({
+          message: "Search field required..!",
+          success: false,
+        });
+      }
+      await Product.find({ 
+        name: {$regex: req.body.search}})
+            .then((products) => {
+            if(products.length===0){
+              return res.status(200).send({
+                message: "No products found..!",
+                success: true,
+              });
+            }
+        return res.status(200).send({
+          data: products,
+          message: "Successfully fetched products..!",
+          success: true,
+        });
+      });
+    } catch (error) {
+      return res.status(404).send({
+        message: "error",
+        status: false,
+      });
+    }
+  }, 
 };
