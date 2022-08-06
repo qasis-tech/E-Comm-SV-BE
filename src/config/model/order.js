@@ -12,7 +12,11 @@ const orderSchema = mongoose.Schema({
  status: {
     type: String,
     required: true,
-  }
+  },
+  orderId: {
+    type: String,
+    required: true,
+  },
 },
   {
     timestamps: true

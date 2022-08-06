@@ -1,20 +1,16 @@
 const express = require("express");
 const app = express();
-const expressValidator = require("express-validator");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const adminRouter = require("./src/routes/adminRouter");
 const dbCon = require("./src/config/connections/connection");
 const cors = require("cors");
-
 require("dotenv").config();
-
 app.use(
   bodyParser.urlencoded({
     extended: false,
   })
 );
-
 app.use(bodyParser.json());
 app.use("/", adminRouter);
 const port = process.env.PORT || 7000;

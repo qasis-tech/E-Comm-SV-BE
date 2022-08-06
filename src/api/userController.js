@@ -14,7 +14,10 @@ module.exports = {
           success: false,
         });
       }
-      const passwordMatch = await comparePassword(password, user.password);
+      const passwordMatch = await UtilService.comparePassword(
+        password,
+        user.password
+      );
       if (!passwordMatch) {
         return res.status(404).send({
           message: "password do not match..!",
@@ -35,6 +38,13 @@ module.exports = {
       const newUser = await User.findOne({
         email: email,
       });
+      if (newUser.role === "admin") {
+        return res.status(200).send({
+          data: newUser,
+          message: "Welcome to AdminPanel..!",
+          success: true,
+        });
+      }
       return res.status(200).send({
         data: newUser,
         message: "Successfully Login..!",
@@ -133,11 +143,92 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.log("Error", error.details);
-      return res.status(404).send({
+        return res.status(404).send({
         message: "error",
         status: false,
       });
     }
   },
-};
+  viewUsers: async (req, res) => {
+    try {
+    await User.find({
+        role: "user",
+      })
+      .then((users) => {
+        res.status(200).send({
+          data: users,
+          message: "Successfully fetched users..!",
+          success: true,
+        });
+      })
+      .catch((err) => {
+        res.status(404).send({
+          message: "Error..!",
+          success: false,
+        });
+      });
+    } catch (error) {
+        return res.status(404).send({
+        message: "error",
+        status: false,
+      });
+    }
+},
+editUsers: async (req, res) => {
+  try {   
+  await User.findByIdAndUpdate(
+      req.params.id, {
+        name: req.body.name,
+          mobileNumber: req.body.mobileNumber,
+          email: req.body.email,
+          gender: req.body.gender,
+          dob: req.body.dob,
+          pinCode: req.body.pinCode,
+             }, {
+        new: true,
+      }
+    )
+    .then((user) => {
+      res.status(200).send({
+        data: user,
+        message: "Successfully updated user..!",
+        success: true,
+      });
+    })
+    .catch((error) => {
+      return res.status(404).send({
+        message: "user not found with id " + req.params.id,
+        success: false,
+      });
+    });
+  } catch (error) {
+      return res.status(404).send({
+      message: "error",
+      status: false,
+    });
+  }
+},
+deleteUsers: async (req, res) => {
+  try { 
+   await User.findByIdAndRemove(req.params.id)
+    .then((user) => {
+      res.status(200).send({
+        message: "Successfully deleted user..!",
+        success: true,
+      });
+    })
+    .catch((error) => {
+      return res.status(404).send({
+        message: "user not found with id " + req.params.id,
+        success: false,
+      });
+    });
+  }
+  catch (error) {
+    return res.status(404).send({
+    message: "error",
+    status: false,
+  });
+}
+}
+}

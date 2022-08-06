@@ -10,8 +10,11 @@ const validation = require("../utils/validationSchema");
 router.get("/", function (req, res, next) {
   res.send("welcome to adminPanel");
 });
-router.post("/signup",userController.addUser);
+router.post("/signup",validate(validation.usersignup),userController.addUser);
 router.post("/google",validate(validation.googleAuth),userController.googleAuth);
+router.get("/signup",userController.viewUsers);
+router.put("/signup/:id",userController.editUsers);
+router.delete("/signup/:id",userController.deleteUsers);
 router.post("/login", validate(validation.signin), userController.login);
 router.post("/category",categoryController.addCategory);
 router.get("/category",categoryController.viewCategory);

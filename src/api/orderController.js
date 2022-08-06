@@ -30,10 +30,21 @@ module.exports = {
                 }
               });
             });
+            function makeid() {
+              let text = "";
+              let possible = "0123456789";
+              for (var i = 0; i < 4; i++)
+                text += possible.charAt(
+                  Math.floor(Math.random() * possible.length)
+                );
+
+              return text;
+            }
             const newOrder = await Order.create({
               product: [{ productList: items }],
               user: userDetails[0],
               status: "pending",
+              orderId: makeid(),
             });
             if (!newOrder) {
               return res.status(404).send({
@@ -128,34 +139,31 @@ module.exports = {
     }
   },
   searchOrder: async (req, res) => {
-    try {
-      if(req.body.search==="")
-      {
-        return res.status(404).send({
-          message: "Search field required..!",
-          success: false,
-        });
-      }
-      await Order.find({ 
-        product: {$regex: req.body.search}})
-            .then((orders) => {
-            if(orders.length===0){
-              return res.status(200).send({
-                message: "No order found..!",
-                success: true,
-              });
-            }
-        return res.status(200).send({
-          data: orders,
-          message: "Successfully fetched orders..!",
-          success: true,
-        });
-      });
-    } catch (error) {
+    if (req.body.search === "") {
       return res.status(404).send({
-        message: "error",
-        status: false,
+        message: "Search field required..!",
+        success: false,
       });
     }
-  }, 
+    const search=req.body.search
+    Order.find({"orderId": {$regex: ".*" + search + ".*"}})
+
+    // let id = req.body.search;
+    // id = new RegExp(id, "i");
+    // let query = { orderId: id };
+    // await Order.find(query)
+    .then((orders) => {
+      if (!orders.length) {
+        return res.status(200).send({
+          message: "No order found..!",
+          success: true,
+        });
+      }
+      return res.status(200).send({
+        data: orders,
+        message: "Successfully fetched orders..!",
+        success: true,
+      });
+    });
+  },
 };
