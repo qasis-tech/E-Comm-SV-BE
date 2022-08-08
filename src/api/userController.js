@@ -1,16 +1,15 @@
 const User = require("../config/model/user");
 const UtilService = require("../utils/utilService");
 const JWTService = require("../utils/JWTService");
+
 module.exports = {
   login: async function (req, res) {
     try {
       const { email, password } = req.body;
-      const user = await User.findOne({
-        email: email,
-      });
+      const user = await User.findOne({ email });
       if (!user) {
-        return res.status(404).send({
-          message: "Invalid User..!",
+        return res.status(200).send({
+          message: "Invalid user.",
           success: false,
         });
       }
@@ -19,15 +18,15 @@ module.exports = {
         user.password
       );
       if (!passwordMatch) {
-        return res.status(404).send({
+        return res.status(200).send({
           message: "password do not match..!",
           success: false,
         });
       }
-      const token = await JWTService.issuer({ email: user.email }, "10 day");
+      const token = await JWTService.issuer({ email }, "10 day");
       const login = await User.updateOne(
         {
-          email: email,
+          email,
         },
         {
           $set: {
@@ -35,19 +34,17 @@ module.exports = {
           },
         }
       );
-      const newUser = await User.findOne({
-        email: email,
-      });
+      const newUser = await User.findOne({ email });
       if (newUser.role === "admin") {
         return res.status(200).send({
           data: newUser,
-          message: "Welcome to AdminPanel..!",
+          message: "Welcome to adminPanel",
           success: true,
         });
       }
       return res.status(200).send({
         data: newUser,
-        message: "Successfully Login..!",
+        message: "Successfully login",
         success: true,
       });
     } catch (error) {
@@ -59,24 +56,23 @@ module.exports = {
   },
   addUser: async (req, res) => {
     try {
-      const { email, password } = req.body;
-      const oldUser = await User.findOne({
-        email: email,
-      });
+      const { email, password, name, mobileNumber, gender, dob, pinCode } =
+        req.body;
+      const oldUser = await User.findOne({ email });
       if (oldUser) {
         return res.status(404).send({
-          message: "Emailid already exists..!",
+          message: "Emailid already exists",
           success: false,
         });
       } else {
         const encryptedPassword = await UtilService.hashPassword(password);
         const newUser = await User.create({
-          name: req.body.name,
-          mobileNumber: req.body.mobileNumber,
-          email: req.body.email,
-          gender: req.body.gender,
-          dob: req.body.dob,
-          pinCode: req.body.pinCode,
+          name,
+          mobileNumber,
+          email,
+          gender,
+          dob,
+          pinCode,
           password: encryptedPassword,
           role: "user",
           token: null,
@@ -143,7 +139,7 @@ module.exports = {
         });
       }
     } catch (error) {
-        return res.status(404).send({
+      return res.status(404).send({
         message: "error",
         status: false,
       });
@@ -151,84 +147,85 @@ module.exports = {
   },
   viewUsers: async (req, res) => {
     try {
-    await User.find({
+      await User.find({
         role: "user",
       })
-      .then((users) => {
-        res.status(200).send({
-          data: users,
-          message: "Successfully fetched users..!",
-          success: true,
+        .then((users) => {
+          res.status(200).send({
+            data: users,
+            message: "Successfully fetched users..!",
+            success: true,
+          });
+        })
+        .catch((err) => {
+          res.status(404).send({
+            message: "Error..!",
+            success: false,
+          });
         });
-      })
-      .catch((err) => {
-        res.status(404).send({
-          message: "Error..!",
-          success: false,
-        });
-      });
     } catch (error) {
-        return res.status(404).send({
+      return res.status(404).send({
         message: "error",
         status: false,
       });
     }
-},
-editUsers: async (req, res) => {
-  try {   
-  await User.findByIdAndUpdate(
-      req.params.id, {
-        name: req.body.name,
+  },
+  editUsers: async (req, res) => {
+    try {
+      await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          name: req.body.name,
           mobileNumber: req.body.mobileNumber,
           email: req.body.email,
           gender: req.body.gender,
           dob: req.body.dob,
           pinCode: req.body.pinCode,
-             }, {
-        new: true,
-      }
-    )
-    .then((user) => {
-      res.status(200).send({
-        data: user,
-        message: "Successfully updated user..!",
-        success: true,
-      });
-    })
-    .catch((error) => {
+        },
+        {
+          new: true,
+        }
+      )
+        .then((user) => {
+          res.status(200).send({
+            data: user,
+            message: "Successfully updated user..!",
+            success: true,
+          });
+        })
+        .catch((error) => {
+          return res.status(404).send({
+            message: "user not found with id " + req.params.id,
+            success: false,
+          });
+        });
+    } catch (error) {
       return res.status(404).send({
-        message: "user not found with id " + req.params.id,
-        success: false,
+        message: "error",
+        status: false,
       });
-    });
-  } catch (error) {
+    }
+  },
+  deleteUsers: async (req, res) => {
+    try {
+      await User.findByIdAndRemove(req.params.id)
+        .then((user) => {
+          res.status(200).send({
+            message: "Successfully deleted user..!",
+            success: true,
+          });
+        })
+        .catch((error) => {
+          return res.status(404).send({
+            message: "user not found with id " + req.params.id,
+            success: false,
+          });
+        });
+    } catch (error) {
       return res.status(404).send({
-      message: "error",
-      status: false,
-    });
-  }
-},
-deleteUsers: async (req, res) => {
-  try { 
-   await User.findByIdAndRemove(req.params.id)
-    .then((user) => {
-      res.status(200).send({
-        message: "Successfully deleted user..!",
-        success: true,
+        message: "error",
+        status: false,
       });
-    })
-    .catch((error) => {
-      return res.status(404).send({
-        message: "user not found with id " + req.params.id,
-        success: false,
-      });
-    });
-  }
-  catch (error) {
-    return res.status(404).send({
-    message: "error",
-    status: false,
-  });
-}
-}
-}
+    }
+  },
+};
