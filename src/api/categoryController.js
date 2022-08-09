@@ -19,8 +19,7 @@ module.exports = {
   addCategory: async (req, res) => {
     try {
       await fileUpload(req, res, (err) => {
-        console.log("SUb Categories", req.body, req.files);
-        if (err) {
+          if (err) {
           return res.status(200).send({
             data: [],
             message: "Error in image uploading..!",
@@ -28,8 +27,7 @@ module.exports = {
           });
         }
         const subCategory = [];
-        const list = [{ title: "sub1" }, { title: "sub2" }, { title: "sub3" }];
-        req.files.forEach((image) => {
+         req.files.forEach((image) => {
           if (image.fieldname !== "image") {
             subCategory.push({
               title: image.fieldname,
