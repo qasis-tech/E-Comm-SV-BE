@@ -48,7 +48,8 @@ module.exports = {
               orderId: makeid(),
             });
             if (!newOrder) {
-              return res.status(404).send({
+              return res.status(200).send({
+                data:[],
                 message: "Failed to place order..!",
                 success: false,
               });
@@ -62,7 +63,9 @@ module.exports = {
         );
       });
     } catch (error) {
+      console.log('error',error)
       return res.status(404).send({
+        data:[],
         message: "error",
         status: false,
       });
@@ -73,6 +76,7 @@ module.exports = {
       await Order.find().then((orders) => {
         if (orders.length === 0) {
           return res.status(200).send({
+            data:[],
             message: "No orders yet..!",
             success: true,
           });
@@ -97,7 +101,9 @@ module.exports = {
         });
       });
     } catch (error) {
+      console.log('error',error)
       return res.status(404).send({
+        data:[],
         message: "error",
         status: false,
       });
@@ -108,6 +114,7 @@ module.exports = {
       const { startDate, endDate } = req.body;
       if (startDate === "" || endDate === "") {
         return res.status(400).send({
+          data:[],
           message: "Please ensure you pick two dates",
           success: "false",
         });
@@ -122,6 +129,7 @@ module.exports = {
         .then((orderList) => {
           if (orderList.length === 0) {
             return res.status(200).send({
+              data:[],
               message: "No orders yet..!",
               success: true,
             });
@@ -133,7 +141,9 @@ module.exports = {
           });
         });
     } catch (error) {
+      console.log('error',error)
       return res.status(404).send({
+        data:[],
         message: "error",
         status: false,
       });
@@ -141,7 +151,8 @@ module.exports = {
   },
   searchOrder: async (req, res) => {
     if (req.body.search === "") {
-      return res.status(404).send({
+      return res.status(200).send({
+        data:[],
         message: "Search field required..!",
         success: false,
       });
@@ -150,6 +161,7 @@ module.exports = {
     await Order.find({ orderId: { $regex: search } }).then((orders) => {
       if (!orders.length) {
         return res.status(200).send({
+          data:[],
           message: "No order found..!",
           success: true,
         });

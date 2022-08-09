@@ -20,7 +20,9 @@ module.exports = {
     try {
       await fileUpload(req, res, (err) => {
         if (err) {
+          console.log('error in image upload',err)
           return res.status(404).send({
+            data:[],
             message: "Error in image uploading..!",
             success: false,
           });
@@ -55,11 +57,20 @@ module.exports = {
               message: "Successfully Added Products..!",
               success: true,
             });
-          });
+          }).catch((err)=>{
+            console.log('error',err)
+            return res.status(404).send({
+              data:[],
+              message: "error",
+              status: false,
+            });
+          })
         }
       });
     } catch (error) {
+      console.log('error',error)
       return res.status(404).send({
+        data:[],
         message: "error",
         status: false,
       });
@@ -73,9 +84,19 @@ module.exports = {
           message: "Successfully fetched all Products..!",
           success: true,
         });
-      });
+      }).catch((err)=>{
+        console.log('error',err)
+        return res.status(404).send({
+          data:[],
+          message: "error",
+          status: false,
+        });
+      })
+
     } catch (error) {
+      console.log('error',error)
       return res.status(404).send({
+        data:[],
         message: "error",
         status: false,
       });
@@ -86,6 +107,7 @@ module.exports = {
     try {
       await fileUpload(req, res, (err) => {
         if (err) {
+          console.log('error in image upload',err)
           return res.status(404).send({
             message: "Error in image uploading..!",
             success: false,
@@ -129,16 +151,26 @@ module.exports = {
                 success: true,
               });
             }
-          });
+          }).catch((err)=>{
+            console.log('error',err)
+            return res.status(404).send({
+              data:[],
+              message: "error",
+              status: false,
+            });
+          })
         } else {
-          return res.status(404).send({
+          return res.status(200).send({
+            data:[],
             message: "Cannot find product with id " + req.params.id,
             success: false,
           });
         }
       });
     } catch (error) {
+      console.log('error',error)
       return res.status(404).send({
+        data:[],
         message: "error",
         status: false,
       });
@@ -148,7 +180,8 @@ module.exports = {
     try {
       if(req.body.search==="")
       {
-        return res.status(404).send({
+        return res.status(200).send({
+          data:[],
           message: "Search field required..!",
           success: false,
         });
@@ -158,6 +191,7 @@ module.exports = {
             .then((products) => {
             if(products.length===0){
               return res.status(200).send({
+                data:[],
                 message: "No products found..!",
                 success: true,
               });
@@ -167,8 +201,16 @@ module.exports = {
           message: "Successfully fetched products..!",
           success: true,
         });
-      });
+      }).catch((err)=>{
+        console.log('error',err)
+        return res.status(404).send({
+          data:[],
+          message: "error",
+          status: false,
+        });
+      })
     } catch (error) {
+      console.log('error',error)
       return res.status(404).send({
         message: "error",
         status: false,
