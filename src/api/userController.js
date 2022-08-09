@@ -9,8 +9,9 @@ module.exports = {
         email: email,
       });
       if (!user) {
-        return res.status(404).send({
-          message: "Invalid User..!",
+        return res.status(200).send({
+          data: [],
+          message: "User not found..!",
           success: false,
         });
       }
@@ -19,7 +20,8 @@ module.exports = {
         user.password
       );
       if (!passwordMatch) {
-        return res.status(404).send({
+        return res.status(200).send({
+          data: [],
           message: "password do not match..!",
           success: false,
         });
@@ -51,7 +53,9 @@ module.exports = {
         success: true,
       });
     } catch (error) {
+      console.log("error", error);
       return res.status(404).send({
+        data: [],
         message: error,
         status: false,
       });
@@ -64,14 +68,16 @@ module.exports = {
         email: email,
       });
       if (oldUser) {
-        return res.status(404).send({
+        return res.status(200).send({
+          data: [],
           message: "Emailid already exists..!",
           success: false,
         });
       } else {
         const encryptedPassword = await UtilService.hashPassword(password);
         const newUser = await User.create({
-          name: req.body.name,
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
           mobileNumber: req.body.mobileNumber,
           email: req.body.email,
           gender: req.body.gender,
@@ -82,7 +88,8 @@ module.exports = {
           token: null,
         });
         if (!newUser) {
-          return res.status(404).send({
+          return res.status(200).send({
+            data: [],
             message: "Failed to create your account..!",
             success: false,
           });
@@ -94,7 +101,9 @@ module.exports = {
         });
       }
     } catch (error) {
+      console.log("error", error);
       return res.status(404).send({
+        data: [],
         message: "error",
         status: false,
       });
@@ -102,14 +111,15 @@ module.exports = {
   },
   googleAuth: async (req, res) => {
     try {
-      const { email, name, photoUrl } = req.body;
+      const { email, firstName, lastName, photoUrl } = req.body;
       const user = await User.findOne({
         email,
       });
       if (!user) {
         await User.create({
           email,
-          name,
+          firstName,
+          lastName,
           profilePic: photoUrl,
           role: "user",
         });
@@ -143,7 +153,9 @@ module.exports = {
         });
       }
     } catch (error) {
-        return res.status(404).send({
+      console.log("error", error);
+      return res.status(404).send({
+        data: [],
         message: "error",
         status: false,
       });
@@ -151,84 +163,99 @@ module.exports = {
   },
   viewUsers: async (req, res) => {
     try {
-    await User.find({
+      await User.find({
         role: "user",
       })
-      .then((users) => {
-        res.status(200).send({
-          data: users,
-          message: "Successfully fetched users..!",
-          success: true,
+        .then((users) => {
+          res.status(200).send({
+            data: users,
+            message: "Successfully fetched users..!",
+            success: true,
+          });
+        })
+        .catch((err) => {
+          console.log("error", err);
+          res.status(404).send({
+            data: [],
+            message: "Error..!",
+            success: false,
+          });
         });
-      })
-      .catch((err) => {
-        res.status(404).send({
-          message: "Error..!",
-          success: false,
-        });
-      });
     } catch (error) {
-        return res.status(404).send({
+      console.log("error", error);
+      return res.status(404).send({
+        data: [],
         message: "error",
         status: false,
       });
     }
-},
-editUsers: async (req, res) => {
-  try {   
-  await User.findByIdAndUpdate(
-      req.params.id, {
-        name: req.body.name,
+  },
+  editUsers: async (req, res) => {
+    try {
+      await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
           mobileNumber: req.body.mobileNumber,
           email: req.body.email,
           gender: req.body.gender,
           dob: req.body.dob,
           pinCode: req.body.pinCode,
-             }, {
-        new: true,
-      }
-    )
-    .then((user) => {
-      res.status(200).send({
-        data: user,
-        message: "Successfully updated user..!",
-        success: true,
-      });
-    })
-    .catch((error) => {
+        },
+        {
+          new: true,
+        }
+      )
+        .then((user) => {
+          res.status(200).send({
+            data: user,
+            message: "Successfully updated user..!",
+            success: true,
+          });
+        })
+        .catch((error) => {
+          console.log("error", error);
+          return res.status(404).send({
+            data: [],
+            message: "user not found with id " + req.params.id,
+            success: false,
+          });
+        });
+    } catch (error) {
+      console.log("error", error);
       return res.status(404).send({
-        message: "user not found with id " + req.params.id,
-        success: false,
+        data: [],
+        message: "error",
+        status: false,
       });
-    });
-  } catch (error) {
+    }
+  },
+  deleteUsers: async (req, res) => {
+    try {
+      await User.findByIdAndRemove(req.params.id)
+        .then((user) => {
+          res.status(200).send({
+            data: user,
+            message: "Successfully deleted user..!",
+            success: true,
+          });
+        })
+        .catch((error) => {
+          console.log("error", error);
+          return res.status(200).send({
+            data: [],
+            message: "user not found with id " + req.params.id,
+            success: false,
+          });
+        });
+    } catch (error) {
+      console.log("error", error);
       return res.status(404).send({
-      message: "error",
-      status: false,
-    });
-  }
-},
-deleteUsers: async (req, res) => {
-  try { 
-   await User.findByIdAndRemove(req.params.id)
-    .then((user) => {
-      res.status(200).send({
-        message: "Successfully deleted user..!",
-        success: true,
+        data: [],
+        message: "error",
+        status: false,
       });
-    })
-    .catch((error) => {
-      return res.status(404).send({
-        message: "user not found with id " + req.params.id,
-        success: false,
-      });
-    });
-  }
-  catch (error) {
-    return res.status(404).send({
-    message: "error",
-    status: false,
-  });
-}
-}
-}
+    }
+  },
+};

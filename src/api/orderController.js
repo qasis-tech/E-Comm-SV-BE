@@ -145,14 +145,8 @@ module.exports = {
         success: false,
       });
     }
-    const search=req.body.search
-    Order.find({"orderId": {$regex: ".*" + search + ".*"}})
-
-    // let id = req.body.search;
-    // id = new RegExp(id, "i");
-    // let query = { orderId: id };
-    // await Order.find(query)
-    .then((orders) => {
+    const search = req.body.search;
+    await Order.find({ orderId: { $regex: search } }).then((orders) => {
       if (!orders.length) {
         return res.status(200).send({
           message: "No order found..!",
