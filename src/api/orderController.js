@@ -150,6 +150,7 @@ module.exports = {
     }
   },
   searchOrder: async (req, res) => {
+    try{   
     if (req.body.search === "") {
       return res.status(200).send({
         data:[],
@@ -172,5 +173,14 @@ module.exports = {
         success: true,
       });
     });
+  }
+  catch (error) {
+    console.log('error',error)
+    return res.status(404).send({
+      data:[],
+      message: "error",
+      status: false,
+    });
+  }
   },
 };

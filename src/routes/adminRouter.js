@@ -31,4 +31,7 @@ router.post("/searchOrder",orderController.searchOrder);
 router.post("/stock",stockController.addStock);
 router.get("/stock",stockController.viewStock);
 router.post("/searchStock",stockController.searchStock);
+router.post("/searchStockId",stockController.searchStockId);
+router.put("/stock/:id",stockController.editStock);
+router.delete("/stock/:id",stockController.deleteStock);
 module.exports = router;
