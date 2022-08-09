@@ -21,6 +21,7 @@ router.get("/category",categoryController.viewCategory);
 router.put("/category/:id",categoryController.editCategory);
 router.post("/category",categoryController.addCategory);
 router.post("/searchCategory",categoryController.searchCategory);
+router.post("/product",productController.addProduct);
 router.get("/product",productController.viewProduct);
 router.put("/product/:id",productController.editProduct);
 router.post("/searchProduct",productController.searchProduct);
