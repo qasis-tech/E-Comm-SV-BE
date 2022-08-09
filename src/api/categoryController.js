@@ -20,7 +20,7 @@ module.exports = {
     try {
       await fileUpload(req, res, (err) => {
         if (err) {
-          return res.status(404).send({
+          return res.status(200).send({
             data: [],
             message: "Error in image uploading..!",
             success: false,
@@ -117,7 +117,7 @@ module.exports = {
     try {
       await fileUpload(req, res, (err) => {
         if (err) {
-          return res.status(404).send({
+          return res.status(200).send({
             data: [],
             message: "Error in image uploading..!",
             success: false,
