@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const adminRouter = require("./src/routes/adminRouter");
 const dbCon = require("./src/config/connections/connection");
 const cors = require("cors");
+app.use(cors({ origin: true, credentials: true }));
 require("dotenv").config();
 app.use(
   bodyParser.urlencoded({
