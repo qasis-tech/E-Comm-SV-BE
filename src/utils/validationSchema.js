@@ -4,7 +4,8 @@ exports.signin = Joi.object().keys({
     password: Joi.string().min(2).required(),
 });
 exports.usersignup = Joi.object().keys({
-    name: Joi.string().required(),
+    firstName: Joi.string().required(),
+    lastName: Joi.string().required(),
     mobileNumber: Joi.string()
     .length(10)
     .pattern(/^[0-9]+$/)

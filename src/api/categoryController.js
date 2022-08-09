@@ -18,9 +18,10 @@ const fileUpload = upload.any();
 module.exports = {
   addCategory: async (req, res) => {
     try {
-         await fileUpload(req, res, (err) => {
+      await fileUpload(req, res, (err) => {
         if (err) {
           return res.status(404).send({
+            data: [],
             message: "Error in image uploading..!",
             success: false,
           });
@@ -39,35 +40,48 @@ module.exports = {
         });
         Category.findOne({
           name: req.body.name,
-        }).then((newCategory) => {
-          if (newCategory)
-            return res.status(404).send({
-              message: "Catergory already exists..!",
-              success: false,
-            });
-          else {
-            Category.create({
-              name: req.body.name,
-              image: req.files[0].path,
-              subCategory: subCategory,
-            }).then((category) => {
-              if (!category) {
-                return res.status(404).send({
-                  message: "Failed to add categories..!",
-                  success: false,
-                });
-              }
+        })
+          .then((newCategory) => {
+            if (newCategory)
               return res.status(200).send({
-                data: category,
-                message: "Successfully Added new Categories..!",
-                success: true,
+                data: [],
+                message: "Catergory already exists..!",
+                success: false,
               });
+            else {
+              Category.create({
+                name: req.body.name,
+                image: req.files[0].path,
+                subCategory: subCategory,
+              }).then((category) => {
+                if (!category) {
+                  return res.status(200).send({
+                    data: [],
+                    message: "Failed to add categories..!",
+                    success: false,
+                  });
+                }
+                return res.status(200).send({
+                  data: category,
+                  message: "Successfully Added new Categories..!",
+                  success: true,
+                });
+              });
+            }
+          })
+          .catch((err) => {
+            console.log("error", err);
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              status: false,
             });
-          }
-        });
+          });
       });
     } catch (error) {
+      console.log("error", error);
       return res.status(404).send({
+        data: [],
         message: "error",
         status: false,
       });
@@ -75,15 +89,25 @@ module.exports = {
   },
   viewCategory: async (req, res) => {
     try {
-      await Category.find().then((categories) => {
-        return res.status(200).send({
-          data: categories,
-          message: "Successfully fetched all categories..!",
-          success: true,
+      await Category.find()
+        .then((categories) => {
+          return res.status(200).send({
+            data: categories,
+            message: "Successfully fetched all categories..!",
+            success: true,
+          });
+        })
+        .catch((err) => {
+          console.log("error", err);
+          return res.status(404).send({
+            data: [],
+            message: "error",
+            status: false,
+          });
         });
-      });
     } catch (error) {
       return res.status(404).send({
+        data: [],
         message: "error",
         status: false,
       });
@@ -94,6 +118,7 @@ module.exports = {
       await fileUpload(req, res, (err) => {
         if (err) {
           return res.status(404).send({
+            data: [],
             message: "Error in image uploading..!",
             success: false,
           });
@@ -135,14 +160,17 @@ module.exports = {
             }
           });
         } else {
-          return res.status(404).send({
+          return res.status(200).send({
+            data: [],
             message: "Cannot find category with id " + req.params.id,
             success: false,
           });
         }
       });
     } catch (error) {
+      console.log("error", error);
       return res.status(404).send({
+        dat: [],
         message: "error",
         status: false,
       });
@@ -150,32 +178,36 @@ module.exports = {
   },
   searchCategory: async (req, res) => {
     try {
-      if(req.body.search==="")
-      {
-        return res.status(404).send({
+      if (req.body.search === "") {
+        return res.status(200).send({
+          data: [],
           message: "Search field required..!",
           success: false,
         });
       }
-      await Category.find({ name: {$regex: req.body.search}})
-            .then((categories) => {
-            if(categories.length===0){
-              return res.status(200).send({
-                message: "No categories found..!",
-                success: true,
-              });
-            }
-        return res.status(200).send({
-          data: categories,
-          message: "Successfully fetched categories..!",
-          success: true,
-        });
-      });
+      await Category.find({ name: { $regex: req.body.search } }).then(
+        (categories) => {
+          if (categories.length === 0) {
+            return res.status(200).send({
+              data: [],
+              message: "No categories found..!",
+              success: true,
+            });
+          }
+          return res.status(200).send({
+            data: categories,
+            message: "Successfully fetched categories..!",
+            success: true,
+          });
+        }
+      );
     } catch (error) {
+      console.log("error", error);
       return res.status(404).send({
+        data: [],
         message: "error",
         status: false,
       });
     }
-  }, 
+  },
 };

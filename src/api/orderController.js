@@ -12,7 +12,8 @@ module.exports = {
         { name: 1, mobileNumber: 1, email: 1, pinCode: 1 }
       ).then((userDetails) => {
         if (!userDetails) {
-          return res.status(404).send({
+          return res.status(200).send({
+            data:[],
             message: "Failed to fetch user details..!",
             success: false,
           });
