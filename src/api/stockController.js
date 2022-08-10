@@ -111,7 +111,7 @@ module.exports = {
   },
   searchStock: async (req, res) => {
     try {
-      if (req.body.search === "") {
+      if (req.query.search === "") {
         return res.status(200).send({
           data: [],
           message: "Search field required..!",
@@ -119,7 +119,7 @@ module.exports = {
         });
       }
       await Stock.find({
-        product: { $regex: req.body.search },
+        product: { $regex: req.query.search },
       }).then((stock) => {
         if (stock.length === 0) {
           return res.status(200).send({
@@ -133,6 +133,13 @@ module.exports = {
           message: "Successfully fetched stock..!",
           success: true,
         });
+      }).catch((err)=>{
+        console.log("error", err);
+      return res.status(404).send({
+        data: [],
+        message: "error",
+        status: false,
+      });
       });
     } catch (error) {
       console.log("error", error);
@@ -190,14 +197,15 @@ module.exports = {
   },
   searchStockId: async (req, res) => {
     try {
-      if (req.body.search === "") {
+      const search = req.query.search;
+      if (search === "") {
         return res.status(200).send({
           data: [],
           message: "Search field required..!",
           success: false,
         });
       }
-      const search = req.body.search;
+     
       await Stock.find({ stockId: { $regex: search } })
         .then((stocks) => {
           if (!stocks.length) {

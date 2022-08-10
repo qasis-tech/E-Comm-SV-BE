@@ -111,7 +111,7 @@ module.exports = {
   },
   filterOrder: async (req, res) => {
     try {
-      const { startDate, endDate } = req.body;
+      const { startDate, endDate } = req.query;
       if (startDate === "" || endDate === "") {
         return res.status(400).send({
           data:[],
@@ -151,14 +151,14 @@ module.exports = {
   },
   searchOrder: async (req, res) => {
     try{   
-    if (req.body.search === "") {
+      const search = req.query.search;
+    if (search === "") {
       return res.status(200).send({
         data:[],
         message: "Search field required..!",
         success: false,
       });
-    }
-    const search = req.body.search;
+    }   
     await Order.find({ orderId: { $regex: search } }).then((orders) => {
       if (!orders.length) {
         return res.status(200).send({
@@ -172,7 +172,14 @@ module.exports = {
         message: "Successfully fetched orders..!",
         success: true,
       });
-    });
+    }).catch((err)=>{
+      console.log('error',err)
+      return res.status(404).send({
+        data:[],
+        message: "error",
+        status: false,
+      });
+    })
   }
   catch (error) {
     console.log('error',error)

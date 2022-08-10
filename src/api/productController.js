@@ -178,7 +178,8 @@ module.exports = {
   },
   searchProduct: async (req, res) => {
     try {
-      if(req.body.search==="")
+      const search=req.query.search
+      if(search==="")
       {
         return res.status(200).send({
           data:[],
@@ -187,7 +188,7 @@ module.exports = {
         });
       }
       await Product.find({ 
-        name: {$regex: req.body.search}})
+        name: {$regex: search}})
             .then((products) => {
             if(products.length===0){
               return res.status(200).send({

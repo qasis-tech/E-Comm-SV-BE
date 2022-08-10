@@ -86,6 +86,7 @@ module.exports = {
   },
   viewCategory: async (req, res) => {
     try {
+      console.log('search',req)
       await Category.find()
         .then((categories) => {
           return res.status(200).send({
@@ -175,14 +176,15 @@ module.exports = {
   },
   searchCategory: async (req, res) => {
     try {
-      if (req.body.search === "") {
+     
+        if (req.query.search === "") {
         return res.status(200).send({
           data: [],
           message: "Search field required..!",
           success: false,
         });
       }
-      await Category.find({ name: { $regex: req.body.search } }).then(
+        await Category.find({ name: { $regex: req.query.search } }).then(
         (categories) => {
           if (categories.length === 0) {
             return res.status(200).send({
@@ -197,7 +199,14 @@ module.exports = {
             success: true,
           });
         }
-      );
+      ).catch((err)=>{
+        console.log("error", err);
+        return res.status(404).send({
+          data: [],
+          message: "error",
+          status: false,
+        });
+      });
     } catch (error) {
       console.log("error", error);
       return res.status(404).send({

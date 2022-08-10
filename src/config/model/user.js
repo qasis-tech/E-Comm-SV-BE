@@ -23,6 +23,18 @@ const userSchema = mongoose.Schema({
   pinCode: {
     type: Number,
   },
+  location: {
+    default:null,
+    type: String,
+  },
+  primaryAddress: {
+    default:null,
+    type: String,
+  },
+  otherAddress: {
+    default:null,
+    type: String,
+  },
   profilePic: {
     default:null,
     type: String,
@@ -36,5 +48,9 @@ const userSchema = mongoose.Schema({
   token: {
     type: String,
   },
-});
+},
+{
+  timestamps: true,
+}
+);
 module.exports = mongoose.model("users", userSchema);

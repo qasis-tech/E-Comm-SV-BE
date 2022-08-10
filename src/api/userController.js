@@ -258,4 +258,42 @@ module.exports = {
       });
     }
   },
+  addUserDetails: async (req, res) => {
+    try {
+      await User.findByIdAndUpdate(
+        req.params.id,
+        {
+        location:req.body.location,
+        primaryAddress:req.body.primaryAddress,
+        otherAddress:req.body.otherAddress,
+        pinCode:req.body.pinCode
+        },
+        {
+          new: true,
+        }
+      )
+        .then((user) => {
+          res.status(200).send({
+            data: user,
+            message: "Successfully updated user..!",
+            success: true,
+          });
+        })
+        .catch((error) => {
+          console.log("error", error);
+          return res.status(404).send({
+            data: [],
+            message: "user not found with id " + req.params.id,
+            success: false,
+          });
+        });
+    } catch (error) {
+      console.log("error", error);
+      return res.status(404).send({
+        data: [],
+        message: "error",
+        status: false,
+      });
+    }
+  },
 };
