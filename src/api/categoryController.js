@@ -86,30 +86,58 @@ module.exports = {
   },
   viewCategory: async (req, res) => {
     try {
-      console.log('search',req)
+     if(!req.query.search){
       await Category.find()
-        .then((categories) => {
-          return res.status(200).send({
-            data: categories,
-            message: "Successfully fetched all categories..!",
-            success: true,
-          });
-        })
-        .catch((err) => {
-          console.log("error", err);
-          return res.status(404).send({
-            data: [],
-            message: "error",
-            status: false,
-          });
+      .then((categories) => {
+        return res.status(200).send({
+          data: categories,
+          message: "Successfully fetched all categories..!",
+          success: true,
         });
-    } catch (error) {
-      return res.status(404).send({
-        data: [],
-        message: "error",
-        status: false,
+      })
+      .catch((err) => {
+        console.log("error", err);
+        return res.status(404).send({
+          data: [],
+          message: "error",
+          status: false,
+        });
       });
+  }
+else if(req.query.search){
+  await Category.find({ name: { $regex: req.query.search } }).then(
+    (categories) => {
+      if (categories.length === 0) {
+        return res.status(200).send({
+          data: [],
+          message: "No categories found..!",
+          success: true,
+        });
+      }     
+      return res.status(200).send({
+        data: categories,
+        message: "Successfully fetched categories..!",
+        success: true,
+      });
+  
     }
+  ).catch((err)=>{
+    console.log("error", err);
+    return res.status(404).send({
+      data: [],
+      message: "error",
+      status: false,
+    });
+  });
+}
+}catch (error) {
+    console.log("error", error);
+    return res.status(404).send({
+      data: [],
+      message: "error",
+      status: false,
+    });
+  }   
   },
   editCategory: async (req, res) => {
     try {
@@ -169,48 +197,6 @@ module.exports = {
       console.log("error", error);
       return res.status(404).send({
         dat: [],
-        message: "error",
-        status: false,
-      });
-    }
-  },
-  searchCategory: async (req, res) => {
-    try {
-     
-        if (req.query.search === "") {
-        return res.status(200).send({
-          data: [],
-          message: "Search field required..!",
-          success: false,
-        });
-      }
-        await Category.find({ name: { $regex: req.query.search } }).then(
-        (categories) => {
-          if (categories.length === 0) {
-            return res.status(200).send({
-              data: [],
-              message: "No categories found..!",
-              success: true,
-            });
-          }
-          return res.status(200).send({
-            data: categories,
-            message: "Successfully fetched categories..!",
-            success: true,
-          });
-        }
-      ).catch((err)=>{
-        console.log("error", err);
-        return res.status(404).send({
-          data: [],
-          message: "error",
-          status: false,
-        });
-      });
-    } catch (error) {
-      console.log("error", error);
-      return res.status(404).send({
-        data: [],
         message: "error",
         status: false,
       });

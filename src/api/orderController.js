@@ -13,7 +13,7 @@ module.exports = {
       ).then((userDetails) => {
         if (!userDetails) {
           return res.status(200).send({
-            data:[],
+            data: [],
             message: "Failed to fetch user details..!",
             success: false,
           });
@@ -49,7 +49,7 @@ module.exports = {
             });
             if (!newOrder) {
               return res.status(200).send({
-                data:[],
+                data: [],
                 message: "Failed to place order..!",
                 success: false,
               });
@@ -63,9 +63,9 @@ module.exports = {
         );
       });
     } catch (error) {
-      console.log('error',error)
+      console.log("error", error);
       return res.status(404).send({
-        data:[],
+        data: [],
         message: "error",
         status: false,
       });
@@ -73,121 +73,90 @@ module.exports = {
   },
   viewTotalOrder: async (req, res) => {
     try {
-      await Order.find().then((orders) => {
-        if (orders.length === 0) {
-          return res.status(200).send({
-            data:[],
-            message: "No orders yet..!",
-            success: true,
-          });
-        }
-        Order.find({
-          status: "pending",
-        }).then((pendingOrders) => {
-          Order.find({
-            status: "completed",
-          }).then((completedOrders) => {
-            res.status(200).send({
+      if (req.query.search) {
+        const search = req.query.search;
+        await Order.find({ orderId: { $regex: search } })
+          .then((orders) => {
+            if (!orders.length) {
+              return res.status(200).send({
+                data: [],
+                message: "No order found..!",
+                success: true,
+              });
+            }
+            return res.status(200).send({
               data: orders,
-              shorthanddetails: {
-                totalorders: orders,
-                pendingOrders: pendingOrders,
-                completedOrders: completedOrders,
-              },
+              message: "Successfully fetched orders..!",
+              success: true,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              status: false,
+            });
+          });
+      } else if (req.query.startDate && req.query.endDate) {
+        const { startDate, endDate } = req.query;
+        await Order.find({
+          createdAt: {
+            $gte: new Date(new Date(startDate).setHours(00, 00, 00)),
+            $lt: new Date(new Date(endDate).setHours(23, 59, 59)),
+          },
+        })
+          .sort({ createdAt: "asc" })
+          .then((orderList) => {
+            if (orderList.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No orders yet..!",
+                success: true,
+              });
+            }
+            res.status(200).send({
+              data: orderList,
               message: "Successfully fetched orders..!",
               success: true,
             });
           });
-        });
-      });
-    } catch (error) {
-      console.log('error',error)
-      return res.status(404).send({
-        data:[],
-        message: "error",
-        status: false,
-      });
-    }
-  },
-  filterOrder: async (req, res) => {
-    try {
-      const { startDate, endDate } = req.query;
-      if (startDate === "" || endDate === "") {
-        return res.status(400).send({
-          data:[],
-          message: "Please ensure you pick two dates",
-          success: "false",
-        });
-      }
-      await Order.find({
-        createdAt: {
-          $gte: new Date(new Date(startDate).setHours(00, 00, 00)),
-          $lt: new Date(new Date(endDate).setHours(23, 59, 59)),
-        },
-      })
-        .sort({ createdAt: "asc" })
-        .then((orderList) => {
-          if (orderList.length === 0) {
+      } else {
+        await Order.find().then((orders) => {
+          if (orders.length === 0) {
             return res.status(200).send({
-              data:[],
+              data: [],
               message: "No orders yet..!",
               success: true,
             });
           }
-          res.status(200).send({
-            data: orderList,
-            message: "Successfully fetched orders..!",
-            success: true,
+          Order.find({
+            status: "pending",
+          }).then((pendingOrders) => {
+            Order.find({
+              status: "completed",
+            }).then((completedOrders) => {
+              res.status(200).send({
+                data: orders,
+                shorthanddetails: {
+                  totalorders: orders,
+                  pendingOrders: pendingOrders,
+                  completedOrders: completedOrders,
+                },
+                message: "Successfully fetched orders..!",
+                success: true,
+              });
+            });
           });
         });
+      }
     } catch (error) {
-      console.log('error',error)
+      console.log("error", error);
       return res.status(404).send({
-        data:[],
+        data: [],
         message: "error",
         status: false,
       });
     }
-  },
-  searchOrder: async (req, res) => {
-    try{   
-      const search = req.query.search;
-    if (search === "") {
-      return res.status(200).send({
-        data:[],
-        message: "Search field required..!",
-        success: false,
-      });
-    }   
-    await Order.find({ orderId: { $regex: search } }).then((orders) => {
-      if (!orders.length) {
-        return res.status(200).send({
-          data:[],
-          message: "No order found..!",
-          success: true,
-        });
-      }
-      return res.status(200).send({
-        data: orders,
-        message: "Successfully fetched orders..!",
-        success: true,
-      });
-    }).catch((err)=>{
-      console.log('error',err)
-      return res.status(404).send({
-        data:[],
-        message: "error",
-        status: false,
-      });
-    })
-  }
-  catch (error) {
-    console.log('error',error)
-    return res.status(404).send({
-      data:[],
-      message: "error",
-      status: false,
-    });
-  }
   },
 };

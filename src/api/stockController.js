@@ -65,82 +65,95 @@ module.exports = {
   },
   viewStock: async (req, res) => {
     try {
-      await Stock.find()
-        .then((stock) => {
-          if (stock.length === 0) {
-            return res.status(200).send({
-              data: [],
-              message: "No stock available..!",
-              success: true,
-            });
-          }
-          Stock.find({
-            quantity: { $gte: 10 },
-          }).then((inStock) => {
-            Stock.find({
-              quantity: { $lt: 10 },
-            }).then((outStock) => {
-              res.status(200).send({
-                data: {
-                  totalStock: stock,
-                  inStock: inStock,
-                  outStock: outStock,
-                },
-                message: "Successfully fetched stock..!",
+      if (req.query.search) {
+        await Stock.find({
+          product: { $regex: req.query.search },
+        })
+          .then((stock) => {
+            if (stock.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No Stock found..!",
                 success: true,
               });
+            }
+            return res.status(200).send({
+              data: stock,
+              message: "Successfully fetched stock..!",
+              success: true,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              status: false,
             });
           });
-        })
-        .catch((error) => {
-          console.log("error", error);
-          return res.status(404).send({
-            data: [],
-            message: "error..!",
-            success: false,
+      } else if (req.query.id) {
+        const search = req.query.id;
+        await Stock.find({ stockId: { $regex: search } })
+          .then((stocks) => {
+            if (!stocks.length) {
+              return res.status(200).send({
+                data: [],
+                message: "No stock found..!",
+                success: true,
+              });
+            }
+            return res.status(200).send({
+              data: stocks,
+              message: "Successfully fetched stocks..!",
+              success: true,
+            });
+          })
+          .catch((error) => {
+            console.log("error", error);
+            return res.status(404).send({
+              dat: [],
+              message: "error",
+              status: false,
+            });
           });
-        });
-    } catch (error) {
-      console.log("error", error);
-      return res.status(404).send({
-        data: [],
-        message: "error",
-        status: false,
-      });
-    }
-  },
-  searchStock: async (req, res) => {
-    try {
-      if (req.query.search === "") {
-        return res.status(200).send({
-          data: [],
-          message: "Search field required..!",
-          success: false,
-        });
       }
-      await Stock.find({
-        product: { $regex: req.query.search },
-      }).then((stock) => {
-        if (stock.length === 0) {
-          return res.status(200).send({
-            data: [],
-            message: "No Stock found..!",
-            success: true,
+       else {
+        await Stock.find()
+          .then((stock) => {
+            if (stock.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No stock available..!",
+                success: true,
+              });
+            }
+            Stock.find({
+              quantity: { $gte: 10 },
+            }).then((inStock) => {
+              Stock.find({
+                quantity: { $lt: 10 },
+              }).then((outStock) => {
+                res.status(200).send({
+                  data: {
+                    totalStock: stock,
+                    inStock: inStock,
+                    outStock: outStock,
+                  },
+                  message: "Successfully fetched stock..!",
+                  success: true,
+                });
+              });
+            });
+          })
+          .catch((error) => {
+            console.log("error", error);
+            return res.status(404).send({
+              data: [],
+              message: "error..!",
+              success: false,
+            });
           });
-        }
-        return res.status(200).send({
-          data: stock,
-          message: "Successfully fetched stock..!",
-          success: true,
-        });
-      }).catch((err)=>{
-        console.log("error", err);
-      return res.status(404).send({
-        data: [],
-        message: "error",
-        status: false,
-      });
-      });
+      }
     } catch (error) {
       console.log("error", error);
       return res.status(404).send({
@@ -150,6 +163,7 @@ module.exports = {
       });
     }
   },
+
   editStock: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
@@ -186,49 +200,6 @@ module.exports = {
           success: false,
         });
       }
-    } catch (error) {
-      console.log("error", error);
-      return res.status(404).send({
-        dat: [],
-        message: "error",
-        status: false,
-      });
-    }
-  },
-  searchStockId: async (req, res) => {
-    try {
-      const search = req.query.search;
-      if (search === "") {
-        return res.status(200).send({
-          data: [],
-          message: "Search field required..!",
-          success: false,
-        });
-      }
-     
-      await Stock.find({ stockId: { $regex: search } })
-        .then((stocks) => {
-          if (!stocks.length) {
-            return res.status(200).send({
-              data: [],
-              message: "No stock found..!",
-              success: true,
-            });
-          }
-          return res.status(200).send({
-            data: stocks,
-            message: "Successfully fetched stocks..!",
-            success: true,
-          });
-        })
-        .catch((error) => {
-          console.log("error", error);
-          return res.status(404).send({
-            dat: [],
-            message: "error",
-            status: false,
-          });
-        });
     } catch (error) {
       console.log("error", error);
       return res.status(404).send({

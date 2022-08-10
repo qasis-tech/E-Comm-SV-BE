@@ -20,9 +20,9 @@ module.exports = {
     try {
       await fileUpload(req, res, (err) => {
         if (err) {
-          console.log('error in image upload',err)
+          console.log("error in image upload", err);
           return res.status(404).send({
-            data:[],
+            data: [],
             message: "Error in image uploading..!",
             success: false,
           });
@@ -51,26 +51,29 @@ module.exports = {
             productImage: imageArray,
             productVideo: videoArray,
           });
-          newProduct.save().then((product) => {
-            return res.status(200).send({
-              data: product,
-              message: "Successfully Added Products..!",
-              success: true,
+          newProduct
+            .save()
+            .then((product) => {
+              return res.status(200).send({
+                data: product,
+                message: "Successfully Added Products..!",
+                success: true,
+              });
+            })
+            .catch((err) => {
+              console.log("error", err);
+              return res.status(404).send({
+                data: [],
+                message: "error",
+                status: false,
+              });
             });
-          }).catch((err)=>{
-            console.log('error',err)
-            return res.status(404).send({
-              data:[],
-              message: "error",
-              status: false,
-            });
-          })
         }
       });
     } catch (error) {
-      console.log('error',error)
+      console.log("error", error);
       return res.status(404).send({
-        data:[],
+        data: [],
         message: "error",
         status: false,
       });
@@ -78,25 +81,55 @@ module.exports = {
   },
   viewProduct: async (req, res) => {
     try {
-      await Product.find().then((products) => {
-        return res.status(200).send({
-          data: products,
-          message: "Successfully fetched all Products..!",
-          success: true,
-        });
-      }).catch((err)=>{
-        console.log('error',err)
-        return res.status(404).send({
-          data:[],
-          message: "error",
-          status: false,
-        });
-      })
-
+      if (!req.query.search) {
+        await Product.find()
+          .then((products) => {
+            return res.status(200).send({
+              data: products,
+              message: "Successfully fetched all Products..!",
+              success: true,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              status: false,
+            });
+          });
+      } else if (req.query.search) {
+        const search = req.query.search;
+          await Product.find({
+          name: { $regex: search },
+        })
+          .then((products) => {
+            if (products.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No products found..!",
+                success: true,
+              });
+            }
+            return res.status(200).send({
+              data: products,
+              message: "Successfully fetched products..!",
+              success: true,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              status: false,
+            });
+          });
+      }
     } catch (error) {
-      console.log('error',error)
+      console.log("error", error);
       return res.status(404).send({
-        data:[],
+        data: [],
         message: "error",
         status: false,
       });
@@ -107,7 +140,7 @@ module.exports = {
     try {
       await fileUpload(req, res, (err) => {
         if (err) {
-          console.log('error in image upload',err)
+          console.log("error in image upload", err);
           return res.status(404).send({
             message: "Error in image uploading..!",
             success: false,
@@ -143,79 +176,39 @@ module.exports = {
             {
               new: true,
             }
-          ).then((newProducts) => {
-            if (newProducts) {
-              return res.status(200).send({
-                data: newProducts,
-                message: "Successfully updated Products..!",
-                success: true,
+          )
+            .then((newProducts) => {
+              if (newProducts) {
+                return res.status(200).send({
+                  data: newProducts,
+                  message: "Successfully updated Products..!",
+                  success: true,
+                });
+              }
+            })
+            .catch((err) => {
+              console.log("error", err);
+              return res.status(404).send({
+                data: [],
+                message: "error",
+                status: false,
               });
-            }
-          }).catch((err)=>{
-            console.log('error',err)
-            return res.status(404).send({
-              data:[],
-              message: "error",
-              status: false,
             });
-          })
         } else {
           return res.status(200).send({
-            data:[],
+            data: [],
             message: "Cannot find product with id " + req.params.id,
             success: false,
           });
         }
       });
     } catch (error) {
-      console.log('error',error)
+      console.log("error", error);
       return res.status(404).send({
-        data:[],
+        data: [],
         message: "error",
         status: false,
       });
     }
   },
-  searchProduct: async (req, res) => {
-    try {
-      const search=req.query.search
-      if(search==="")
-      {
-        return res.status(200).send({
-          data:[],
-          message: "Search field required..!",
-          success: false,
-        });
-      }
-      await Product.find({ 
-        name: {$regex: search}})
-            .then((products) => {
-            if(products.length===0){
-              return res.status(200).send({
-                data:[],
-                message: "No products found..!",
-                success: true,
-              });
-            }
-        return res.status(200).send({
-          data: products,
-          message: "Successfully fetched products..!",
-          success: true,
-        });
-      }).catch((err)=>{
-        console.log('error',err)
-        return res.status(404).send({
-          data:[],
-          message: "error",
-          status: false,
-        });
-      })
-    } catch (error) {
-      console.log('error',error)
-      return res.status(404).send({
-        message: "error",
-        status: false,
-      });
-    }
-  }, 
 };

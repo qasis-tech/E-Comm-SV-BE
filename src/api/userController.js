@@ -192,6 +192,7 @@ module.exports = {
   },
   editUsers: async (req, res) => {
     try {
+      if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
       await User.findByIdAndUpdate(
         req.params.id,
         {
@@ -214,14 +215,14 @@ module.exports = {
             success: true,
           });
         })
-        .catch((error) => {
+      }else {
           console.log("error", error);
           return res.status(404).send({
             data: [],
             message: "user not found with id " + req.params.id,
             success: false,
           });
-        });
+        };
     } catch (error) {
       console.log("error", error);
       return res.status(404).send({
@@ -233,6 +234,7 @@ module.exports = {
   },
   deleteUsers: async (req, res) => {
     try {
+      if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
       await User.findByIdAndRemove(req.params.id)
         .then((user) => {
           res.status(200).send({
@@ -240,15 +242,14 @@ module.exports = {
             message: "Successfully deleted user..!",
             success: true,
           });
-        })
-        .catch((error) => {
+        })}else {
           console.log("error", error);
           return res.status(200).send({
             data: [],
             message: "user not found with id " + req.params.id,
             success: false,
           });
-        });
+        };
     } catch (error) {
       console.log("error", error);
       return res.status(404).send({
@@ -260,6 +261,7 @@ module.exports = {
   },
   addUserDetails: async (req, res) => {
     try {
+      if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
       await User.findByIdAndUpdate(
         req.params.id,
         {
@@ -279,14 +281,14 @@ module.exports = {
             success: true,
           });
         })
-        .catch((error) => {
+       }else {
           console.log("error", error);
           return res.status(404).send({
             data: [],
             message: "user not found with id " + req.params.id,
             success: false,
           });
-        });
+        };
     } catch (error) {
       console.log("error", error);
       return res.status(404).send({
