@@ -1,4 +1,5 @@
 const User = require("../config/model/user");
+const mongoose = require("mongoose");
 const UtilService = require("../utils/utilService");
 const JWTService = require("../utils/JWTService");
 module.exports = {
