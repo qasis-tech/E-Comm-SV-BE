@@ -46,40 +46,38 @@ module.exports = {
                 success: false,
               });
             else {
-              Category.create({
+              const newCategory = new Category({
                 name: req.body.name,
                 image: req.files[0].path,
                 subCategory: subCategory,
-              }).then((category) => {
-                if (!category) {
-                  return res.status(200).send({
-                    data: [],
-                    message: "Failed to add categories..!",
-                    success: false,
-                  });
-                }
-                return res.status(200).send({
-                  data: category,
-                  message: "Successfully Added new Categories..!",
-                  success: true,
-                });
               });
+              newCategory
+                .save()
+                .then((Category) => {
+                  return res.status(200).send({
+                    data: Category,
+                    message: "Successfully Added Category..!",
+                    success: true,
+                  });
+                })
+                .catch((err) => {
+                  console.log("error", err);
+                  let errormessage=err.message
+                  return res.status(404).send({
+                    data: [],
+                    message: "error",errormessage,
+                    status: false,
+                  });
+                });
             }
-          })
-          .catch((err) => {
-            console.log("error", err);
-            return res.status(404).send({
-              data: [],
-              message: "error",
-              status: false,
-            });
           });
-      });
+        })
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
-        data: [],
-        message: "error",
+        data: [error],
+        message: "error",errormessage,
         status: false,
       });
     }
@@ -97,9 +95,10 @@ module.exports = {
       })
       .catch((err) => {
         console.log("error", err);
+        let errormessage=err.message
         return res.status(404).send({
           data: [],
-          message: "error",
+          message: "error",errormessage,
           status: false,
         });
       });
@@ -123,18 +122,20 @@ else if(req.query.search){
     }
   ).catch((err)=>{
     console.log("error", err);
+    let errormessage=err.message
     return res.status(404).send({
       data: [],
-      message: "error",
+      message: "error",errormessage,
       status: false,
     });
   });
 }
 }catch (error) {
     console.log("error", error);
+    let errormessage=error.message
     return res.status(404).send({
       data: [],
-      message: "error",
+      message: "error",errormessage,
       status: false,
     });
   }   
@@ -184,7 +185,15 @@ else if(req.query.search){
                 success: true,
               });
             }
-          });
+          }).catch((error)=>{
+            console.log('error',error)
+            let errormessage=error.message
+            return res.status(404).send({
+              data: [],
+              message: "error",errormessage,
+              status: false,
+            });
+          })
         } else {
           return res.status(200).send({
             data: [],
@@ -195,9 +204,10 @@ else if(req.query.search){
       });
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
-        dat: [],
-        message: "error",
+        data: [],
+        message: "error",errormessage,
         status: false,
       });
     }

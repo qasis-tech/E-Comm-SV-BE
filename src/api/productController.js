@@ -62,9 +62,10 @@ module.exports = {
             })
             .catch((err) => {
               console.log("error", err);
+              let errormessage=err.message
               return res.status(404).send({
                 data: [],
-                message: "error",
+                message: "error",errormessage,
                 status: false,
               });
             });
@@ -72,9 +73,10 @@ module.exports = {
       });
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
         data: [],
-        message: "error",
+        message: "error",errormessage,
         status: false,
       });
     }
@@ -92,9 +94,10 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error", err);
+            let errormessage=err.message
             return res.status(404).send({
               data: [],
-              message: "error",
+              message: "error",errormessage,
               status: false,
             });
           });
@@ -119,18 +122,20 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error", err);
+            let errormessage=err.message
             return res.status(404).send({
               data: [],
-              message: "error",
+              message: "error",errormessage,
               status: false,
             });
           });
       }
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
         data: [],
-        message: "error",
+        message: "error",errormessage,
         status: false,
       });
     }
@@ -188,9 +193,10 @@ module.exports = {
             })
             .catch((err) => {
               console.log("error", err);
+              let errormessage=err.message
               return res.status(404).send({
                 data: [],
-                message: "error",
+                message: "error",errormessage,
                 status: false,
               });
             });
@@ -204,9 +210,10 @@ module.exports = {
       });
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
         data: [],
-        message: "error",
+        message: "error",errormessage,
         status: false,
       });
     }

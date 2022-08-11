@@ -55,9 +55,10 @@ module.exports = {
       });
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
         data: [],
-        message: error,
+        message: error,errormessage,
         status: false,
       });
     }
@@ -103,9 +104,10 @@ module.exports = {
       }
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
         data: [],
-        message: "error",
+        message: "error",errormessage,
         status: false,
       });
     }
@@ -155,9 +157,10 @@ module.exports = {
       }
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
         data: [],
-        message: "error",
+        message: "error",errormessage,
         status: false,
       });
     }
@@ -176,17 +179,19 @@ module.exports = {
         })
         .catch((err) => {
           console.log("error", err);
+          let errormessage=err.message
           res.status(404).send({
             data: [],
-            message: "Error..!",
+            message: "Error..!",errormessage,
             success: false,
           });
         });
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
         data: [],
-        message: "error",
+        message: "error",errormessage,
         status: false,
       });
     }
@@ -218,7 +223,7 @@ module.exports = {
         })
       }else {
           console.log("error", error);
-          return res.status(404).send({
+            return res.status(404).send({
             data: [],
             message: "user not found with id " + req.params.id,
             success: false,
@@ -226,9 +231,10 @@ module.exports = {
         };
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
         data: [],
-        message: "error",
+        message: "error",errormessage,
         status: false,
       });
     }
@@ -253,9 +259,10 @@ module.exports = {
         };
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
         data: [],
-        message: "error",
+        message: "error",errormessage,
         status: false,
       });
     }
@@ -284,7 +291,7 @@ module.exports = {
         })
        }else {
           console.log("error", error);
-          return res.status(404).send({
+            return res.status(404).send({
             data: [],
             message: "user not found with id " + req.params.id,
             success: false,
@@ -292,9 +299,10 @@ module.exports = {
         };
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
         data: [],
-        message: "error",
+        message: "error",errormessage,
         status: false,
       });
     }

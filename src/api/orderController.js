@@ -46,27 +46,31 @@ module.exports = {
               user: userDetails[0],
               status: "pending",
               orderId: makeid(),
-            });
-            if (!newOrder) {
+            }).then((newOrder)=>{
               return res.status(200).send({
-                data: [],
-                message: "Failed to place order..!",
-                success: false,
+                data: newOrder,
+                message: "Successfully placed order..!",
+                success: true,
               });
-            }
+            })
+           .catch((error)=>{
+            console.log('error',error)
+            let errormessage=error.message
             return res.status(200).send({
-              data: newOrder,
-              message: "Successfully placed order..!",
-              success: true,
+              data: [],
+              message: "Failed to place order..!",errormessage,
+              success: false,
             });
-          }
+           })    
+            }
         );
       });
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
         data: [],
-        message: "error",
+        message: "error",errormessage,
         status: false,
       });
     }
@@ -92,9 +96,10 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error", err);
+            let errormessage=err.message
             return res.status(404).send({
               data: [],
-              message: "error",
+              message: "error",errormessage,
               status: false,
             });
           });
@@ -152,9 +157,10 @@ module.exports = {
       }
     } catch (error) {
       console.log("error", error);
+      let errormessage=error.message
       return res.status(404).send({
         data: [],
-        message: "error",
+        message: "error",errormessage,
         status: false,
       });
     }
