@@ -62,10 +62,11 @@ module.exports = {
             })
             .catch((err) => {
               console.log("error", err);
-              let errormessage=err.message
+              let errormessage = err.message;
               return res.status(404).send({
                 data: [],
-                message: "error",errormessage,
+                message: "error",
+                errormessage,
                 status: false,
               });
             });
@@ -73,10 +74,11 @@ module.exports = {
       });
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }
@@ -84,7 +86,15 @@ module.exports = {
   viewProduct: async (req, res) => {
     try {
       if (!req.query.search) {
+        let limit = 10;
+        let skip = 0;
+        if (req.query.limit && req.query.skip) {
+          limit = parseInt(req.query.limit);
+          skip = parseInt(req.query.skip);
+        }
         await Product.find()
+          .skip(skip)
+          .limit(limit)
           .then((products) => {
             return res.status(200).send({
               data: products,
@@ -94,16 +104,17 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error", err);
-            let errormessage=err.message
+            let errormessage = err.message;
             return res.status(404).send({
               data: [],
-              message: "error",errormessage,
+              message: "error",
+              errormessage,
               status: false,
             });
           });
       } else if (req.query.search) {
         const search = req.query.search;
-          await Product.find({
+        await Product.find({
           name: { $regex: search },
         })
           .then((products) => {
@@ -122,20 +133,22 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error", err);
-            let errormessage=err.message
+            let errormessage = err.message;
             return res.status(404).send({
               data: [],
-              message: "error",errormessage,
+              message: "error",
+              errormessage,
               status: false,
             });
           });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }
@@ -193,10 +206,11 @@ module.exports = {
             })
             .catch((err) => {
               console.log("error", err);
-              let errormessage=err.message
+              let errormessage = err.message;
               return res.status(404).send({
                 data: [],
-                message: "error",errormessage,
+                message: "error",
+                errormessage,
                 status: false,
               });
             });
@@ -210,10 +224,11 @@ module.exports = {
       });
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }

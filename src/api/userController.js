@@ -55,10 +55,11 @@ module.exports = {
       });
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: error,errormessage,
+        message: error,
+        errormessage,
         status: false,
       });
     }
@@ -104,10 +105,11 @@ module.exports = {
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }
@@ -157,19 +159,28 @@ module.exports = {
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }
   },
   viewUsers: async (req, res) => {
     try {
+      let limit = 10;
+      let skip = 0;
+      if (req.query.limit && req.query.skip) {
+        limit = parseInt(req.query.limit);
+        skip = parseInt(req.query.skip);
+      }
       await User.find({
         role: "user",
       })
+        .skip(skip)
+        .limit(limit)
         .then((users) => {
           res.status(200).send({
             data: users,
@@ -179,19 +190,21 @@ module.exports = {
         })
         .catch((err) => {
           console.log("error", err);
-          let errormessage=err.message
+          let errormessage = err.message;
           res.status(404).send({
             data: [],
-            message: "Error..!",errormessage,
+            message: "Error..!",
+            errormessage,
             success: false,
           });
         });
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }
@@ -199,42 +212,42 @@ module.exports = {
   editUsers: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-      await User.findByIdAndUpdate(
-        req.params.id,
-        {
-          firstName: req.body.firstName,
-          lastName: req.body.lastName,
-          mobileNumber: req.body.mobileNumber,
-          email: req.body.email,
-          gender: req.body.gender,
-          dob: req.body.dob,
-          pinCode: req.body.pinCode,
-        },
-        {
-          new: true,
-        }
-      )
-        .then((user) => {
+        await User.findByIdAndUpdate(
+          req.params.id,
+          {
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            mobileNumber: req.body.mobileNumber,
+            email: req.body.email,
+            gender: req.body.gender,
+            dob: req.body.dob,
+            pinCode: req.body.pinCode,
+          },
+          {
+            new: true,
+          }
+        ).then((user) => {
           res.status(200).send({
             data: user,
             message: "Successfully updated user..!",
             success: true,
           });
-        })
-      }else {
-          console.log("error", error);
-            return res.status(404).send({
-            data: [],
-            message: "user not found with id " + req.params.id,
-            success: false,
-          });
-        };
+        });
+      } else {
+        console.log("error", error);
+        return res.status(404).send({
+          data: [],
+          message: "user not found with id " + req.params.id,
+          success: false,
+        });
+      }
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }
@@ -242,27 +255,28 @@ module.exports = {
   deleteUsers: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-      await User.findByIdAndRemove(req.params.id)
-        .then((user) => {
+        await User.findByIdAndRemove(req.params.id).then((user) => {
           res.status(200).send({
             data: user,
             message: "Successfully deleted user..!",
             success: true,
           });
-        })}else {
-          console.log("error", error);
-          return res.status(200).send({
-            data: [],
-            message: "user not found with id " + req.params.id,
-            success: false,
-          });
-        };
+        });
+      } else {
+        console.log("error", error);
+        return res.status(200).send({
+          data: [],
+          message: "user not found with id " + req.params.id,
+          success: false,
+        });
+      }
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }
@@ -270,39 +284,39 @@ module.exports = {
   addUserDetails: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-      await User.findByIdAndUpdate(
-        req.params.id,
-        {
-        location:req.body.location,
-        primaryAddress:req.body.primaryAddress,
-        otherAddress:req.body.otherAddress,
-        pinCode:req.body.pinCode
-        },
-        {
-          new: true,
-        }
-      )
-        .then((user) => {
+        await User.findByIdAndUpdate(
+          req.params.id,
+          {
+            location: req.body.location,
+            primaryAddress: req.body.primaryAddress,
+            otherAddress: req.body.otherAddress,
+            pinCode: req.body.pinCode,
+          },
+          {
+            new: true,
+          }
+        ).then((user) => {
           res.status(200).send({
             data: user,
             message: "Successfully updated user..!",
             success: true,
           });
-        })
-       }else {
-          console.log("error", error);
-            return res.status(404).send({
-            data: [],
-            message: "user not found with id " + req.params.id,
-            success: false,
-          });
-        };
+        });
+      } else {
+        console.log("error", error);
+        return res.status(404).send({
+          data: [],
+          message: "user not found with id " + req.params.id,
+          success: false,
+        });
+      }
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }

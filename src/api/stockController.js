@@ -15,50 +15,50 @@ module.exports = {
         product: product,
         category: category,
         subCategory: subCategory,
-      })
-        .then((oldStock) => {
-          if (oldStock.length) {
-            return res.status(200).send({
-              data: [],
-              message: "Stock already exists..!",
-              success: false,
-            });
-          }
-          else {
-            const newStock = new Stock({
-              product: product,
-              category: category,
-              subCategory: subCategory,
-              quantity: quantity,
-              unit: unit,
-              stockId: makeid(),
-            });
-            newStock
-              .save()
-              .then((stock) => {
-                return res.status(200).send({
-                  data: stock,
-                  message: "Successfully Added stock..!",
-                  success: true,
-                });
-              })
-              .catch((err) => {
-                console.log("error", err);
-                let errormessage=err.message
-                return res.status(404).send({
-                  data: [],
-                  message: "error",errormessage,
-                  status: false,
-                });
+      }).then((oldStock) => {
+        if (oldStock.length) {
+          return res.status(200).send({
+            data: [],
+            message: "Stock already exists..!",
+            success: false,
+          });
+        } else {
+          const newStock = new Stock({
+            product: product,
+            category: category,
+            subCategory: subCategory,
+            quantity: quantity,
+            unit: unit,
+            stockId: makeid(),
+          });
+          newStock
+            .save()
+            .then((stock) => {
+              return res.status(200).send({
+                data: stock,
+                message: "Successfully Added stock..!",
+                success: true,
               });
-          }
-       })
+            })
+            .catch((err) => {
+              console.log("error", err);
+              let errormessage = err.message;
+              return res.status(404).send({
+                data: [],
+                message: "error",
+                errormessage,
+                status: false,
+              });
+            });
+        }
+      });
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }
@@ -85,10 +85,11 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error", err);
-            let errormessage=err.message
+            let errormessage = err.message;
             return res.status(404).send({
               data: [],
-              message: "error",errormessage,
+              message: "error",
+              errormessage,
               status: false,
             });
           });
@@ -111,16 +112,24 @@ module.exports = {
           })
           .catch((error) => {
             console.log("error", error);
-            let errormessage=error.message
+            let errormessage = error.message;
             return res.status(404).send({
               dat: [],
-              message: "error",errormessage,
+              message: "error",
+              errormessage,
               status: false,
             });
           });
-      }
-       else {
+      } else {
+        let limit = 10;
+        let skip = 0;
+        if (req.query.limit && req.query.skip) {
+          limit = parseInt(req.query.limit);
+          skip = parseInt(req.query.skip);
+        }
         await Stock.find()
+          .skip(skip)
+          .limit(limit)
           .then((stock) => {
             if (stock.length === 0) {
               return res.status(200).send({
@@ -149,20 +158,22 @@ module.exports = {
           })
           .catch((error) => {
             console.log("error", error);
-            let errormessage=error.message
+            let errormessage = error.message;
             return res.status(404).send({
               data: [],
-              message: "error..!",errormessage,
+              message: "error..!",
+              errormessage,
               success: false,
             });
           });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }
@@ -191,7 +202,7 @@ module.exports = {
           })
           .catch((error) => {
             console.log("error", error);
-            let errormessage=error.message
+            let errormessage = error.message;
             return res.status(404).send({
               dat: [],
               message: "error",
@@ -207,10 +218,11 @@ module.exports = {
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         dat: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }
@@ -235,10 +247,11 @@ module.exports = {
         });
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }

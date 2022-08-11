@@ -46,31 +46,34 @@ module.exports = {
               user: userDetails[0],
               status: "pending",
               orderId: makeid(),
-            }).then((newOrder)=>{
-              return res.status(200).send({
-                data: newOrder,
-                message: "Successfully placed order..!",
-                success: true,
-              });
             })
-           .catch((error)=>{
-            console.log('error',error)
-            let errormessage=error.message
-            return res.status(200).send({
-              data: [],
-              message: "Failed to place order..!",errormessage,
-              success: false,
-            });
-           })    
-            }
+              .then((newOrder) => {
+                return res.status(200).send({
+                  data: newOrder,
+                  message: "Successfully placed order..!",
+                  success: true,
+                });
+              })
+              .catch((error) => {
+                console.log("error", error);
+                let errormessage = error.message;
+                return res.status(200).send({
+                  data: [],
+                  message: "Failed to place order..!",
+                  errormessage,
+                  success: false,
+                });
+              });
+          }
         );
       });
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }
@@ -96,10 +99,11 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error", err);
-            let errormessage=err.message
+            let errormessage = err.message;
             return res.status(404).send({
               data: [],
-              message: "error",errormessage,
+              message: "error",
+              errormessage,
               status: false,
             });
           });
@@ -127,40 +131,50 @@ module.exports = {
             });
           });
       } else {
-        await Order.find().then((orders) => {
-          if (orders.length === 0) {
-            return res.status(200).send({
-              data: [],
-              message: "No orders yet..!",
-              success: true,
-            });
-          }
-          Order.find({
-            status: "pending",
-          }).then((pendingOrders) => {
-            Order.find({
-              status: "completed",
-            }).then((completedOrders) => {
-              res.status(200).send({
-                data: orders,
-                shorthanddetails: {
-                  totalorders: orders,
-                  pendingOrders: pendingOrders,
-                  completedOrders: completedOrders,
-                },
-                message: "Successfully fetched orders..!",
+        let limit = 10;
+        let skip = 0;
+        if (req.query.limit && req.query.skip) {
+          limit = parseInt(req.query.limit);
+          skip = parseInt(req.query.skip);
+        }
+        await Order.find()
+          .skip(skip)
+          .limit(limit)
+          .then((orders) => {
+            if (orders.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No orders yet..!",
                 success: true,
+              });
+            }
+            Order.find({
+              status: "pending",
+            }).then((pendingOrders) => {
+              Order.find({
+                status: "completed",
+              }).then((completedOrders) => {
+                res.status(200).send({
+                  data: orders,
+                  shorthanddetails: {
+                    totalorders: orders,
+                    pendingOrders: pendingOrders,
+                    completedOrders: completedOrders,
+                  },
+                  message: "Successfully fetched orders..!",
+                  success: true,
+                });
               });
             });
           });
-        });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }

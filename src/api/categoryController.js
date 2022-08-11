@@ -19,7 +19,7 @@ module.exports = {
   addCategory: async (req, res) => {
     try {
       await fileUpload(req, res, (err) => {
-          if (err) {
+        if (err) {
           return res.status(200).send({
             data: [],
             message: "Error in image uploading..!",
@@ -27,7 +27,7 @@ module.exports = {
           });
         }
         const subCategory = [];
-         req.files.forEach((image) => {
+        req.files.forEach((image) => {
           if (image.fieldname !== "image") {
             subCategory.push({
               title: image.fieldname,
@@ -37,108 +37,118 @@ module.exports = {
         });
         Category.findOne({
           name: req.body.name,
-        })
-          .then((newCategory) => {
-            if (newCategory)
-              return res.status(200).send({
-                data: [],
-                message: "Catergory already exists..!",
-                success: false,
-              });
-            else {
-              const newCategory = new Category({
-                name: req.body.name,
-                image: req.files[0].path,
-                subCategory: subCategory,
-              });
-              newCategory
-                .save()
-                .then((Category) => {
-                  return res.status(200).send({
-                    data: Category,
-                    message: "Successfully Added Category..!",
-                    success: true,
-                  });
-                })
-                .catch((err) => {
-                  console.log("error", err);
-                  let errormessage=err.message
-                  return res.status(404).send({
-                    data: [],
-                    message: "error",errormessage,
-                    status: false,
-                  });
+        }).then((newCategory) => {
+          if (newCategory)
+            return res.status(200).send({
+              data: [],
+              message: "Catergory already exists..!",
+              success: false,
+            });
+          else {
+            const newCategory = new Category({
+              name: req.body.name,
+              image: req.files[0].path,
+              subCategory: subCategory,
+            });
+            newCategory
+              .save()
+              .then((Category) => {
+                return res.status(200).send({
+                  data: Category,
+                  message: "Successfully Added Category..!",
+                  success: true,
                 });
-            }
-          });
-        })
+              })
+              .catch((err) => {
+                console.log("error", err);
+                let errormessage = err.message;
+                return res.status(404).send({
+                  data: [],
+                  message: "error",
+                  errormessage,
+                  status: false,
+                });
+              });
+          }
+        });
+      });
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [error],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }
   },
   viewCategory: async (req, res) => {
     try {
-     if(!req.query.search){
-      await Category.find()
-      .then((categories) => {
-        return res.status(200).send({
-          data: categories,
-          message: "Successfully fetched all categories..!",
-          success: true,
-        });
-      })
-      .catch((err) => {
-        console.log("error", err);
-        let errormessage=err.message
-        return res.status(404).send({
-          data: [],
-          message: "error",errormessage,
-          status: false,
-        });
+      if (!req.query.search) {
+        let limit = 10;
+        let skip = 0;
+        if (req.query.limit && req.query.skip) {
+          limit = parseInt(req.query.limit);
+          skip = parseInt(req.query.skip);
+        }
+        await Category.find()
+          .skip(skip)
+          .limit(limit)
+          .then((categories) => {
+            return res.status(200).send({
+              data: categories,
+              message: "Successfully fetched all categories..!",
+              success: true,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            let errormessage = err.message;
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              errormessage,
+              status: false,
+            });
+          });
+      } else if (req.query.search) {
+        await Category.find({ name: { $regex: req.query.search } })
+          .then((categories) => {
+            if (categories.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No categories found..!",
+                success: true,
+              });
+            }
+            return res.status(200).send({
+              data: categories,
+              message: "Successfully fetched categories..!",
+              success: true,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            let errormessage = err.message;
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              errormessage,
+              status: false,
+            });
+          });
+      }
+    } catch (error) {
+      console.log("error", error);
+      let errormessage = error.message;
+      return res.status(404).send({
+        data: [],
+        message: "error",
+        errormessage,
+        status: false,
       });
-  }
-else if(req.query.search){
-  await Category.find({ name: { $regex: req.query.search } }).then(
-    (categories) => {
-      if (categories.length === 0) {
-        return res.status(200).send({
-          data: [],
-          message: "No categories found..!",
-          success: true,
-        });
-      }     
-      return res.status(200).send({
-        data: categories,
-        message: "Successfully fetched categories..!",
-        success: true,
-      });
-  
     }
-  ).catch((err)=>{
-    console.log("error", err);
-    let errormessage=err.message
-    return res.status(404).send({
-      data: [],
-      message: "error",errormessage,
-      status: false,
-    });
-  });
-}
-}catch (error) {
-    console.log("error", error);
-    let errormessage=error.message
-    return res.status(404).send({
-      data: [],
-      message: "error",errormessage,
-      status: false,
-    });
-  }   
   },
   editCategory: async (req, res) => {
     try {
@@ -177,23 +187,26 @@ else if(req.query.search){
             {
               new: true,
             }
-          ).then((newCategories) => {
-            if (newCategories) {
-              return res.status(200).send({
-                data: newCategories,
-                message: "Successfully updated Categories..!",
-                success: true,
+          )
+            .then((newCategories) => {
+              if (newCategories) {
+                return res.status(200).send({
+                  data: newCategories,
+                  message: "Successfully updated Categories..!",
+                  success: true,
+                });
+              }
+            })
+            .catch((error) => {
+              console.log("error", error);
+              let errormessage = error.message;
+              return res.status(404).send({
+                data: [],
+                message: "error",
+                errormessage,
+                status: false,
               });
-            }
-          }).catch((error)=>{
-            console.log('error',error)
-            let errormessage=error.message
-            return res.status(404).send({
-              data: [],
-              message: "error",errormessage,
-              status: false,
             });
-          })
         } else {
           return res.status(200).send({
             data: [],
@@ -204,10 +217,11 @@ else if(req.query.search){
       });
     } catch (error) {
       console.log("error", error);
-      let errormessage=error.message
+      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",errormessage,
+        message: "error",
+        errormessage,
         status: false,
       });
     }
