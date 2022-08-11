@@ -17,7 +17,7 @@ const upload = multer({
 const fileUpload = upload.any();
 module.exports = {
   addCategory: async (req, res) => {
-    try {
+     try {
       await fileUpload(req, res, (err) => {
         if (err) {
           return res.status(200).send({
@@ -30,13 +30,13 @@ module.exports = {
         req.files.forEach((image) => {
           if (image.fieldname !== "image") {
             subCategory.push({
-              title: image.fieldname,
+              label: image.fieldname,
               subCategoryImage: image.path,
             });
           }
         });
         Category.findOne({
-          name: req.body.name,
+          label: req.body.label,
         }).then((newCategory) => {
           if (newCategory)
             return res.status(200).send({
@@ -46,7 +46,7 @@ module.exports = {
             });
           else {
             const newCategory = new Category({
-              name: req.body.name,
+              label: req.body.label,
               image: req.files[0].path,
               subCategory: subCategory,
             });
@@ -113,7 +113,7 @@ module.exports = {
             });
           });
       } else if (req.query.search) {
-        await Category.find({ name: { $regex: req.query.search } })
+        await Category.find({ label: { $regex: req.query.search } })
           .then((categories) => {
             if (categories.length === 0) {
               return res.status(200).send({
@@ -161,26 +161,19 @@ module.exports = {
           });
         }
         const subCategory = [];
-        const list = [
-          { title: "subcat1" },
-          { title: "subcat2" },
-          { title: "subcat3" },
-        ];
         req.files.forEach((image) => {
-          list.forEach((data) => {
-            if (data.title === image.fieldname) {
-              subCategory.push({
-                title: data.title,
-                subCategoryImage: image.path,
-              });
-            }
-          });
+          if (image.fieldname !== "image") {
+            subCategory.push({
+              label: image.fieldname,
+              subCategoryImage: image.path,
+            });
+          }
         });
         if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
           const newCategory = Category.findByIdAndUpdate(
             req.params.id,
             {
-              name: req.body.name,
+              label: req.body.label,
               image: req.files[0].path,
               subCategory: subCategory,
             },
