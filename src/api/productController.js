@@ -203,6 +203,13 @@ module.exports = {
                   success: true,
                 });
               }
+              else{
+                return res.status(404).send({
+                  data: [],
+                  message: "Invalid Id",
+                  status: false,
+                });
+              }
             })
             .catch((err) => {
               console.log("error", err);

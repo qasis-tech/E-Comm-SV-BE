@@ -1,5 +1,7 @@
 const multer = require("multer");
 const path = require("path");
+const http = require('http');
+const url = require('url') ;
 const mongoose = require("mongoose");
 const Category = require("../config/model/category");
 const imageURL = "src/assets/images";
@@ -45,9 +47,11 @@ module.exports = {
               success: false,
             });
           else {
+            const hostname = req.headers.host;
+            const pathname = url.parse(req.url).pathname
             const newCategory = new Category({
               label: req.body.label,
-              image: req.files[0].path,
+              image: hostname+__dirname+req.files[0].path,
               subCategory: subCategory,
             });
             newCategory
@@ -189,18 +193,15 @@ module.exports = {
                   success: true,
                 });
               }
+              else{
+                return res.status(404).send({
+                  data: [],
+                  message: "Invalid Id",
+                  status: false,
+                });
+              }
             })
-            .catch((error) => {
-              console.log("error", error);
-              let errormessage = error.message;
-              return res.status(404).send({
-                data: [],
-                message: "error",
-                errormessage,
-                status: false,
-              });
-            });
-        } else {
+          } else {
           return res.status(200).send({
             data: [],
             message: "Cannot find category with id " + req.params.id,

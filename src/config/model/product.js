@@ -10,8 +10,7 @@ const productSchema = mongoose.Schema({
     required: true,
   },
   subCategory: {
-    type: String,
-    required: true,
+    type: String,  
   },
   unit: {
     type: String,
