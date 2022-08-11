@@ -21,7 +21,7 @@ module.exports = {
       await fileUpload(req, res, (err) => {
         if (err) {
           console.log("error in image upload", err);
-          return res.status(404).send({
+          return res.status(200).send({
             data: [],
             message: "Error in image uploading..!",
             success: false,
@@ -141,7 +141,7 @@ module.exports = {
       await fileUpload(req, res, (err) => {
         if (err) {
           console.log("error in image upload", err);
-          return res.status(404).send({
+          return res.status(200).send({
             message: "Error in image uploading..!",
             success: false,
           });
