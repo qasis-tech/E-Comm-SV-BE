@@ -2,7 +2,7 @@ const multer = require("multer");
 const path = require("path");  
 const mongoose = require("mongoose");
 const Category = require("../config/model/category");
-const imageURL = "src/assets/images";
+const imageURL = "public/uploads";
 const Storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, imageURL);

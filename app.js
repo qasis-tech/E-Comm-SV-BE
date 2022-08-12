@@ -13,6 +13,8 @@ app.use(
   })
 );
 app.use(bodyParser.json());
+app.use(express.static('public')); 
+app.use('/uploads', express.static('uploads'));
 app.use("/", adminRouter);
 const port = process.env.PORT || 7000;
 app.listen(port, () => {
