@@ -97,6 +97,13 @@ module.exports = {
           .skip(skip)
           .limit(limit)
           .then((categories) => {
+            if (categories.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No categories found..!",
+                success: true,
+              });
+            }
             return res.status(200).send({
               data: categories,
               message: "Successfully fetched all categories..!",

@@ -2,6 +2,8 @@ const multer = require("multer");
 const path = require("path");
 const mongoose = require("mongoose");
 const Product = require("../config/model/product");
+const { json } = require("body-parser");
+const { features } = require("process");
 const imageURL = "public/uploads";
 const Storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -18,7 +20,7 @@ const fileUpload = upload.any();
 module.exports = {
   addProduct: async (req, res) => {
     try {
-      const hostname = req.headers.host; 
+      const hostname = req.headers.host;
       await fileUpload(req, res, (err) => {
         if (err) {
           console.log("error in image upload", err);
@@ -32,9 +34,15 @@ module.exports = {
           const videoArray = [];
           req.files.forEach((file) => {
             if (file.fieldname === "productImage") {
-              imageArray.push({image: 'http://'+hostname+'/'+file.path.replaceAll('\\', "/") });
+              imageArray.push({
+                image:
+                  "http://" + hostname + "/" + file.path.replaceAll("\\", "/"),
+              });
             } else {
-              videoArray.push({ video: 'http://'+hostname+'/'+file.path.replaceAll('\\', "/") });
+              videoArray.push({
+                video:
+                  "http://" + hostname + "/" + file.path.replaceAll("\\", "/"),
+              });
             }
           });
           const newProduct = new Product({
@@ -93,26 +101,68 @@ module.exports = {
           limit = parseInt(req.query.limit);
           skip = parseInt(req.query.skip);
         }
-        await Product.find()
-          .skip(skip)
-          .limit(limit)
+        // await Product.find()
+        //   .skip(skip)
+        //   .limit(limit)
+        //   .then((products) => {
+        //    console.log('products',products)
+        //   }).then((features)=>{
+        //     console.log('features',features)
+        //   })
+
+        Product.find()
           .then((products) => {
-            return res.status(200).send({
-              data: products,
-              message: "Successfully fetched all Products..!",
-              success: true,
-            });
+            // console.log('products',products)
+            return products;
           })
-          .catch((err) => {
-            console.log("error", err);
-            let errormessage = err.message;
-            return res.status(404).send({
-              data: [],
-              message: "error",
-              errormessage,
-              status: false,
-            });
-          });
+          .then((products) => {
+            const features = products[0].features;
+            // console.log('features',features)
+            return JSON.stringify(features);
+          })
+          .then((features) => {
+            // console.log('type',typeof features)
+            // const parsedData=JSON.parse(features)
+            // const newData=JSON.parse('[{"model":"mvv"},{"color":["red","blue","green"]},{"dimension":"10*50"}]')
+            // console.log(
+            //   "new data",
+            //   JSON.parse(
+            //     '[{"model":"mvv"},{"color":["red","blue","green"]},{"dimension":"10*50"}]'
+            //   )
+            // );
+            // console.log('features',features)          
+            console.log('feature',features)
+            const newFeature=JSON.parse(features)
+            return newFeature
+          }).then((newFeature)=>{
+            console.log('parsed feature',newFeature)
+            console.log('model',typeof newFeature)
+          })
+
+        res.send("done");
+        // if (products.length === 0) {
+        //   return res.status(200).send({
+        //     data: [],
+        //     message: "No Products found..!",
+        //     success: true,
+        //   });
+        // }
+        // return res.status(200).send({
+        //   data: products,
+        //   message: "Successfully fetched all Products..!",
+        //   success: true,
+        // });
+
+        // .catch((err) => {
+        //   console.log("error", err);
+        //   let errormessage = err.message;
+        //   return res.status(404).send({
+        //     data: [],
+        //     message: "error",
+        //     errormessage,
+        //     status: false,
+        //   });
+        // });
       } else if (req.query.search) {
         const search = req.query.search;
         await Product.find({
@@ -157,7 +207,7 @@ module.exports = {
 
   editProduct: async (req, res) => {
     try {
-      const hostname = req.headers.host; 
+      const hostname = req.headers.host;
       await fileUpload(req, res, (err) => {
         if (err) {
           console.log("error in image upload", err);
@@ -170,9 +220,15 @@ module.exports = {
         const videoArray = [];
         req.files.forEach((file) => {
           if (file.fieldname === "productImage") {
-            imageArray.push({ image: 'http://'+hostname+'/'+file.path.replaceAll('\\', "/") });
+            imageArray.push({
+              image:
+                "http://" + hostname + "/" + file.path.replaceAll("\\", "/"),
+            });
           } else {
-            videoArray.push({ video: 'http://'+hostname+'/'+file.path.replaceAll('\\', "/") });
+            videoArray.push({
+              video:
+                "http://" + hostname + "/" + file.path.replaceAll("\\", "/"),
+            });
           }
         });
         if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
@@ -204,8 +260,7 @@ module.exports = {
                   message: "Successfully updated Products..!",
                   success: true,
                 });
-              }
-              else{
+              } else {
                 return res.status(404).send({
                   data: [],
                   message: "Invalid Id",

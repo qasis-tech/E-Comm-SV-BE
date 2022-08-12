@@ -182,6 +182,13 @@ module.exports = {
         .skip(skip)
         .limit(limit)
         .then((users) => {
+          if (users.length === 0) {
+            return res.status(200).send({
+              data: [],
+              message: "No Users found..!",
+              success: true,
+            });
+          }
           res.status(200).send({
             data: users,
             message: "Successfully fetched users..!",
