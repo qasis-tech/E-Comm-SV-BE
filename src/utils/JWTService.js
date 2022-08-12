@@ -10,13 +10,23 @@ module.exports = {
   verifyToken(req,res,next){
     const bearerHeader=req.headers['authorization']
     if(typeof bearerHeader !='undefined'){
-     const bearer=bearerHeader.split(' ')
-     const bearerToken=bearer[1]
+     const bearer=bearerHeader.split(' ')[1]
+     const bearerToken=bearer
      req.token=bearerToken
      next()
     }
     else{
       res.sendStatus(401)
     }
-  }
+  },
+verifyMyToken(req,res,next){
+  jwt.verify(req.headers['authorization'],SECRET,(err,authData)=>{
+    if(err){
+         res.sendStatus(401)
+    }
+    else{
+    next()
+    }
+  })
+}
 };

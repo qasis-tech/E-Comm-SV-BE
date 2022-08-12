@@ -1,7 +1,5 @@
 const multer = require("multer");
-const path = require("path");
-const http = require('http');
-const url = require('url') ;
+const path = require("path");  
 const mongoose = require("mongoose");
 const Category = require("../config/model/category");
 const imageURL = "src/assets/images";
@@ -20,6 +18,7 @@ const fileUpload = upload.any();
 module.exports = {
   addCategory: async (req, res) => {
      try {
+      const hostname = req.headers.host;  
       await fileUpload(req, res, (err) => {
         if (err) {
           return res.status(200).send({
@@ -33,7 +32,7 @@ module.exports = {
           if (image.fieldname !== "image") {
             subCategory.push({
               label: image.fieldname,
-              subCategoryImage: image.path,
+              subCategoryImage:'http://'+hostname+'/'+image.path.replaceAll('\\', "/"),
             });
           }
         });
@@ -47,11 +46,9 @@ module.exports = {
               success: false,
             });
           else {
-            const hostname = req.headers.host;
-            const pathname = url.parse(req.url).pathname
-            const newCategory = new Category({
+              const newCategory = new Category({
               label: req.body.label,
-              image: hostname+__dirname+req.files[0].path,
+              image:'http://'+hostname+'/'+req.files[0].path.replaceAll('\\', "/"),
               subCategory: subCategory,
             });
             newCategory
@@ -156,6 +153,7 @@ module.exports = {
   },
   editCategory: async (req, res) => {
     try {
+      const hostname = req.headers.host; 
       await fileUpload(req, res, (err) => {
         if (err) {
           return res.status(200).send({
@@ -169,7 +167,7 @@ module.exports = {
           if (image.fieldname !== "image") {
             subCategory.push({
               label: image.fieldname,
-              subCategoryImage: image.path,
+              subCategoryImage:'http://'+hostname+'/'+image.path.replaceAll('\\', "/"),
             });
           }
         });
@@ -178,7 +176,7 @@ module.exports = {
             req.params.id,
             {
               label: req.body.label,
-              image: req.files[0].path,
+              image: 'http://'+hostname+'/'+req.files[0].path.replaceAll('\\', "/"),
               subCategory: subCategory,
             },
             {

@@ -18,6 +18,7 @@ const fileUpload = upload.any();
 module.exports = {
   addProduct: async (req, res) => {
     try {
+      const hostname = req.headers.host; 
       await fileUpload(req, res, (err) => {
         if (err) {
           console.log("error in image upload", err);
@@ -31,9 +32,9 @@ module.exports = {
           const videoArray = [];
           req.files.forEach((file) => {
             if (file.fieldname === "productImage") {
-              imageArray.push({ image: file.path });
+              imageArray.push({image: 'http://'+hostname+'/'+file.path.replaceAll('\\', "/") });
             } else {
-              videoArray.push({ video: file.path });
+              videoArray.push({ video: 'http://'+hostname+'/'+file.path.replaceAll('\\', "/") });
             }
           });
           const newProduct = new Product({
@@ -156,6 +157,7 @@ module.exports = {
 
   editProduct: async (req, res) => {
     try {
+      const hostname = req.headers.host; 
       await fileUpload(req, res, (err) => {
         if (err) {
           console.log("error in image upload", err);
@@ -168,9 +170,9 @@ module.exports = {
         const videoArray = [];
         req.files.forEach((file) => {
           if (file.fieldname === "productImage") {
-            imageArray.push({ image: file.path });
+            imageArray.push({ image: 'http://'+hostname+'/'+file.path.replaceAll('\\', "/") });
           } else {
-            videoArray.push({ video: file.path });
+            videoArray.push({ video: 'http://'+hostname+'/'+file.path.replaceAll('\\', "/") });
           }
         });
         if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
