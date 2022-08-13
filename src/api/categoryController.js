@@ -18,88 +18,98 @@ const fileUpload = upload.any();
 
 module.exports = {
   addCategory: async (req, res) => {
+    const { body } = req;
     try {
       const { host } = req.headers;
       fileUpload(req, res, (err) => {
-        if (!req?.files?.length || req?.body?.label === "") {
+        if (err) {
+          console.log("error in file uploading", err);
+          let errormessage = err.message;
+          return res.status(200).send({
+            data: [],
+            message: `Error in image uploading..! ${err.message}`,
+            success: false,
+          });
+        }
+
+        if (req?.files?.length === 0 || body?.label === "") {
           return res.status(200).send({
             data: [],
             message: '{label : "" , image : "", required fields. }',
             success: false,
           });
-        } else if (err) {
-          console.log("error in file uploading", err);
-          let errormessage = err.message;
-          return res.status(200).send({
-            data: [],
-            message: "Error in image uploading..!",
-            errormessage,
-            success: false,
+        } else {
+          const subCategory = [];
+          req?.files?.forEach((image) => {
+            if (image?.fieldname !== "image") {
+              subCategory.push({
+                label: image.fieldname,
+                subCategoryImage:
+                  "http://" + host + "/" + image?.path?.replaceAll("\\", "/"),
+              });
+            }
           });
-        }
-        const subCategory = [];
-        req.files.forEach((image) => {
-          if (image.fieldname !== "image") {
-            subCategory.push({
-              label: image.fieldname,
-              subCategoryImage:
-                "http://" + host + "/" + image.path.replaceAll("\\", "/"),
-            });
-          }
-        });
-        Category.findOne({
-          label: req.body.label,
-        }).then((newCategory) => {
-          if (newCategory) {
-            const newsubCategory = Category.findByIdAndUpdate(
-              newCategory._id,
-              {
-                subCategory: subCategory,
-              },
-              {
-                new: true,
-              }
-            ).then((newsubCategory) => {
-              if (newsubCategory) {
-                return res.status(200).send({
-                  data: newsubCategory,
-                  message:
-                    "Catergory already exists ...Successfully updated sub Categories..!",
-                  success: true,
-                });
-              }
-            });
-          } else {
-            const newCategory = new Category({
-              label: req.body.label,
-              image:
-                "http://" +
-                host +
-                "/" +
-                req.files[0].path.replaceAll("\\", "/"),
-              subCategory: subCategory,
-            });
-            newCategory
-              .save()
-              .then((Category) => {
-                return res.status(200).send({
-                  data: Category,
-                  message: "Successfully Added Category..!",
-                  success: true,
-                });
-              })
-              .catch((err) => {
-                console.log("error 4", err);
-                let errormessage = err.message;
+          Category.findOne({
+            label: req.body.label,
+          }).then((newCategory) => {
+            if (newCategory) {
+              const newsubCategory = Category.findByIdAndUpdate(
+                newCategory._id,
+                {
+                  subCategory: subCategory,
+                },
+                {
+                  new: true,
+                }
+              ).then((newsubCategory) => {
+                if (newsubCategory) {
+                  return res.status(200).send({
+                    data: newsubCategory,
+                    message:
+                      "Catergory already exists ...Successfully updated sub Categories..!",
+                    success: true,
+                  });
+                }
+              });
+            } else {
+              if (req?.body?.label !== "" || req?.files[0]?.path) {
                 return res.status(404).send({
                   data: [],
-                  message: "error",
-                  errormessage,
+                  message: '{label : "" , image : "", required fields. }',
                   status: false,
                 });
-              });
-          }
-        });
+              } else {
+                const newCategory = new Category({
+                  label: req.body.label,
+                  image: `http://${host}/${req.files[0].path.replaceAll(
+                    "\\",
+                    "/"
+                  )}`,
+                  subCategory: subCategory,
+                });
+                newCategory
+                  .save()
+                  .then((Category) => {
+                    return res.status(200).send({
+                      data: Category,
+                      message: "Successfully Added Category..!",
+                      success: true,
+                    });
+                  })
+                  .catch((err) => {
+                    console.log("error 4", err);
+                    let errormessage = err.message;
+                    return res.status(404).send({
+                      data: [],
+                      message: "error",
+                      errormessage,
+                      status: false,
+                    });
+                  });
+              }
+            }
+          });
+        }
       });
     } catch (error) {
       console.log("error 5", error);
