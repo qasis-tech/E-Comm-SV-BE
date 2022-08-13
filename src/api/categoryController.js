@@ -51,12 +51,24 @@ module.exports = {
         Category.findOne({
           label: req.body.label,
         }).then((newCategory) => {
-          if (newCategory)
-            return res.status(200).send({
-              data: [],
-              message: "Catergory already exists..!",
-              success: false,
-            });
+          if (newCategory){
+            const newsubCategory = Category.findByIdAndUpdate(
+              newCategory._id,
+              {
+                subCategory: subCategory,
+              },
+              {
+                new: true,
+              }
+            ).then((newsubCategory) => {
+              if (newsubCategory) {
+                return res.status(200).send({
+                  data: newsubCategory,
+                  message: "Catergory already exists ...Successfully updated sub Categories..!",
+                  success: true,
+                });
+              }})          
+          }
           else {
             const newCategory = new Category({
               label: req.body.label,
