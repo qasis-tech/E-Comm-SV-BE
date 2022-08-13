@@ -92,40 +92,52 @@ module.exports = {
                   });
                 }
               });
-              const newProduct = new Product({
-                name: req.body.name,
-                category: req.body.category,
-                subCategory: req.body.subCategory,
-                unit: req.body.unit,
-                quantity: req.body.quantity,
-                description: req.body.description,
-                features: req.body.features,
-                price: req.body.price,
-                offerUnit: req.body.offerUnit,
-                offerQuantity: req.body.offerQuantity,
-                offerPrice: req.body.offerPrice,
-                productImage: imageArray,
-                productVideo: videoArray,
-              });
-              newProduct
-                .save()
-                .then((product) => {
-                  return res.status(200).send({
-                    data: product,
-                    message: "Successfully Added Products..!",
-                    success: true,
-                  });
-                })
-                .catch((err) => {
-                  console.log("error", err);
-                  let errormessage = err.message;
-                  return res.status(404).send({
-                    data: [],
-                    message: "error",
-                    errormessage,
-                    status: false,
-                  });
+              const unitList = ["kg" ,"g", "ltr", "no"]
+              
+              if(unitList.indexOf(req.body.unit) ){
+                return res.status(200).send({
+                  data: [],
+                  message: "g/kg/ltr/no allowed in units..!",
+                  success: false,
                 });
+              }
+              else{
+                const newProduct = new Product({
+                  name: req.body.name,
+                  category: req.body.category,
+                  subCategory: req.body.subCategory,
+                  unit: req.body.unit,
+                  quantity: req.body.quantity,
+                  description: req.body.description,
+                  features: req.body.features,
+                  price: req.body.price,
+                  offerUnit: req.body.offerUnit,
+                  offerQuantity: req.body.offerQuantity,
+                  offerPrice: req.body.offerPrice,
+                  productImage: imageArray,
+                  productVideo: videoArray,
+                });
+                newProduct
+                  .save()
+                  .then((product) => {
+                    return res.status(200).send({
+                      data: product,
+                      message: "Successfully Added Products..!",
+                      success: true,
+                    });
+                  })
+                  .catch((err) => {
+                    console.log("error", err);
+                    let errormessage = err.message;
+                    return res.status(404).send({
+                      data: [],
+                      message: "error",
+                      errormessage,
+                      status: false,
+                    });
+                  });
+              }
+          
             }
           }).catch((err)=>{
             console.log("error", err);
