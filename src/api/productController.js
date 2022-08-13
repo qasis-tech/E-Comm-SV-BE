@@ -105,29 +105,29 @@ module.exports = {
           .skip(skip)
           .limit(limit)
           .then((products) => {
-                  if (products.length === 0) {
-          return res.status(200).send({
-            data: [],
-            message: "No Products found..!",
-            success: true,
+            if (products.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No Products found..!",
+                success: true,
+              });
+            }
+            return res.status(200).send({
+              data: products,
+              message: "Successfully fetched all Products..!",
+              success: true,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            let errormessage = err.message;
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              errormessage,
+              status: false,
+            });
           });
-        }
-        return res.status(200).send({
-          data: products,
-          message: "Successfully fetched all Products..!",
-          success: true,
-        });
-      })
-        .catch((err) => {
-          console.log("error", err);
-          let errormessage = err.message;
-          return res.status(404).send({
-            data: [],
-            message: "error",
-            errormessage,
-            status: false,
-          });
-        });
       } else if (req.query.search) {
         const search = req.query.search;
         await Product.find({
@@ -251,6 +251,52 @@ module.exports = {
           });
         }
       });
+    } catch (error) {
+      console.log("error", error);
+      let errormessage = error.message;
+      return res.status(404).send({
+        data: [],
+        message: "error",
+        errormessage,
+        status: false,
+      });
+    }
+  },
+  viewProductDetails: async (req, res) => {
+    try {
+      if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
+        await Product.findById({ _id: req.params.id })
+          .then((products) => {
+            if (products.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No Product found..!",
+                success: true,
+              });
+            }
+            return res.status(200).send({
+              data: products,
+              message: "Successfully fetched Product details..!",
+              success: true,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            let errormessage = err.message;
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              errormessage,
+              status: false,
+            });
+          });
+      } else {
+        return res.status(200).send({
+          data: [],
+          message: "Cannot find product with id " + req.params.id,
+          success: false,
+        });
+      }
     } catch (error) {
       console.log("error", error);
       let errormessage = error.message;

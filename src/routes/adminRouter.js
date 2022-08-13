@@ -32,4 +32,7 @@ router.get("/stock",tokenAuth.verifyToken,tokenAuth.verifyMyToken,stockControlle
 router.put("/stock/:id",tokenAuth.verifyToken,tokenAuth.verifyMyToken,stockController.editStock);
 router.delete("/stock/:id",tokenAuth.verifyToken,tokenAuth.verifyMyToken,stockController.deleteStock);
 router.put("/addUser/:id",userController.addUserDetails);
+router.get("/product/:id",productController.viewProductDetails);
+router.get("/order/:id",orderController.viewOrderDetails);
+router.get("/signup/:id",userController.viewUserDetails);
 module.exports = router;

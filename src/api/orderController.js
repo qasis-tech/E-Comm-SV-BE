@@ -179,4 +179,50 @@ module.exports = {
       });
     }
   },
+  viewOrderDetails: async (req, res) => {
+    try {
+      if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
+        await Order.findById({ _id: req.params.id })
+          .then((order) => {
+            if (order.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No order found..!",
+                success: true,
+              });
+            }
+            return res.status(200).send({
+              data: order,
+              message: "Successfully fetched order details..!",
+              success: true,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            let errormessage = err.message;
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              errormessage,
+              status: false,
+            });
+          });
+      } else {
+        return res.status(200).send({
+          data: [],
+          message: "Cannot find order with id " + req.params.id,
+          success: false,
+        });
+      }
+    } catch (error) {
+      console.log("error", error);
+      let errormessage = error.message;
+      return res.status(404).send({
+        data: [],
+        message: "error",
+        errormessage,
+        status: false,
+      });
+    }
+  },
 };
