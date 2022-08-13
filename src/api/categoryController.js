@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const Category = require("../config/model/category");
 const imageURL = "public/uploads";
 const Storage = multer.diskStorage({
-   destination: (req, file, cb) => {
+  destination: (req, file, cb) => {
     cb(null, imageURL);
   },
   filename: (req, file, cb) => {
@@ -15,20 +15,19 @@ const upload = multer({
   storage: Storage,
 });
 const fileUpload = upload.any();
+
 module.exports = {
   addCategory: async (req, res) => {
     try {
-      const hostname = req.headers.host;
-      await fileUpload(req, res, (err) => {
-        if (req.files.length === 0 || req.body.label === "") {
+      const { host } = req.headers;
+      fileUpload(req, res, (err) => {
+        if (!req?.files?.length || req?.body?.label === "") {
           return res.status(200).send({
             data: [],
-            message: "must fill out all fields",
+            message: '{label : "" , image : "", required fields. }',
             success: false,
           });
-        }
-       
-       else if (err) {
+        } else if (err) {
           console.log("error in file uploading", err);
           let errormessage = err.message;
           return res.status(200).send({
@@ -44,14 +43,14 @@ module.exports = {
             subCategory.push({
               label: image.fieldname,
               subCategoryImage:
-                "http://" + hostname + "/" + image.path.replaceAll("\\", "/"),
+                "http://" + host + "/" + image.path.replaceAll("\\", "/"),
             });
           }
         });
         Category.findOne({
           label: req.body.label,
         }).then((newCategory) => {
-          if (newCategory){
+          if (newCategory) {
             const newsubCategory = Category.findByIdAndUpdate(
               newCategory._id,
               {
@@ -64,17 +63,18 @@ module.exports = {
               if (newsubCategory) {
                 return res.status(200).send({
                   data: newsubCategory,
-                  message: "Catergory already exists ...Successfully updated sub Categories..!",
+                  message:
+                    "Catergory already exists ...Successfully updated sub Categories..!",
                   success: true,
                 });
-              }})          
-          }
-          else {
+              }
+            });
+          } else {
             const newCategory = new Category({
               label: req.body.label,
               image:
                 "http://" +
-                hostname +
+                host +
                 "/" +
                 req.files[0].path.replaceAll("\\", "/"),
               subCategory: subCategory,
@@ -89,7 +89,7 @@ module.exports = {
                 });
               })
               .catch((err) => {
-                console.log("error", err);
+                console.log("error 4", err);
                 let errormessage = err.message;
                 return res.status(404).send({
                   data: [],
@@ -102,12 +102,11 @@ module.exports = {
         });
       });
     } catch (error) {
-      console.log("error", error);
+      console.log("error 5", error);
       let errormessage = error.message;
       return res.status(404).send({
-        data: [error],
-        message: "error",
-        errormessage,
+        data: [],
+        message: errormessage,
         status: false,
       });
     }
@@ -125,7 +124,7 @@ module.exports = {
           .skip(skip)
           .limit(limit)
           .then((categories) => {
-            if (categories.length === 0) {
+            if (!categories.length) {
               return res.status(200).send({
                 data: [],
                 message: "No categories found..!",
@@ -139,7 +138,7 @@ module.exports = {
             });
           })
           .catch((err) => {
-            console.log("error", err);
+            console.log("error 3", err);
             let errormessage = err.message;
             return res.status(404).send({
               data: [],
@@ -165,7 +164,7 @@ module.exports = {
             });
           })
           .catch((err) => {
-            console.log("error", err);
+            console.log("error 1", err);
             let errormessage = err.message;
             return res.status(404).send({
               data: [],
@@ -176,12 +175,11 @@ module.exports = {
           });
       }
     } catch (error) {
-      console.log("error", error);
+      console.log("error 2", error);
       let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: errormessage,
         status: false,
       });
     }
