@@ -18,7 +18,6 @@ const fileUpload = upload.any();
 
 module.exports = {
   addCategory: async (req, res) => {
-    const { body } = req;
     try {
       const { host } = req.headers;
       fileUpload(req, res, (err) => {
@@ -32,51 +31,125 @@ module.exports = {
           });
         }
 
-        if (req?.files?.length === 0 || body?.label === "") {
+        if (req?.files?.length === 0 || req?.body?.label === "") {
           return res.status(200).send({
             data: [],
             message: '{label : "" , image : "", required fields. }',
             success: false,
           });
         } else {
-          const subCategory = [];
-          req?.files?.forEach((image) => {
-            if (image?.fieldname !== "image") {
-              subCategory.push({
+          const subCategory = req?.files
+            ?.filter((fl) => fl?.fieldname !== "image")
+            .map((image) => {
+              return {
                 label: image.fieldname,
-                subCategoryImage:
-                  "http://" + host + "/" + image?.path?.replaceAll("\\", "/"),
-              });
+                subCategoryImage: `http://${host}/${image?.path?.replaceAll(
+                  "\\",
+                  "/"
+                )}`,
+              };
+            });
+          let temp = [];
+
+          if (subCategory.length) {
+            for (let index = 0; index < subCategory.length; index++) {
+              let i = temp?.findIndex(
+                (fi) => fi?.label === subCategory[index]?.label
+              );
+              if (i === -1) {
+                temp.push(subCategory[index]);
+              }
             }
-          });
-          Category.findOne({
-            label: req.body.label,
-          }).then((newCategory) => {
-            if (newCategory) {
-              const newsubCategory = Category.findByIdAndUpdate(
-                newCategory._id,
-                {
-                  subCategory: subCategory,
-                },
-                {
-                  new: true,
-                }
-              ).then((newsubCategory) => {
-                if (newsubCategory) {
-                  return res.status(200).send({
-                    data: newsubCategory,
-                    message:
-                      "Catergory already exists ...Successfully updated sub Categories..!",
-                    success: true,
+          }
+          console.log("temp 11", temp, subCategory);
+          if (
+            temp.length > 0 &&
+            subCategory.length > 0 &&
+            temp.length === subCategory.length
+          ) {
+            if (temp.length) {
+              Category.findOne({
+                label: req.body.label,
+              }).then((newCategory) => {
+                if (newCategory) {
+                  console.log("subCategory in Create : ", subCategory);
+                  const newsubCategory = Category.findByIdAndUpdate(
+                    newCategory._id,
+                    {
+                      subCategory: subCategory,
+                    },
+                    {
+                      new: true,
+                    }
+                  ).then((newsubCategory) => {
+                    if (newsubCategory) {
+                      return res.status(200).send({
+                        data: newsubCategory,
+                        message: "Successfully updated sub Categories..!",
+                        success: true,
+                      });
+                    }
                   });
+                } else {
+                  if (req?.body?.label !== "" || req?.files[0]?.path) {
+                    return res.status(404).send({
+                      data: [],
+                      message: '{label : "" , image : "", required fields. }',
+                      status: false,
+                    });
+                  } else {
+                    const newCategory = new Category({
+                      label: req.body.label,
+                      image: `http://${host}/${req.files[0].path.replaceAll(
+                        "\\",
+                        "/"
+                      )}`,
+                      subCategory: subCategory,
+                    });
+                    newCategory
+                      .save()
+                      .then((Category) => {
+                        return res.status(200).send({
+                          data: Category,
+                          message: "Successfully Added Category..!",
+                          success: true,
+                        });
+                      })
+                      .catch((err) => {
+                        console.log("error 4", err);
+                        let errormessage = err.message;
+                        return res.status(404).send({
+                          data: [],
+                          message: "error",
+                          errormessage,
+                          status: false,
+                        });
+                      });
+                  }
                 }
               });
             } else {
-              if (req?.body?.label !== "" || req?.files[0]?.path) {
-                return res.status(404).send({
+              Category.findOne({
+                label: req.body.label,
+              }).then((newCategory) => {
+                if (newCategory) {
+                  res.send({
+                    data: [],
+                    message: "Category already exists...!",
+                    success: false,
+                  });
+                }
+              });
+            }
+          } else if (temp.length === 0 && subCategory.length === 0) {
+            Category.findOne({
+              label: req.body.label,
+            }).then((cat) => {
+              if (cat) {
+                return res.status(200).send({
                   data: [],
-                  message: '{label : "" , image : "", required fields. }',
-                  status: false,
+                  message: "Category already exists...!",
+                  success: false,
                 });
               } else {
                 const newCategory = new Category({
@@ -101,14 +174,19 @@ module.exports = {
                     let errormessage = err.message;
                     return res.status(404).send({
                       data: [],
-                      message: "error",
-                      errormessage,
+                      message: errormessage,
                       status: false,
                     });
                   });
               }
-            }
-          });
+            });
+          } else {
+            res.send({
+              data: [],
+              message: "Duplication of Subcategory not allowed...!",
+              success: false,
+            });
+          }
         }
       });
     } catch (error) {
