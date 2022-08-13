@@ -59,56 +59,84 @@ module.exports = {
             success: false,
           });
         } else {
-          const imageArray = [];
-          const videoArray = [];
-
-          req.files.forEach((file) => {
-            if (file.fieldname === "productImage") {
-              imageArray.push({
-                image:
-                  "http://" + hostname + "/" + file.path.replaceAll("\\", "/"),
-              });
-            } else {
-              videoArray.push({
-                video:
-                  "http://" + hostname + "/" + file.path.replaceAll("\\", "/"),
-              });
-            }
-          });
-          const newProduct = new Product({
+          Product.find({
             name: req.body.name,
             category: req.body.category,
             subCategory: req.body.subCategory,
-            unit: req.body.unit,
-            quantity: req.body.quantity,
-            description: req.body.description,
-            features: req.body.features,
-            price: req.body.price,
-            offerUnit: req.body.offerUnit,
-            offerQuantity: req.body.offerQuantity,
-            offerPrice: req.body.offerPrice,
-            productImage: imageArray,
-            productVideo: videoArray,
-          });
-          newProduct
-            .save()
-            .then((product) => {
+          }).then((oldProduct) => {
+            if (oldProduct.length) {
               return res.status(200).send({
-                data: product,
-                message: "Successfully Added Products..!",
-                success: true,
-              });
-            })
-            .catch((err) => {
-              console.log("error", err);
-              let errormessage = err.message;
-              return res.status(404).send({
                 data: [],
-                message: "error",
-                errormessage,
-                status: false,
+                message: "Product already exists..!",
+                success: false,
               });
+            } else {
+              const imageArray = [];
+              const videoArray = [];
+              req.files.forEach((file) => {
+                if (file.fieldname === "productImage") {
+                  imageArray.push({
+                    image:
+                      "http://" +
+                      hostname +
+                      "/" +
+                      file.path.replaceAll("\\", "/"),
+                  });
+                } else {
+                  videoArray.push({
+                    video:
+                      "http://" +
+                      hostname +
+                      "/" +
+                      file.path.replaceAll("\\", "/"),
+                  });
+                }
+              });
+              const newProduct = new Product({
+                name: req.body.name,
+                category: req.body.category,
+                subCategory: req.body.subCategory,
+                unit: req.body.unit,
+                quantity: req.body.quantity,
+                description: req.body.description,
+                features: req.body.features,
+                price: req.body.price,
+                offerUnit: req.body.offerUnit,
+                offerQuantity: req.body.offerQuantity,
+                offerPrice: req.body.offerPrice,
+                productImage: imageArray,
+                productVideo: videoArray,
+              });
+              newProduct
+                .save()
+                .then((product) => {
+                  return res.status(200).send({
+                    data: product,
+                    message: "Successfully Added Products..!",
+                    success: true,
+                  });
+                })
+                .catch((err) => {
+                  console.log("error", err);
+                  let errormessage = err.message;
+                  return res.status(404).send({
+                    data: [],
+                    message: "error",
+                    errormessage,
+                    status: false,
+                  });
+                });
+            }
+          }).catch((err)=>{
+            console.log("error", err);
+            let errormessage = err.message;
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              errormessage,
+              status: false,
             });
+          })
         }
       });
     } catch (error) {
