@@ -101,68 +101,33 @@ module.exports = {
           limit = parseInt(req.query.limit);
           skip = parseInt(req.query.skip);
         }
-        // await Product.find()
-        //   .skip(skip)
-        //   .limit(limit)
-        //   .then((products) => {
-        //    console.log('products',products)
-        //   }).then((features)=>{
-        //     console.log('features',features)
-        //   })
-
-        Product.find()
+        await Product.find()
+          .skip(skip)
+          .limit(limit)
           .then((products) => {
-            // console.log('products',products)
-            return products;
-          })
-          .then((products) => {
-            const features = products[0].features;
-            // console.log('features',features)
-            return JSON.stringify(features);
-          })
-          .then((features) => {
-            // console.log('type',typeof features)
-            // const parsedData=JSON.parse(features)
-            // const newData=JSON.parse('[{"model":"mvv"},{"color":["red","blue","green"]},{"dimension":"10*50"}]')
-            // console.log(
-            //   "new data",
-            //   JSON.parse(
-            //     '[{"model":"mvv"},{"color":["red","blue","green"]},{"dimension":"10*50"}]'
-            //   )
-            // );
-            // console.log('features',features)          
-            console.log('feature',features)
-            const newFeature=JSON.parse(features)
-            return newFeature
-          }).then((newFeature)=>{
-            console.log('parsed feature',newFeature)
-            console.log('model',typeof newFeature)
-          })
-
-        res.send("done");
-        // if (products.length === 0) {
-        //   return res.status(200).send({
-        //     data: [],
-        //     message: "No Products found..!",
-        //     success: true,
-        //   });
-        // }
-        // return res.status(200).send({
-        //   data: products,
-        //   message: "Successfully fetched all Products..!",
-        //   success: true,
-        // });
-
-        // .catch((err) => {
-        //   console.log("error", err);
-        //   let errormessage = err.message;
-        //   return res.status(404).send({
-        //     data: [],
-        //     message: "error",
-        //     errormessage,
-        //     status: false,
-        //   });
-        // });
+                  if (products.length === 0) {
+          return res.status(200).send({
+            data: [],
+            message: "No Products found..!",
+            success: true,
+          });
+        }
+        return res.status(200).send({
+          data: products,
+          message: "Successfully fetched all Products..!",
+          success: true,
+        });
+      })
+        .catch((err) => {
+          console.log("error", err);
+          let errormessage = err.message;
+          return res.status(404).send({
+            data: [],
+            message: "error",
+            errormessage,
+            status: false,
+          });
+        });
       } else if (req.query.search) {
         const search = req.query.search;
         await Product.find({
