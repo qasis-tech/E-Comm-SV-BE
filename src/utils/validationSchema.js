@@ -12,13 +12,14 @@ exports.usersignup = Joi.object().keys({
     .required(),
     email: Joi.string().email().lowercase().required(),
     gender: Joi.string().required(),
-    dob: Joi.string().required(),
+    dob: Joi.date().required(),
     pinCode: Joi.string().required(),   
-    password: Joi.string().required(),
+    password: Joi.string().min(8).required(),
 });
 exports.googleAuth = Joi.object().keys({
     email: Joi.string().email().lowercase().required(),
     name: Joi.string().required(),
     photoUrl: Joi.string().required(),
 });
+
 

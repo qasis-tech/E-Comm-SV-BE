@@ -1,0 +1,662 @@
+{
+	"info": {
+		"_postman_id": "1ff9eaad-f9d3-4288-9b33-b77c4f5fa27b",
+		"name": "single_vendor_ecommerce",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21549581"
+	},
+	"item": [
+		{
+			"name": "category",
+			"item": [
+				{
+					"name": "categoryList",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "cfgfg",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"contentType": "",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "fresh veg",
+									"contentType": "",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "leafy veg",
+									"contentType": "",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "root veg",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:4000/category",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"category"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "categoryList",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:4000/category",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"category"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "categoryList",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "veg12",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"contentType": "",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "fresh veg",
+									"contentType": "",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "leafy veg",
+									"contentType": "",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "root veg",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:4000/category/62f224759fe9d138f7685f5c",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"category",
+								"62f224759fe9d138f7685f5c"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "product",
+			"item": [
+				{
+					"name": "productList",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "kiwi",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "vegetable",
+									"type": "text"
+								},
+								{
+									"key": "subCategory",
+									"value": "fresh fruits",
+									"type": "text"
+								},
+								{
+									"key": "unit",
+									"value": "kg",
+									"type": "text"
+								},
+								{
+									"key": "quantity",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "good",
+									"type": "text"
+								},
+								{
+									"key": "features",
+									"value": "good",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "140",
+									"type": "text"
+								},
+								{
+									"key": "offerUnit",
+									"value": "%",
+									"type": "text"
+								},
+								{
+									"key": "offerQuantity",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "offerPrice",
+									"value": "100",
+									"type": "text"
+								},
+								{
+									"key": "productImage",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "productVideo",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:4000/product",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "productList",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:4000/product",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "productList",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "orangeeww",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "fruitss",
+									"type": "text"
+								},
+								{
+									"key": "subCategory",
+									"value": "fresh fruits",
+									"type": "text"
+								},
+								{
+									"key": "unit",
+									"value": "kg",
+									"type": "text"
+								},
+								{
+									"key": "quantity",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "good",
+									"type": "text"
+								},
+								{
+									"key": "features",
+									"value": "good",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "140",
+									"type": "text"
+								},
+								{
+									"key": "offerUnit",
+									"value": "%",
+									"type": "text"
+								},
+								{
+									"key": "offerQuantity",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "offerPrice",
+									"value": "100",
+									"type": "text"
+								},
+								{
+									"key": "productImage",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "productVideo",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:4000/product/62e8fa474e95372315789afb",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"product",
+								"62e8fa474e95372315789afb"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "order",
+			"item": [
+				{
+					"name": "orderList",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"productId\": [{\"id\":\"62e8fa474e95372315789afb\",\"quantity\":40,\"unit\":\"kg\"},{\"id\":\"62e8fad04e95372315789afd\",\"quantity\":4,\"unit\":\"kg\"}],\"userId\":\"62f3799f73e85daeb9451890\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:4000/order",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "orderList",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:4000/order",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"order"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "stock",
+			"item": [
+				{
+					"name": "stockList",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"product\":\"beans\",\"category\":\"vegetable\",\"subCategory\":\"fresh vegetable\",\"quantity\":\"20\",\"unit\":\"kg\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:4000/stock",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"stock"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "stockList",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:4000/stock",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"stock"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "stockList",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"product\":\"garlic\",\"category\":\"vegetable\",\"subCategory\":\"root vegetable\",\"quantity\":\"20\",\"unit\":\"kg\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:4000/stock/62f1fd3613be9dfeb68c2352",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"stock",
+								"62f1fd3613be9dfeb68c2352"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "stockList",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:4000/stock/62f1fd3613be9dfeb68c2352",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"stock",
+								"62f1fd3613be9dfeb68c2352"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"firstName\":\"veena\",\"lastName\":\"vijayanvv\",\"mobileNumber\":\"9656458545\",\"email\":\"veena1ds2@gmail.com\",\"gender\":\"female\",\"dob\":\"11-12-1993\",\"pinCode\":\"682012\",\"password\":\"czc\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:4000/signup",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "googleauth",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"ssssss@gmail.com\",\"name\":\"vgv\",\"photoUrl\":\"ffhfgffchg\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:4000/google",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"google"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"aa@gmail.com\",\"password\":\"123456\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:4000/login",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addUser",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"location\":\"erkm\",\"primaryAddress\":\"pulleparambil h\",\"otherAddress\":\"test h\",\"pinCode\":\"685062\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:4000/addUser/62f3799f73e85daeb9451890",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"addUser",
+								"62f3799f73e85daeb9451890"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signup",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:4000/signup",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signup",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"firstName\":\"veenavvv\",\"lastName\":\"vijayanvv\",\"mobileNumber\":\"9656458545\",\"email\":\"veena1ds2@gmail.com\",\"gender\":\"female\",\"dob\":\"11-12-1993\",\"pinCode\":\"682012\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:4000/signup/62f3799f73e85daeb9451890",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"signup",
+								"62f3799f73e85daeb9451890"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signup",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:4000/signup/62f36d577aa0c330da208787",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"signup",
+								"62f36d577aa0c330da208787"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -12,6 +12,15 @@ const Storage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
   },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" || file.mimetype == "image/svg" || 
+    file.mimetype == "video/mp4") {
+      cb(null, true);
+    } else {
+      cb(null, false);
+      return cb(new Error('Only .png, .jpg, .jpeg,.svg and .mp4 format allowed!'));
+    }
+  }
 });
 const upload = multer({
   storage: Storage,
@@ -22,11 +31,19 @@ module.exports = {
     try {
       const hostname = req.headers.host;
       await fileUpload(req, res, (err) => {
+        if(req.files.length===0 ||req.body===""){
+          return res.status(200).send({
+                data: [],
+                message: "must fill out all fields",
+                success: false,
+              });
+            }          
         if (err) {
           console.log("error in image upload", err);
+          let errormessage=err.message
           return res.status(200).send({
             data: [],
-            message: "Error in image uploading..!",
+            message: "Error in image uploading..!",errormessage,
             success: false,
           });
         } else {

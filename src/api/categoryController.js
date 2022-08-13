@@ -1,10 +1,10 @@
 const multer = require("multer");
-const path = require("path");  
+const path = require("path");
 const mongoose = require("mongoose");
 const Category = require("../config/model/category");
 const imageURL = "public/uploads";
 const Storage = multer.diskStorage({
-  destination: (req, file, cb) => {
+   destination: (req, file, cb) => {
     cb(null, imageURL);
   },
   filename: (req, file, cb) => {
@@ -17,13 +17,24 @@ const upload = multer({
 const fileUpload = upload.any();
 module.exports = {
   addCategory: async (req, res) => {
-     try {
-      const hostname = req.headers.host;  
+    try {
+      const hostname = req.headers.host;
       await fileUpload(req, res, (err) => {
-        if (err) {
+        if (req.files.length === 0 || req.body.label === "") {
+          return res.status(200).send({
+            data: [],
+            message: "must fill out all fields",
+            success: false,
+          });
+        }
+       
+       else if (err) {
+          console.log("error in file uploading", err);
+          let errormessage = err.message;
           return res.status(200).send({
             data: [],
             message: "Error in image uploading..!",
+            errormessage,
             success: false,
           });
         }
@@ -32,7 +43,8 @@ module.exports = {
           if (image.fieldname !== "image") {
             subCategory.push({
               label: image.fieldname,
-              subCategoryImage:'http://'+hostname+'/'+image.path.replaceAll('\\', "/"),
+              subCategoryImage:
+                "http://" + hostname + "/" + image.path.replaceAll("\\", "/"),
             });
           }
         });
@@ -46,9 +58,13 @@ module.exports = {
               success: false,
             });
           else {
-              const newCategory = new Category({
+            const newCategory = new Category({
               label: req.body.label,
-              image:'http://'+hostname+'/'+req.files[0].path.replaceAll('\\', "/"),
+              image:
+                "http://" +
+                hostname +
+                "/" +
+                req.files[0].path.replaceAll("\\", "/"),
               subCategory: subCategory,
             });
             newCategory
@@ -160,7 +176,7 @@ module.exports = {
   },
   editCategory: async (req, res) => {
     try {
-      const hostname = req.headers.host; 
+      const hostname = req.headers.host;
       await fileUpload(req, res, (err) => {
         if (err) {
           return res.status(200).send({
@@ -174,7 +190,8 @@ module.exports = {
           if (image.fieldname !== "image") {
             subCategory.push({
               label: image.fieldname,
-              subCategoryImage:'http://'+hostname+'/'+image.path.replaceAll('\\', "/"),
+              subCategoryImage:
+                "http://" + hostname + "/" + image.path.replaceAll("\\", "/"),
             });
           }
         });
@@ -183,30 +200,32 @@ module.exports = {
             req.params.id,
             {
               label: req.body.label,
-              image: 'http://'+hostname+'/'+req.files[0].path.replaceAll('\\', "/"),
+              image:
+                "http://" +
+                hostname +
+                "/" +
+                req.files[0].path.replaceAll("\\", "/"),
               subCategory: subCategory,
             },
             {
               new: true,
             }
-          )
-            .then((newCategories) => {
-              if (newCategories) {
-                return res.status(200).send({
-                  data: newCategories,
-                  message: "Successfully updated Categories..!",
-                  success: true,
-                });
-              }
-              else{
-                return res.status(404).send({
-                  data: [],
-                  message: "Invalid Id",
-                  status: false,
-                });
-              }
-            })
-          } else {
+          ).then((newCategories) => {
+            if (newCategories) {
+              return res.status(200).send({
+                data: newCategories,
+                message: "Successfully updated Categories..!",
+                success: true,
+              });
+            } else {
+              return res.status(404).send({
+                data: [],
+                message: "Invalid Id",
+                status: false,
+              });
+            }
+          });
+        } else {
           return res.status(200).send({
             data: [],
             message: "Cannot find category with id " + req.params.id,
@@ -214,6 +233,52 @@ module.exports = {
           });
         }
       });
+    } catch (error) {
+      console.log("error", error);
+      let errormessage = error.message;
+      return res.status(404).send({
+        data: [],
+        message: "error",
+        errormessage,
+        status: false,
+      });
+    }
+  },
+  viewCategoryDetails: async (req, res) => {
+    try {
+      if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
+        await Category.findById({ _id: req.params.id })
+          .then((category) => {
+            if (category.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No category found..!",
+                success: true,
+              });
+            }
+            return res.status(200).send({
+              data: category,
+              message: "Successfully fetched category details..!",
+              success: true,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            let errormessage = err.message;
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              errormessage,
+              status: false,
+            });
+          });
+      } else {
+        return res.status(200).send({
+          data: [],
+          message: "Cannot find category with id " + req.params.id,
+          success: false,
+        });
+      }
     } catch (error) {
       console.log("error", error);
       let errormessage = error.message;

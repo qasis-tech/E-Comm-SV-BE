@@ -35,4 +35,5 @@ router.put("/addUser/:id",userController.addUserDetails);
 router.get("/product/:id",productController.viewProductDetails);
 router.get("/order/:id",orderController.viewOrderDetails);
 router.get("/signup/:id",userController.viewUserDetails);
+router.get("/category/:id",categoryController.viewCategoryDetails);
 module.exports = router;

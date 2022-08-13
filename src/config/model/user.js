@@ -18,7 +18,7 @@ const userSchema = mongoose.Schema({
     type: String,
   },
   dob: {
-    type: Date,
+    type: String,
   },
   pinCode: {
     type: Number,
