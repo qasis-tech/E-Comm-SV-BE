@@ -275,7 +275,7 @@ module.exports = {
   editCategory: async (req, res) => {
     try {
       const hostname = req.headers.host;
-      await fileUpload(req, res, (err) => {
+      fileUpload(req, res, (err) => {
         if (err) {
           return res.status(200).send({
             data: [],
@@ -284,7 +284,7 @@ module.exports = {
           });
         }
         const subCategory = [];
-        req.files.forEach((image) => {
+        req?.files?.forEach((image) => {
           if (image.fieldname !== "image") {
             subCategory.push({
               label: image.fieldname,

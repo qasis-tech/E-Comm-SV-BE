@@ -13,14 +13,21 @@ const Storage = multer.diskStorage({
     cb(null, Date.now() + "-" + file.originalname);
   },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" || file.mimetype == "image/svg" || 
-    file.mimetype == "video/mp4") {
+    if (
+      file.mimetype == "image/png" ||
+      file.mimetype == "image/jpg" ||
+      file.mimetype == "image/jpeg" ||
+      file.mimetype == "image/svg" ||
+      file.mimetype == "video/mp4"
+    ) {
       cb(null, true);
     } else {
       cb(null, false);
-      return cb(new Error('Only .png, .jpg, .jpeg,.svg and .mp4 format allowed!'));
+      return cb(
+        new Error("Only .png, .jpg, .jpeg,.svg and .mp4 format allowed!")
+      );
     }
-  }
+  },
 });
 const upload = multer({
   storage: Storage,
@@ -30,25 +37,31 @@ module.exports = {
   addProduct: async (req, res) => {
     try {
       const hostname = req.headers.host;
-      await fileUpload(req, res, (err) => {
-        if(req.files.length===0 ||req.body===""){
-          return res.status(200).send({
-                data: [],
-                message: "must fill out all fields",
-                success: false,
-              });
-            }          
-        if (err) {
-          console.log("error in image upload", err);
-          let errormessage=err.message
+      fileUpload(req, res, (err) => {
+        // const field = req.body;
+        // let pa = typeof field === string ? JSON.parse(field.features) : field;
+        // console.log("req.body", pa[0]);
+
+        if (req.files.length === 0 || req.body === "") {
           return res.status(200).send({
             data: [],
-            message: "Error in image uploading..!",errormessage,
+            message: "must fill out all fields",
+            success: false,
+          });
+        }
+        if (err) {
+          console.log("error in image upload", err);
+          let errormessage = err.message;
+          return res.status(200).send({
+            data: [],
+            message: "Error in image uploading..!",
+            errormessage,
             success: false,
           });
         } else {
           const imageArray = [];
           const videoArray = [];
+
           req.files.forEach((file) => {
             if (file.fieldname === "productImage") {
               imageArray.push({
