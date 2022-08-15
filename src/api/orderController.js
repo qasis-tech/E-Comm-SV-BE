@@ -9,100 +9,97 @@ module.exports = {
       const products = req.body.productId;
       const unitList = ["kg", "g", "ltr", "no"];
       const unitArray = [];
-      const productArray=[]
+      const productArray = [];
       products.forEach((units) => {
         if (unitList.indexOf(units.unit) === -1) {
           unitArray.push(units.unit);
-          productArray.push(units.id)
+          productArray.push(units.id);
         }
       });
       if (unitArray.length) {
         res.status(200).send({
           data: [],
-          message: "Allowed units for product id "+productArray + " are "+unitList,
+          message:
+            "Allowed units for product id " + productArray + " are " + unitList,
           success: false,
-        });
-      }
-      else{
-          if (mongoose.Types.ObjectId.isValid(req.body.userId) === true) {
-        User.find(
-          {
-            _id: req.body.userId,
-          },
-          { name: 1, mobileNumber: 1, email: 1, pinCode: 1 }
-        ).then((userDetails) => {
-          if (!userDetails.length) {
-            return res.status(200).send({
-              data: [],
-              message: "User not exists..!",
-              success: false,
-            });
-          }
-          const productDetails = products.map((item) => item.id);
-          Product.find(
-            { _id: { $in: productDetails } },
-            async function (err, items) {
-              if (err) {
-                return res.status(200).send({
-                  data: [],
-                  message: "Enter correct product Id..!",
-                  success: false,
-                });
-              }
-              items.forEach((data) => {
-                products.forEach((productData) => {
-                  if (productData.id === data.id) {
-                    data.unit = productData.unit;
-                    data.quantity = productData.quantity;
-                  }
-                });
-              });
-              function makeid() {
-                let text = "";
-                let possible = "0123456789";
-                for (var i = 0; i < 4; i++)
-                  text += possible.charAt(
-                    Math.floor(Math.random() * possible.length)
-                  );
-                return text;
-              }
-              const newOrder = Order.create({
-                product: [{ productList: items }],
-                user: userDetails[0],
-                status: "pending",
-                orderId: makeid(),
-              })
-                .then((newOrder) => {
-                  return res.status(200).send({
-                    data: newOrder,
-                    message: "Successfully placed order..!",
-                    success: true,
-                  });
-                })
-                .catch((error) => {
-                  console.log("error", error);
-                  let errormessage = error.message;
-                  return res.status(200).send({
-                    data: [],
-                    message: "Failed to place order..!",
-                    errormessage,
-                    success: false,
-                  });
-                });
-            }
-          );
         });
       } else {
-        return res.status(200).send({
-          data: [],
-          message: "Cannot find user with id " + req.body.userId,
-          success: false,
-        });
+        if (mongoose.Types.ObjectId.isValid(req.body.userId) === true) {
+          User.find(
+            {
+              _id: req.body.userId,
+            },
+            { name: 1, mobileNumber: 1, email: 1, pinCode: 1 }
+          ).then((userDetails) => {
+            if (!userDetails.length) {
+              return res.status(200).send({
+                data: [],
+                message: "User not exists..!",
+                success: false,
+              });
+            }
+            const productDetails = products.map((item) => item.id);
+            Product.find(
+              { _id: { $in: productDetails } },
+              async function (err, items) {
+                if (err) {
+                  return res.status(200).send({
+                    data: [],
+                    message: "Enter correct product Id..!",
+                    success: false,
+                  });
+                }
+                items.forEach((data) => {
+                  products.forEach((productData) => {
+                    if (productData.id === data.id) {
+                      data.unit = productData.unit;
+                      data.quantity = productData.quantity;
+                    }
+                  });
+                });
+                function makeid() {
+                  let text = "";
+                  let possible = "0123456789";
+                  for (var i = 0; i < 4; i++)
+                    text += possible.charAt(
+                      Math.floor(Math.random() * possible.length)
+                    );
+                  return text;
+                }
+                const newOrder = Order.create({
+                  product: [{ productList: items }],
+                  user: userDetails[0],
+                  status: "pending",
+                  orderId: makeid(),
+                })
+                  .then((newOrder) => {
+                    return res.status(200).send({
+                      data: newOrder,
+                      message: "Successfully placed order..!",
+                      success: true,
+                    });
+                  })
+                  .catch((error) => {
+                    console.log("error", error);
+                    let errormessage = error.message;
+                    return res.status(200).send({
+                      data: [],
+                      message: "Failed to place order..!",
+                      errormessage,
+                      success: false,
+                    });
+                  });
+              }
+            );
+          });
+        } else {
+          return res.status(200).send({
+            data: [],
+            message: "Cannot find user with id " + req.body.userId,
+            success: false,
+          });
+        }
       }
-     
-      }
-
-    
     } catch (error) {
       console.log("error", error);
       let errormessage = error.message;
