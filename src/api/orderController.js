@@ -1,3 +1,4 @@
+const { exist } = require("joi");
 const mongoose = require("mongoose");
 const Order = require("../config/model/order");
 const Product = require("../config/model/product");
@@ -5,68 +6,103 @@ const User = require("../config/model/user");
 module.exports = {
   addOrder: async (req, res) => {
     try {
-      await User.find(
-        {
-          _id: req.body.userId,
-        },
-        { name: 1, mobileNumber: 1, email: 1, pinCode: 1 }
-      ).then((userDetails) => {
-        if (!userDetails) {
-          return res.status(200).send({
-            data: [],
-            message: "Failed to fetch user details..!",
-            success: false,
-          });
+      const products = req.body.productId;
+      const unitList = ["kg", "g", "ltr", "no"];
+      const unitArray = [];
+      const productArray=[]
+      products.forEach((units) => {
+        if (unitList.indexOf(units.unit) === -1) {
+          unitArray.push(units.unit);
+          productArray.push(units.id)
         }
-        const productDetails = req.body.productId.map((item) => item.id);
-        Product.find(
-          { _id: { $in: productDetails } },
-          async function (err, items) {
-            const products = req.body.productId;
-            items.forEach((data) => {
-              products.forEach((aa) => {
-                if (aa.id === data.id) {
-                  data.unit = aa.unit;
-                  data.quantity = aa.quantity;
-                }
-              });
+      });
+      if (unitArray.length) {
+        res.status(200).send({
+          data: [],
+          message: "Allowed units for product id "+productArray + " are "+unitList,
+          success: false,
+        });
+      }
+      else{
+          if (mongoose.Types.ObjectId.isValid(req.body.userId) === true) {
+        User.find(
+          {
+            _id: req.body.userId,
+          },
+          { name: 1, mobileNumber: 1, email: 1, pinCode: 1 }
+        ).then((userDetails) => {
+          if (!userDetails.length) {
+            return res.status(200).send({
+              data: [],
+              message: "User not exists..!",
+              success: false,
             });
-            function makeid() {
-              let text = "";
-              let possible = "0123456789";
-              for (var i = 0; i < 4; i++)
-                text += possible.charAt(
-                  Math.floor(Math.random() * possible.length)
-                );
-
-              return text;
-            }
-            const newOrder = await Order.create({
-              product: [{ productList: items }],
-              user: userDetails[0],
-              status: "pending",
-              orderId: makeid(),
-            })
-              .then((newOrder) => {
-                return res.status(200).send({
-                  data: newOrder,
-                  message: "Successfully placed order..!",
-                  success: true,
-                });
-              })
-              .catch((error) => {
-                console.log("error", error);
-                let errormessage = error.message;
+          }
+          const productDetails = products.map((item) => item.id);
+          Product.find(
+            { _id: { $in: productDetails } },
+            async function (err, items) {
+              if (err) {
                 return res.status(200).send({
                   data: [],
-                  message: "Failed to place order..!",
-                  errormessage,
+                  message: "Enter correct product Id..!",
                   success: false,
                 });
+              }
+              items.forEach((data) => {
+                products.forEach((productData) => {
+                  if (productData.id === data.id) {
+                    data.unit = productData.unit;
+                    data.quantity = productData.quantity;
+                  }
+                });
               });
-          }
-        );
-      });
+              function makeid() {
+                let text = "";
+                let possible = "0123456789";
+                for (var i = 0; i < 4; i++)
+                  text += possible.charAt(
+                    Math.floor(Math.random() * possible.length)
+                  );
+                return text;
+              }
+              const newOrder = Order.create({
+                product: [{ productList: items }],
+                user: userDetails[0],
+                status: "pending",
+                orderId: makeid(),
+              })
+                .then((newOrder) => {
+                  return res.status(200).send({
+                    data: newOrder,
+                    message: "Successfully placed order..!",
+                    success: true,
+                  });
+                })
+                .catch((error) => {
+                  console.log("error", error);
+                  let errormessage = error.message;
+                  return res.status(200).send({
+                    data: [],
+                    message: "Failed to place order..!",
+                    errormessage,
+                    success: false,
+                  });
+                });
+            }
+          );
+        });
+      } else {
+        return res.status(200).send({
+          data: [],
+          message: "Cannot find user with id " + req.body.userId,
+          success: false,
+        });
+      }
+     
+      }
+
+    
     } catch (error) {
       console.log("error", error);
       let errormessage = error.message;

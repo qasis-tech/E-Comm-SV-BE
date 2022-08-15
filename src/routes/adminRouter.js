@@ -25,7 +25,7 @@ router.put("/category/:id",tokenAuth.verifyToken,tokenAuth.verifyMyToken,categor
 router.post("/product",tokenAuth.verifyToken,tokenAuth.verifyMyToken,productController.addProduct);
 router.get("/product",tokenAuth.verifyToken,tokenAuth.verifyMyToken,productController.viewProduct);
 router.put("/product/:id",tokenAuth.verifyToken,tokenAuth.verifyMyToken,productController.editProduct);
-router.post("/order",tokenAuth.verifyToken,tokenAuth.verifyMyToken,orderController.addOrder);
+router.post("/order",tokenAuth.verifyToken,tokenAuth.verifyMyToken,validate(validation.orderValid),orderController.addOrder);
 router.get("/order",tokenAuth.verifyToken,tokenAuth.verifyMyToken,orderController.viewTotalOrder);
 router.post("/stock",tokenAuth.verifyToken,tokenAuth.verifyMyToken,stockController.addStock);
 router.get("/stock",tokenAuth.verifyToken,tokenAuth.verifyMyToken,stockController.viewStock);

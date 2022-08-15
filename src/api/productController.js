@@ -92,12 +92,11 @@ module.exports = {
                   });
                 }
               });
-              const unitList = ["kg" ,"g", "ltr", "no"]
-              
+              const unitList = ["kg" ,"g", "ltr", "no"]              
               if(unitList.indexOf(req.body.unit) ){
                 return res.status(200).send({
                   data: [],
-                  message: "g/kg/ltr/no allowed in units..!",
+                  message: 'allowed units',unitList,
                   success: false,
                 });
               }

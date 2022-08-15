@@ -21,5 +21,8 @@ exports.googleAuth = Joi.object().keys({
     name: Joi.string().required(),
     photoUrl: Joi.string().required(),
 });
-
+exports.orderValid = Joi.object().keys({
+    productId: Joi.array().required(),
+    userId: Joi.string().required(),    
+});
 
