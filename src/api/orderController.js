@@ -1,5 +1,6 @@
 const { exist } = require("joi");
 const mongoose = require("mongoose");
+const order = require("../config/model/order");
 const Order = require("../config/model/order");
 const Product = require("../config/model/product");
 const User = require("../config/model/user");
@@ -67,7 +68,7 @@ module.exports = {
                   return text;
                 }
                 const newOrder = Order.create({
-                  product: [{ productList: items }],
+                  product:  items,
                   user: userDetails[0],
                   status: "pending",
                   orderId: makeid(),
@@ -174,31 +175,34 @@ module.exports = {
           .skip(skip)
           .limit(limit)
           .then((orders) => {
-            if (orders.length === 0) {
-              return res.status(200).send({
-                data: [],
-                message: "No orders yet..!",
-                success: true,
-              });
-            }
-            Order.find({
-              status: "pending",
-            }).then((pendingOrders) => {
-              Order.find({
-                status: "completed",
-              }).then((completedOrders) => {
-                res.status(200).send({
-                  data: orders,
-                  shorthanddetails: {
-                    totalorders: orders,
-                    pendingOrders: pendingOrders,
-                    completedOrders: completedOrders,
-                  },
-                  message: "Successfully fetched orders..!",
+            Order.find().count().then((orderCount)=>{
+              if (orders.length === 0) {
+                return res.status(200).send({
+                  data: [],
+                  message: "No orders yet..!",
                   success: true,
                 });
+              }
+              Order.find({
+                status: "pending",
+              }).count().then((pendingOrders) => {
+                Order.find({
+                  status: "completed",
+                }).count().then((completedOrders) => {
+                  res.status(200).send({
+                    data: orders,
+                    shorthanddetails: {
+                      totalorders: orderCount,
+                      pendingOrders: pendingOrders,
+                      completedOrders: completedOrders,
+                    },
+                    message: "Successfully fetched orders..!",
+                    success: true,
+                  });
+                });
               });
-            });
+            })          
+         
           });
       }
     } catch (error) {
