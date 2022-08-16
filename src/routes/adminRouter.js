@@ -16,7 +16,7 @@ router.get("/", function (req, res, next) {
 router.post("/signup",validate(validation.usersignup),userController.addUser);
 router.post("/google",validate(validation.googleAuth),userController.googleAuth);
 router.get("/signup",userController.viewUsers);
-router.put("/signup/:id",userController.editUsers);
+router.put("/signup/:id",validate(validation.usersignup),userController.editUsers);
 router.delete("/signup/:id",userController.deleteUsers);
 router.post("/login", validate(validation.signin), userController.login);
 router.post("/category",tokenAuth.verifyToken,tokenAuth.verifyMyToken,categoryController.addCategory);
@@ -27,9 +27,9 @@ router.get("/product",tokenAuth.verifyToken,tokenAuth.verifyMyToken,productContr
 router.put("/product/:id",tokenAuth.verifyToken,tokenAuth.verifyMyToken,productController.editProduct);
 router.post("/order",tokenAuth.verifyToken,tokenAuth.verifyMyToken,validate(validation.orderValid),orderController.addOrder);
 router.get("/order",tokenAuth.verifyToken,tokenAuth.verifyMyToken,orderController.viewTotalOrder);
-router.post("/stock",tokenAuth.verifyToken,tokenAuth.verifyMyToken,stockController.addStock);
+router.post("/stock",tokenAuth.verifyToken,tokenAuth.verifyMyToken,validate(validation.stockValid),stockController.addStock);
 router.get("/stock",tokenAuth.verifyToken,tokenAuth.verifyMyToken,stockController.viewStock);
-router.put("/stock/:id",tokenAuth.verifyToken,tokenAuth.verifyMyToken,stockController.editStock);
+router.put("/stock/:id",tokenAuth.verifyToken,tokenAuth.verifyMyToken,validate(validation.stockValid),stockController.editStock);
 router.delete("/stock/:id",tokenAuth.verifyToken,tokenAuth.verifyMyToken,stockController.deleteStock);
 router.put("/addUser/:id",userController.addUserDetails);
 router.get("/product/:id",productController.viewProductDetails);

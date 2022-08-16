@@ -25,4 +25,11 @@ exports.orderValid = Joi.object().keys({
     productId: Joi.array().required(),
     userId: Joi.string().required(),    
 });
+exports.stockValid = Joi.object().keys({
+    product: Joi.string().required(),
+    category: Joi.string().required(),    
+    subCategory: Joi.string().required(),
+    quantity: Joi.number().required(),
+    unit: Joi.string().required(),
+});
 

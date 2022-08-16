@@ -4,54 +4,66 @@ module.exports = {
   addStock: async (req, res) => {
     try {
       const { product, category, subCategory, quantity, unit } = req.body;
-      function makeid() {
-        let text = "";
-        let possible = "0123456789";
-        for (var i = 0; i < 4; i++)
-          text += possible.charAt(Math.floor(Math.random() * possible.length));
-        return text;
-      }
-      await Stock.find({
-        product: product,
-        category: category,
-        subCategory: subCategory,
-      }).then((oldStock) => {
-        if (oldStock.length) {
-          return res.status(200).send({
-            data: [],
-            message: "Stock already exists..!",
-            success: false,
-          });
-        } else {
-          const newStock = new Stock({
-            product: product,
-            category: category,
-            subCategory: subCategory,
-            quantity: quantity,
-            unit: unit,
-            stockId: makeid(),
-          });
-          newStock
-            .save()
-            .then((stock) => {
-              return res.status(200).send({
-                data: stock,
-                message: "Successfully Added stock..!",
-                success: true,
-              });
-            })
-            .catch((err) => {
-              console.log("error", err);
-              let errormessage = err.message;
-              return res.status(404).send({
-                data: [],
-                message: "error",
-                errormessage,
-                status: false,
-              });
-            });
+      const unitList = ["kg", "g", "ltr", "no"];
+      if (unitList.indexOf(unit)) {
+        return res.status(200).send({
+          data: [],
+          message: "allowed units",
+          unitList,
+          success: false,
+        });
+      } else {
+        function makeid() {
+          let text = "";
+          let possible = "0123456789";
+          for (var i = 0; i < 4; i++)
+            text += possible.charAt(
+              Math.floor(Math.random() * possible.length)
+            );
+          return text;
         }
-      });
+        await Stock.find({
+          product: product,
+          category: category,
+          subCategory: subCategory,
+        }).then((oldStock) => {
+          if (oldStock.length) {
+            return res.status(200).send({
+              data: [],
+              message: "Stock already exists..!",
+              success: false,
+            });
+          } else {
+            const newStock = new Stock({
+              product: product,
+              category: category,
+              subCategory: subCategory,
+              quantity: quantity,
+              unit: unit,
+              stockId: makeid(),
+            });
+            newStock
+              .save()
+              .then((stock) => {
+                return res.status(200).send({
+                  data: stock,
+                  message: "Successfully Added stock..!",
+                  success: true,
+                });
+              })
+              .catch((err) => {
+                console.log("error", err);
+                let errormessage = err.message;
+                return res.status(404).send({
+                  data: [],
+                  message: "error",
+                  errormessage,
+                  status: false,
+                });
+              });
+          }
+        });
+      }
     } catch (error) {
       console.log("error", error);
       let errormessage = error.message;
