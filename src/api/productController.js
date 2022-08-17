@@ -12,22 +12,6 @@ const Storage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
   },
-  fileFilter: (req, file, cb) => {
-    if (
-      file.mimetype == "image/png" ||
-      file.mimetype == "image/jpg" ||
-      file.mimetype == "image/jpeg" ||
-      file.mimetype == "image/svg" ||
-      file.mimetype == "video/mp4"
-    ) {
-      cb(null, true);
-    } else {
-      cb(null, false);
-      return cb(
-        new Error("Only .png, .jpg, .jpeg,.svg and .mp4 format allowed!")
-      );
-    }
-  },
 });
 const upload = multer({
   storage: Storage,
@@ -38,7 +22,6 @@ module.exports = {
     try {
       const hostname = req.headers.host;
       fileUpload(req, res, (err) => {
-       
         if (err) {
           console.log("error in image upload", err);
           let errormessage = err.message;
@@ -49,92 +32,93 @@ module.exports = {
             success: false,
           });
         } else {
-          if(!req.body.name){
+          if (!req.body.name) {
             return res.status(200).send({
               data: [],
               message: "Product Name required!",
               success: false,
             });
           }
-          if(!req.body.category){
+          if (!req.body.category) {
             return res.status(200).send({
               data: [],
               message: "Category required!",
               success: false,
             });
           }
-          if(!req.body.subCategory){
+          if (!req.body.subCategory) {
             return res.status(200).send({
               data: [],
               message: "subCategory required!",
               success: false,
             });
           }
-        
-          if(!req.body.unit){
+
+          if (!req.body.unit) {
             return res.status(200).send({
               data: [],
               message: "unit required!",
               success: false,
             });
           }
-          if(!req.body.quantity){
+          if (!req.body.quantity) {
             return res.status(200).send({
               data: [],
               message: "quantity required!",
               success: false,
             });
           }
-          if(!req.body.description){
+          if (!req.body.description) {
             return res.status(200).send({
               data: [],
               message: "description required!",
               success: false,
             });
           }
-          if(!req.body.features){
+          if (!req.body.features) {
             return res.status(200).send({
               data: [],
               message: "features required!",
               success: false,
             });
           }
-          if(!req.body.price){
+          if (!req.body.price) {
             return res.status(200).send({
               data: [],
               message: "price required!",
               success: false,
             });
           }
-          if(!req.body.offerUnit){
+          if (!req.body.offerUnit) {
             return res.status(200).send({
               data: [],
               message: "offerunit required!",
               success: false,
             });
           }
-          if(!req.body.offerQuantity){
+          if (!req.body.offerQuantity) {
             return res.status(200).send({
               data: [],
               message: "offer quantity required!",
               success: false,
             });
           }
-          if(!req.body.offerPrice){
+          if (!req.body.offerPrice) {
             return res.status(200).send({
               data: [],
               message: "offer price required!",
               success: false,
             });
           }
-          if(req?.files[0]?.path===undefined){
+          if (req?.files[0]?.path === undefined) {
             return res.status(200).send({
               data: [],
               message: "product Image required!",
               success: false,
             });
           }
-           Product.find({
+
+          Product.find({
             name: req.body.name,
             category: req.body.category,
             subCategory: req.body.subCategory,
@@ -149,8 +133,18 @@ module.exports = {
               } else {
                 const imageArray = [];
                 const videoArray = [];
-                req.files.forEach((file) => {
+                const imgResult = [];
+                const fileFormat = [
+                  "image/jpeg",
+                  "image/jpg",
+                  "image/png",
+                  "image/svg",
+                ];
+                  req.files.forEach((file) => {
                   if (file.fieldname === "productImage") {
+                    if (fileFormat.indexOf(req?.files[0]?.mimetype) === -1) {
+                      imgResult.push(req?.files[0]?.mimetype);
+                    }
                     imageArray.push({
                       image:
                         "http://" +
@@ -166,11 +160,18 @@ module.exports = {
                         "/" +
                         file.path.replaceAll("\\", "/"),
                     });
+                    console.log("video", req?.files[0]?.mimetype);
                   }
                 });
-              
-             
-                const unitList = ["kg", "g", "ltr", "no"];
+                if (imgResult.length) {
+                  return res.status(200).send({
+                    data: [],
+                    message: "allowed file format",
+                    fileFormat,
+                    success: false,
+                  });
+                }
+               const unitList = ["kg", "g", "ltr", "no"];
                 if (unitList.indexOf(req.body.unit)) {
                   return res.status(200).send({
                     data: [],
@@ -178,7 +179,7 @@ module.exports = {
                     unitList,
                     success: false,
                   });
-                } 
+                }
                 if (unitList.indexOf(req.body.offerUnit)) {
                   return res.status(200).send({
                     data: [],
@@ -186,7 +187,7 @@ module.exports = {
                     unitList,
                     success: false,
                   });
-                }else {
+                } else {
                   const newProduct = new Product({
                     name: req.body.name,
                     category: req.body.category,

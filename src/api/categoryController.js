@@ -43,8 +43,16 @@ module.exports = {
               success: false,
             });
           }
-
-
+          const fileFormat = ["image/jpeg", "image/jpg", "image/png", "image/svg"];
+                 if (fileFormat.indexOf(req?.files[0]?.mimetype)===-1) {
+                  return res.status(200).send({
+                    data: [],
+                    message: "allowed file format",
+                    fileFormat,
+                    success: false,
+                  });
+                } 
+          
             const subCategory = req?.files
             ?.filter((fl) => fl?.fieldname !== "image")
             .map((image) => {
