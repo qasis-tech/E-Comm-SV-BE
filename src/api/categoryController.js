@@ -17,8 +17,7 @@ const upload = multer({
 const fileUpload = upload.any();
 module.exports = {
   addCategory: async (req, res) => { 
-      try {
-              
+      try {              
         const { host } = req.headers;
         fileUpload(req, res, (err) => {
           if (err) {
@@ -30,7 +29,23 @@ module.exports = {
               success: false,
             });
           }
-                   const subCategory = req?.files
+          if(!req.body.label){
+            return res.status(200).send({
+              data: [],
+              message: "Category name required!",
+              success: false,
+            });
+          }
+          if(req?.files[0]?.path===undefined){
+            return res.status(200).send({
+              data: [],
+              message: "category Image required!",
+              success: false,
+            });
+          }
+
+
+            const subCategory = req?.files
             ?.filter((fl) => fl?.fieldname !== "image")
             .map((image) => {
               return {

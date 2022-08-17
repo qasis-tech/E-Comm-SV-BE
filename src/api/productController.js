@@ -49,21 +49,21 @@ module.exports = {
             success: false,
           });
         } else {
-          if(req.body.name===""){
+          if(!req.body.name){
             return res.status(200).send({
               data: [],
               message: "Product Name required!",
               success: false,
             });
           }
-          if(req.body.category===""){
+          if(!req.body.category){
             return res.status(200).send({
               data: [],
               message: "Category required!",
               success: false,
             });
           }
-          if(req.body.subCategory===""){
+          if(!req.body.subCategory){
             return res.status(200).send({
               data: [],
               message: "subCategory required!",
@@ -71,64 +71,70 @@ module.exports = {
             });
           }
         
-          if(req.body.unit===""){
+          if(!req.body.unit){
             return res.status(200).send({
               data: [],
               message: "unit required!",
               success: false,
             });
           }
-          if(req.body.quantity===""){
+          if(!req.body.quantity){
             return res.status(200).send({
               data: [],
               message: "quantity required!",
               success: false,
             });
           }
-          if(req.body.description===""){
+          if(!req.body.description){
             return res.status(200).send({
               data: [],
               message: "description required!",
               success: false,
             });
           }
-          if(req.body.features===""){
+          if(!req.body.features){
             return res.status(200).send({
               data: [],
               message: "features required!",
               success: false,
             });
           }
-          if(req.body.price===""){
+          if(!req.body.price){
             return res.status(200).send({
               data: [],
               message: "price required!",
               success: false,
             });
           }
-          if(req.body.offerUnit===""){
+          if(!req.body.offerUnit){
             return res.status(200).send({
               data: [],
               message: "offerunit required!",
               success: false,
             });
           }
-          if(req.body.offerQuantity===""){
+          if(!req.body.offerQuantity){
             return res.status(200).send({
               data: [],
               message: "offer quantity required!",
               success: false,
             });
           }
-          if(req.body.offerPrice===""){
+          if(!req.body.offerPrice){
             return res.status(200).send({
               data: [],
               message: "offer price required!",
               success: false,
             });
           }
-          
-          Product.find({
+          if(req?.files[0]?.path===undefined){
+            return res.status(200).send({
+              data: [],
+              message: "product Image required!",
+              success: false,
+            });
+          }
+           Product.find({
             name: req.body.name,
             category: req.body.category,
             subCategory: req.body.subCategory,
@@ -162,13 +168,7 @@ module.exports = {
                     });
                   }
                 });
-                if(imageArray===""){
-                  return res.status(200).send({
-                    data: [],
-                    message: "product Image required!",
-                    success: false,
-                  });
-                }
+              
              
                 const unitList = ["kg", "g", "ltr", "no"];
                 if (unitList.indexOf(req.body.unit)) {
@@ -178,7 +178,15 @@ module.exports = {
                     unitList,
                     success: false,
                   });
-                } else {
+                } 
+                if (unitList.indexOf(req.body.offerUnit)) {
+                  return res.status(200).send({
+                    data: [],
+                    message: "allowed units",
+                    unitList,
+                    success: false,
+                  });
+                }else {
                   const newProduct = new Product({
                     name: req.body.name,
                     category: req.body.category,
