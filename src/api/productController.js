@@ -38,17 +38,7 @@ module.exports = {
     try {
       const hostname = req.headers.host;
       fileUpload(req, res, (err) => {
-        // const field = req.body;
-        // let pa = typeof field === string ? JSON.parse(field.features) : field;
-        // console.log("req.body", pa[0]);
-
-        if (req.files.length === 0 || req.body === "") {
-          return res.status(200).send({
-            data: [],
-            message: "must fill out all fields",
-            success: false,
-          });
-        }
+       
         if (err) {
           console.log("error in image upload", err);
           let errormessage = err.message;
@@ -59,95 +49,183 @@ module.exports = {
             success: false,
           });
         } else {
+          if(req.body.name===""){
+            return res.status(200).send({
+              data: [],
+              message: "Product Name required!",
+              success: false,
+            });
+          }
+          if(req.body.category===""){
+            return res.status(200).send({
+              data: [],
+              message: "Category required!",
+              success: false,
+            });
+          }
+          if(req.body.subCategory===""){
+            return res.status(200).send({
+              data: [],
+              message: "subCategory required!",
+              success: false,
+            });
+          }
+        
+          if(req.body.unit===""){
+            return res.status(200).send({
+              data: [],
+              message: "unit required!",
+              success: false,
+            });
+          }
+          if(req.body.quantity===""){
+            return res.status(200).send({
+              data: [],
+              message: "quantity required!",
+              success: false,
+            });
+          }
+          if(req.body.description===""){
+            return res.status(200).send({
+              data: [],
+              message: "description required!",
+              success: false,
+            });
+          }
+          if(req.body.features===""){
+            return res.status(200).send({
+              data: [],
+              message: "features required!",
+              success: false,
+            });
+          }
+          if(req.body.price===""){
+            return res.status(200).send({
+              data: [],
+              message: "price required!",
+              success: false,
+            });
+          }
+          if(req.body.offerUnit===""){
+            return res.status(200).send({
+              data: [],
+              message: "offerunit required!",
+              success: false,
+            });
+          }
+          if(req.body.offerQuantity===""){
+            return res.status(200).send({
+              data: [],
+              message: "offer quantity required!",
+              success: false,
+            });
+          }
+          if(req.body.offerPrice===""){
+            return res.status(200).send({
+              data: [],
+              message: "offer price required!",
+              success: false,
+            });
+          }
+          
           Product.find({
             name: req.body.name,
             category: req.body.category,
             subCategory: req.body.subCategory,
-          }).then((oldProduct) => {
-            if (oldProduct.length) {
-              return res.status(200).send({
-                data: [],
-                message: "Product already exists..!",
-                success: false,
-              });
-            } else {
-              const imageArray = [];
-              const videoArray = [];
-              req.files.forEach((file) => {
-                if (file.fieldname === "productImage") {
-                  imageArray.push({
-                    image:
-                      "http://" +
-                      hostname +
-                      "/" +
-                      file.path.replaceAll("\\", "/"),
-                  });
-                } else {
-                  videoArray.push({
-                    video:
-                      "http://" +
-                      hostname +
-                      "/" +
-                      file.path.replaceAll("\\", "/"),
-                  });
-                }
-              });
-              const unitList = ["kg" ,"g", "ltr", "no"]              
-              if(unitList.indexOf(req.body.unit) ){
+          })
+            .then((oldProduct) => {
+              if (oldProduct.length) {
                 return res.status(200).send({
                   data: [],
-                  message: 'allowed units',unitList,
+                  message: "Product already exists..!",
                   success: false,
                 });
-              }
-              else{
-                const newProduct = new Product({
-                  name: req.body.name,
-                  category: req.body.category,
-                  subCategory: req.body.subCategory,
-                  unit: req.body.unit,
-                  quantity: req.body.quantity,
-                  description: req.body.description,
-                  features: req.body.features,
-                  price: req.body.price,
-                  offerUnit: req.body.offerUnit,
-                  offerQuantity: req.body.offerQuantity,
-                  offerPrice: req.body.offerPrice,
-                  productImage: imageArray,
-                  productVideo: videoArray,
+              } else {
+                const imageArray = [];
+                const videoArray = [];
+                req.files.forEach((file) => {
+                  if (file.fieldname === "productImage") {
+                    imageArray.push({
+                      image:
+                        "http://" +
+                        hostname +
+                        "/" +
+                        file.path.replaceAll("\\", "/"),
+                    });
+                  } else {
+                    videoArray.push({
+                      video:
+                        "http://" +
+                        hostname +
+                        "/" +
+                        file.path.replaceAll("\\", "/"),
+                    });
+                  }
                 });
-                newProduct
-                  .save()
-                  .then((product) => {
-                    return res.status(200).send({
-                      data: product,
-                      message: "Successfully Added Products..!",
-                      success: true,
-                    });
-                  })
-                  .catch((err) => {
-                    console.log("error", err);
-                    let errormessage = err.message;
-                    return res.status(404).send({
-                      data: [],
-                      message: "error",
-                      errormessage,
-                      status: false,
-                    });
+                if(imageArray===""){
+                  return res.status(200).send({
+                    data: [],
+                    message: "product Image required!",
+                    success: false,
                   });
+                }
+             
+                const unitList = ["kg", "g", "ltr", "no"];
+                if (unitList.indexOf(req.body.unit)) {
+                  return res.status(200).send({
+                    data: [],
+                    message: "allowed units",
+                    unitList,
+                    success: false,
+                  });
+                } else {
+                  const newProduct = new Product({
+                    name: req.body.name,
+                    category: req.body.category,
+                    subCategory: req.body.subCategory,
+                    unit: req.body.unit,
+                    quantity: req.body.quantity,
+                    description: req.body.description,
+                    features: req.body.features,
+                    price: req.body.price,
+                    offerUnit: req.body.offerUnit,
+                    offerQuantity: req.body.offerQuantity,
+                    offerPrice: req.body.offerPrice,
+                    productImage: imageArray,
+                    productVideo: videoArray,
+                  });
+                  newProduct
+                    .save()
+                    .then((product) => {
+                      return res.status(200).send({
+                        data: product,
+                        message: "Successfully Added Products..!",
+                        success: true,
+                      });
+                    })
+                    .catch((err) => {
+                      console.log("error", err);
+                      let errormessage = err.message;
+                      return res.status(404).send({
+                        data: [],
+                        message: "error",
+                        errormessage,
+                        status: false,
+                      });
+                    });
+                }
               }
-          
-            }
-          }).catch((err)=>{
-            console.log("error", err);
-            let errormessage = err.message;
-            return res.status(404).send({
-              data: [],
-              message: "error",
-              errormessage,
-              status: false,
+            })
+            .catch((err) => {
+              console.log("error", err);
+              let errormessage = err.message;
+              return res.status(404).send({
+                data: [],
+                message: "error",
+                errormessage,
+                status: false,
+              });
             });
-          })
         }
       });
     } catch (error) {

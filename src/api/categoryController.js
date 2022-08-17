@@ -15,30 +15,22 @@ const upload = multer({
   storage: Storage,
 });
 const fileUpload = upload.any();
-
 module.exports = {
-  addCategory: async (req, res) => {
-    try {
-      const { host } = req.headers;
-      fileUpload(req, res, (err) => {
-        if (err) {
-          console.log("error in file uploading", err);
-          let errormessage = err.message;
-          return res.status(200).send({
-            data: [],
-            message: `Error in image uploading..! ${err.message}`,
-            success: false,
-          });
-        }
-
-        if (req?.files?.length === 0 || req?.body?.label === "") {
-          return res.status(200).send({
-            data: [],
-            message: '{label : "" , image : "", required fields. }',
-            success: false,
-          });
-        } else {
-          const subCategory = req?.files
+  addCategory: async (req, res) => { 
+      try {
+              
+        const { host } = req.headers;
+        fileUpload(req, res, (err) => {
+          if (err) {
+            console.log("error in file uploading", err);
+            let errormessage = err.message;
+            return res.status(200).send({
+              data: [],
+              message: `Error in image uploading..! ${err.message}`,
+              success: false,
+            });
+          }
+                   const subCategory = req?.files
             ?.filter((fl) => fl?.fieldname !== "image")
             .map((image) => {
               return {
@@ -61,7 +53,7 @@ module.exports = {
               }
             }
           }
-          console.log("temp 11", temp, subCategory);
+
           if (
             temp.length > 0 &&
             subCategory.length > 0 &&
@@ -72,7 +64,6 @@ module.exports = {
                 label: req.body.label,
               }).then((newCategory) => {
                 if (newCategory) {
-                  console.log("subCategory in Create : ", subCategory);
                   const newsubCategory = Category.findByIdAndUpdate(
                     newCategory._id,
                     {
@@ -91,41 +82,33 @@ module.exports = {
                     }
                   });
                 } else {
-                  if (req?.body?.label !== "" || req?.files[0]?.path) {
-                    return res.status(404).send({
-                      data: [],
-                      message: '{label : "" , image : "", required fields. }',
-                      status: false,
-                    });
-                  } else {
-                    const newCategory = new Category({
-                      label: req.body.label,
-                      image: `http://${host}/${req.files[0].path.replaceAll(
-                        "\\",
-                        "/"
-                      )}`,
-                      subCategory: subCategory,
-                    });
-                    newCategory
-                      .save()
-                      .then((Category) => {
-                        return res.status(200).send({
-                          data: Category,
-                          message: "Successfully Added Category..!",
-                          success: true,
-                        });
-                      })
-                      .catch((err) => {
-                        console.log("error 4", err);
-                        let errormessage = err.message;
-                        return res.status(404).send({
-                          data: [],
-                          message: "error",
-                          errormessage,
-                          status: false,
-                        });
+                  const newCategory = new Category({
+                    label: req.body.label,
+                    image: `http://${host}/${req?.files[0]?.path.replaceAll(
+                      "\\",
+                      "/"
+                    )}`,
+                    subCategory: subCategory,
+                  });
+                  newCategory
+                    .save()
+                    .then((Category) => {
+                      return res.status(200).send({
+                        data: Category,
+                        message: "Successfully Added Category..!",
+                        success: true,
                       });
-                  }
+                    })
+                    .catch((err) => {
+                      console.log("error 4", err);
+                      let errormessage = err.message;
+                      return res.status(404).send({
+                        data: [],
+                        message: "error",
+                        errormessage,
+                        status: false,
+                      });
+                    });
                 }
               });
             } else {
@@ -154,7 +137,7 @@ module.exports = {
               } else {
                 const newCategory = new Category({
                   label: req.body.label,
-                  image: `http://${host}/${req.files[0].path.replaceAll(
+                  image: `http://${host}/${req?.files[0]?.path.replaceAll(
                     "\\",
                     "/"
                   )}`,
@@ -187,17 +170,17 @@ module.exports = {
               success: false,
             });
           }
-        }
-      });
-    } catch (error) {
-      console.log("error 5", error);
-      let errormessage = error.message;
-      return res.status(404).send({
-        data: [],
-        message: errormessage,
-        status: false,
-      });
-    }
+        });
+      } catch (error) {
+        console.log("error 5", error);
+        let errormessage = error.message;
+        return res.status(404).send({
+          data: [],
+          message: errormessage,
+          status: false,
+        });
+      }
+  //  }
   },
   viewCategory: async (req, res) => {
     try {
