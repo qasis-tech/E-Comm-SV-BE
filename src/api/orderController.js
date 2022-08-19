@@ -179,10 +179,10 @@ module.exports = {
           skip = parseInt(req.query.skip);
         }
         const totalOrders = await Order.find().count();
-        const pendingOrders =await Order.find({
+        const pendingOrders = await Order.find({
           status: "Order Pending",
         }).count();
-        const completedOrders =await Order.find({
+        const completedOrders = await Order.find({
           status: "Delivered",
         }).count();
         await Order.find()

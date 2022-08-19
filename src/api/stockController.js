@@ -243,6 +243,7 @@ module.exports = {
   },
   deleteStock: async (req, res) => {
     try {
+      if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
       await Stock.findByIdAndRemove(req.params.id)
         .then((stock) => {
           res.status(200).send({
@@ -259,6 +260,13 @@ module.exports = {
             success: false,
           });
         });
+      } else {
+        return res.status(200).send({
+          data: [],
+          message: "Cannot find stock with id " + req.params.id,
+          success: false,
+        });
+      }
     } catch (error) {
       console.log("error", error);
       let errormessage = error.message;
