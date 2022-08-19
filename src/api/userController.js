@@ -176,6 +176,7 @@ module.exports = {
         limit = parseInt(req.query.limit);
         skip = parseInt(req.query.skip);
       }
+      let count=await User.find({role:"user"}).count()
       await User.find({
         role: "user",
       })
@@ -193,6 +194,7 @@ module.exports = {
             data: users,
             message: "Successfully fetched users..!",
             success: true,
+            count:count
           });
         })
         .catch((err) => {

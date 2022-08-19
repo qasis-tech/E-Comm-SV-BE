@@ -297,6 +297,34 @@ module.exports = {
             success: false,
           });
         }
+        if (!req.body.label) {
+          return res.status(200).send({
+            data: [],
+            message: "Category name required!",
+            success: false,
+          });
+        }
+        if (req?.files[0]?.path === undefined) {
+          return res.status(200).send({
+            data: [],
+            message: "category Image required!",
+            success: false,
+          });
+        }
+        const fileFormat = [
+          "image/jpeg",
+          "image/jpg",
+          "image/png",
+          "image/svg",
+        ];
+        if (fileFormat.indexOf(req?.files[0]?.mimetype) === -1) {
+          return res.status(200).send({
+            data: [],
+            message: "allowed file format",
+            fileFormat,
+            success: false,
+          });
+        }
         const subCategory = [];
         req?.files?.forEach((image) => {
           if (image.fieldname !== "image") {

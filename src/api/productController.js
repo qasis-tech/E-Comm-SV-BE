@@ -32,6 +32,7 @@ module.exports = {
             success: false,
           });
         } else {
+          const unitList = ["kg", "g", "ltr", "no"];
           if (!req.body.name) {
             return res.status(200).send({
               data: [],
@@ -61,10 +62,25 @@ module.exports = {
               success: false,
             });
           }
+          if (unitList.indexOf(req.body.unit)) {
+            return res.status(200).send({
+              data: [],
+              message: "allowed units",
+              unitList,
+              success: false,
+            });
+          }
           if (!req.body.quantity) {
             return res.status(200).send({
               data: [],
               message: "quantity required!",
+              success: false,
+            });
+          }
+          if (isNaN(req.body.quantity)) {
+            return res.status(200).send({
+              data: [],
+              message: "quantity must be a number!",
               success: false,
             });
           }
@@ -89,6 +105,13 @@ module.exports = {
               success: false,
             });
           }
+          if (isNaN(req.body.price)) {
+            return res.status(200).send({
+              data: [],
+              message: "price must be a number!",
+              success: false,
+            });
+          }
           if (!req.body.offerUnit) {
             return res.status(200).send({
               data: [],
@@ -96,6 +119,14 @@ module.exports = {
               success: false,
             });
           }
+          if (unitList.indexOf(req.body.offerUnit)) {
+            return res.status(200).send({
+              data: [],
+              message: "allowed offer units",
+              unitList,
+              success: false,
+            });
+          } 
           if (!req.body.offerQuantity) {
             return res.status(200).send({
               data: [],
@@ -103,10 +134,24 @@ module.exports = {
               success: false,
             });
           }
+          if (isNaN(req.body.offerQuantity)) {
+            return res.status(200).send({
+              data: [],
+              message: "Offer quantity must be a number!",
+              success: false,
+            });
+          }
           if (!req.body.offerPrice) {
             return res.status(200).send({
               data: [],
               message: "offer price required!",
+              success: false,
+            });
+          }
+          if (isNaN(req.body.offerPrice)) {
+            return res.status(200).send({
+              data: [],
+              message: "Offer price must be a number!",
               success: false,
             });
           }
@@ -170,25 +215,8 @@ module.exports = {
                     fileFormat,
                     success: false,
                   });
-                }
-               const unitList = ["kg", "g", "ltr", "no"];
-                if (unitList.indexOf(req.body.unit)) {
-                  return res.status(200).send({
-                    data: [],
-                    message: "allowed units",
-                    unitList,
-                    success: false,
-                  });
-                }
-                if (unitList.indexOf(req.body.offerUnit)) {
-                  return res.status(200).send({
-                    data: [],
-                    message: "allowed units",
-                    unitList,
-                    success: false,
-                  });
-                } else {
-                  const newProduct = new Product({
+                }           
+                const newProduct = new Product({
                     name: req.body.name,
                     category: req.body.category,
                     subCategory: req.body.subCategory,
@@ -222,7 +250,7 @@ module.exports = {
                         status: false,
                       });
                     });
-                }
+              
               }
             })
             .catch((err) => {
@@ -257,6 +285,7 @@ module.exports = {
           limit = parseInt(req.query.limit);
           skip = parseInt(req.query.skip);
         }
+        let count = await Product.count();
         await Product.find()
           .skip(skip)
           .limit(limit)
@@ -272,6 +301,7 @@ module.exports = {
               data: products,
               message: "Successfully fetched all Products..!",
               success: true,
+              count:count
             });
           })
           .catch((err) => {
@@ -328,6 +358,7 @@ module.exports = {
 
   editProduct: async (req, res) => {
     try {
+
       const hostname = req.headers.host;
       await fileUpload(req, res, (err) => {
         if (err) {
@@ -337,6 +368,150 @@ module.exports = {
             success: false,
           });
         }
+        const unitList = ["kg", "g", "ltr", "no"];
+        if (!req.body.name) {
+          return res.status(200).send({
+            data: [],
+            message: "Product Name required!",
+            success: false,
+          });
+        }
+        if (!req.body.category) {
+          return res.status(200).send({
+            data: [],
+            message: "Category required!",
+            success: false,
+          });
+        }
+        if (!req.body.subCategory) {
+          return res.status(200).send({
+            data: [],
+            message: "subCategory required!",
+            success: false,
+          });
+        }
+
+        if (!req.body.unit) {
+          return res.status(200).send({
+            data: [],
+            message: "unit required!",
+            success: false,
+          });
+        }
+        if (unitList.indexOf(req.body.unit)) {
+          return res.status(200).send({
+            data: [],
+            message: "allowed units",
+            unitList,
+            success: false,
+          });
+        }
+        if (!req.body.quantity) {
+          return res.status(200).send({
+            data: [],
+            message: "quantity required!",
+            success: false,
+          });
+        }
+        if (isNaN(req.body.quantity)) {
+          return res.status(200).send({
+            data: [],
+            message: "quantity must be a number!",
+            success: false,
+          });
+        }
+        if (!req.body.description) {
+          return res.status(200).send({
+            data: [],
+            message: "description required!",
+            success: false,
+          });
+        }
+        if (!req.body.features) {
+          return res.status(200).send({
+            data: [],
+            message: "features required!",
+            success: false,
+          });
+        }
+        if (!req.body.price) {
+          return res.status(200).send({
+            data: [],
+            message: "price required!",
+            success: false,
+          });
+        }
+        if (isNaN(req.body.price)) {
+          return res.status(200).send({
+            data: [],
+            message: "price must be a number!",
+            success: false,
+          });
+        }
+        if (!req.body.offerUnit) {
+          return res.status(200).send({
+            data: [],
+            message: "offerunit required!",
+            success: false,
+          });
+        }
+        if (unitList.indexOf(req.body.offerUnit)) {
+          return res.status(200).send({
+            data: [],
+            message: "allowed offer units",
+            unitList,
+            success: false,
+          });
+        } 
+        if (!req.body.offerQuantity) {
+          return res.status(200).send({
+            data: [],
+            message: "offer quantity required!",
+            success: false,
+          });
+        }
+        if (isNaN(req.body.offerQuantity)) {
+          return res.status(200).send({
+            data: [],
+            message: "offer quantity must be a number!",
+            success: false,
+          });
+        }
+        if (!req.body.offerPrice) {
+          return res.status(200).send({
+            data: [],
+            message: "offer price required!",
+            success: false,
+          });
+        }
+        if (isNaN(req.body.offerPrice)) {
+          return res.status(200).send({
+            data: [],
+            message: "offer price must be a number!",
+            success: false,
+          });
+        }
+        if (req?.files[0]?.path === undefined) {
+          return res.status(200).send({
+            data: [],
+            message: "product Image required!",
+            success: false,
+          });
+        }
+         Product.find({
+            name: req.body.name,
+            category: req.body.category,
+            subCategory: req.body.subCategory,
+          })
+            .then((oldProduct) => {
+              if (oldProduct.length) {
+                return res.status(200).send({
+                  data: [],
+                  message: "Product already exists..!",
+                  success: false,
+                });
+              } 
+            })
         const imageArray = [];
         const videoArray = [];
         req.files.forEach((file) => {

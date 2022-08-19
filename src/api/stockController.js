@@ -139,6 +139,7 @@ module.exports = {
           limit = parseInt(req.query.limit);
           skip = parseInt(req.query.skip);
         }
+        let count = await Stock.count();
         await Stock.find()
           .skip(skip)
           .limit(limit)
@@ -164,6 +165,7 @@ module.exports = {
                   },
                   message: "Successfully fetched stock..!",
                   success: true,
+                  count:count
                 });
               });
             });
