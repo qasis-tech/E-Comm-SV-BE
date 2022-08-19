@@ -353,11 +353,10 @@ module.exports = {
       });
     }
   },
-
   editProduct: async (req, res) => {
     try {
       const hostname = req.headers.host;
-      await fileUpload(req, res, (err) => {
+       fileUpload(req, res, (err) => {
         if (err) {
           console.log("error in image upload", err);
           return res.status(200).send({
@@ -366,15 +365,7 @@ module.exports = {
           });
         }
         if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-          Product.find({ _id: req.params.id }).then((products) => {
-            if (products.length === 0) {
-              return res.status(200).send({
-                data: [],
-                message: "No products found with given id..!",
-                success: false,
-              });
-            } else {
-              const unitList = ["kg", "g", "ltr", "no"];
+             const unitList = ["kg", "g", "ltr", "no"];
               if (!req.body.name) {
                 return res.status(200).send({
                   data: [],
@@ -584,8 +575,6 @@ module.exports = {
                     status: false,
                   });
                 });
-            }
-          });
         } else {
           return res.status(200).send({
             data: [],
