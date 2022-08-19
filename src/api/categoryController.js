@@ -57,7 +57,6 @@ module.exports = {
             success: false,
           });
         }
-
         const subCategory = req?.files
           ?.filter((fl) => fl?.fieldname !== "image")
           .map((image) => {
@@ -70,7 +69,6 @@ module.exports = {
             };
           });
         let temp = [];
-
         if (subCategory.length) {
           for (let index = 0; index < subCategory.length; index++) {
             let i = temp?.findIndex(
@@ -81,7 +79,6 @@ module.exports = {
             }
           }
         }
-
         if (
           temp.length > 0 &&
           subCategory.length > 0 &&
@@ -208,7 +205,6 @@ module.exports = {
         status: false,
       });
     }
-    //  }
   },
   viewCategory: async (req, res) => {
     try {
@@ -289,7 +285,7 @@ module.exports = {
   editCategory: async (req, res) => {
     try {
       const hostname = req.headers.host;
-      await fileUpload(req, res, (err) => {
+      fileUpload(req, res, (err) => {
         if (err) {
           return res.status(200).send({
             data: [],
@@ -324,29 +320,30 @@ module.exports = {
             fileFormat,
             success: false,
           });
-        }    
+        }
         if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-           Category.find({ _id: req.params.id})
-          .then((categories) => {
+          Category.find({ _id: req.params.id }).then((categories) => {
             if (categories.length === 0) {
               return res.status(200).send({
                 data: [],
                 message: "No categories found with given id..!",
                 success: false,
               });
-            }
-            else{
+            } else {
               const subCategory = [];
               req?.files?.forEach((image) => {
                 if (image.fieldname !== "image") {
                   subCategory.push({
                     label: image.fieldname,
                     subCategoryImage:
-                      "http://" + hostname + "/" + image.path.replaceAll("\\", "/"),
+                      "http://" +
+                      hostname +
+                      "/" +
+                      image.path.replaceAll("\\", "/"),
                   });
                 }
               });
-              const newCategory =Category.findByIdAndUpdate(
+              const newCategory = Category.findByIdAndUpdate(
                 req.params.id,
                 {
                   label: req.body.label,
@@ -370,7 +367,7 @@ module.exports = {
                 }
               });
             }
-          })        
+          });
         } else {
           return res.status(200).send({
             data: [],
@@ -393,44 +390,42 @@ module.exports = {
   viewCategoryDetails: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-        Category.find({ _id: req.params.id})
-        .then((categories) => {
+        Category.find({ _id: req.params.id }).then((categories) => {
           if (categories.length === 0) {
             return res.status(200).send({
               data: [],
               message: "No categories found with given id..!",
               success: false,
             });
-          }
-          else{
+          } else {
             Category.findById({ _id: req.params.id })
-            .then((category) => {
-              if (category.length === 0) {
+              .then((category) => {
+                if (category.length === 0) {
+                  return res.status(200).send({
+                    data: [],
+                    message: "No category found..!",
+                    success: false,
+                  });
+                }
                 return res.status(200).send({
-                  data: [],
-                  message: "No category found..!",
-                  success: false,
+                  data: category,
+                  message: "Successfully fetched category details..!",
+                  success: true,
                 });
-              }
-              return res.status(200).send({
-                data: category,
-                message: "Successfully fetched category details..!",
-                success: true,
+              })
+              .catch((err) => {
+                console.log("error", err);
+                let errormessage = err.message;
+                return res.status(404).send({
+                  data: [],
+                  message: "error",
+                  errormessage,
+                  status: false,
+                });
               });
-            })
-            .catch((err) => {
-              console.log("error", err);
-              let errormessage = err.message;
-              return res.status(404).send({
-                data: [],
-                message: "error",
-                errormessage,
-                status: false,
-              });
-            });
-          }       
-      })     
-     } else {
+          }
+        });
+      } else {
         return res.status(200).send({
           data: [],
           message: "Cannot find category with id " + req.params.id,

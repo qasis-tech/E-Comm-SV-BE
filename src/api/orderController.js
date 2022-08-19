@@ -136,7 +136,7 @@ module.exports = {
               data: orders,
               message: "Successfully fetched orders..!",
               success: true,
-              count:orders.length
+              count: orders.length,
             });
           })
           .catch((err) => {
@@ -170,7 +170,7 @@ module.exports = {
               data: orderList,
               message: "Successfully fetched orders..!",
               success: true,
-              count:orderList.length
+              count: orderList.length,
             });
           });
       } else {
@@ -224,45 +224,41 @@ module.exports = {
   viewOrderDetails: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-        Order.find({ _id: req.params.id})
-        .then((orders) => {
+        Order.find({ _id: req.params.id }).then((orders) => {
           if (orders.length === 0) {
             return res.status(200).send({
               data: [],
               message: "No order found with given id..!",
               success: false,
             });
-          }
-          else{
-             Order.findById({ _id: req.params.id })
-            .then((order) => {
-              if (order.length === 0) {
+          } else {
+            Order.findById({ _id: req.params.id })
+              .then((order) => {
+                if (order.length === 0) {
+                  return res.status(200).send({
+                    data: [],
+                    message: "No order found..!",
+                    success: false,
+                  });
+                }
                 return res.status(200).send({
-                  data: [],
-                  message: "No order found..!",
-                  success: false,
+                  data: order,
+                  message: "Successfully fetched order details..!",
+                  success: true,
                 });
-              }
-              return res.status(200).send({
-                data: order,
-                message: "Successfully fetched order details..!",
-                success: true,
+              })
+              .catch((err) => {
+                console.log("error", err);
+                let errormessage = err.message;
+                return res.status(404).send({
+                  data: [],
+                  message: "error",
+                  errormessage,
+                  status: false,
+                });
               });
-            })
-            .catch((err) => {
-              console.log("error", err);
-              let errormessage = err.message;
-              return res.status(404).send({
-                data: [],
-                message: "error",
-                errormessage,
-                status: false,
-              });
-            });
-
           }
-        })
-       
+        });
       } else {
         return res.status(200).send({
           data: [],
@@ -284,66 +280,63 @@ module.exports = {
   editOrder: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-        Order.find({ _id: req.params.id})
-        .then((orders) => {
+        Order.find({ _id: req.params.id }).then((orders) => {
           if (orders.length === 0) {
             return res.status(200).send({
               data: [],
               message: "No order found with given id..!",
               success: false,
             });
-          }
-          else{
-
-        const orderStatus = [
-          "Awaiting order confirming",
-          "Awaiting payment",
-          "Order Pending",
-          "Order received",
-          "Awaiting pickup",
-          "Shipped",
-          "Cancelled",
-          "Awaiting refunding",
-          "Refunded",
-          "Delivered",
-        ];
-        if (orderStatus.indexOf(req.body.status) === -1) {
-          return res.status(200).send({
-            data: [],
-            message: "allowed status",
-            orderStatus,
-            success: false,
-          });
-        }
-        const newOrder = Order.findByIdAndUpdate(
-          req.params.id,
-          {
-            status: req.body.status,
-          },
-          {
-            new: true,
-          }
-        )
-          .then((newOrder) => {
-            if (newOrder) {
+          } else {
+            const orderStatus = [
+              "Awaiting order confirming",
+              "Awaiting payment",
+              "Order Pending",
+              "Order received",
+              "Awaiting pickup",
+              "Shipped",
+              "Cancelled",
+              "Awaiting refunding",
+              "Refunded",
+              "Delivered",
+            ];
+            if (orderStatus.indexOf(req.body.status) === -1) {
               return res.status(200).send({
-                data: newOrder,
-                message: "Successfully updated Order status..!",
-                success: true,
+                data: [],
+                message: "allowed status",
+                orderStatus,
+                success: false,
               });
             }
-          })
-          .catch((error) => {
-            console.log("error", error);
-            let errormessage = error.message;
-            return res.status(404).send({
-              dat: [],
-              message: "error",
-              status: false,
-            });
-          });
-        }
-      })
+            const newOrder = Order.findByIdAndUpdate(
+              req.params.id,
+              {
+                status: req.body.status,
+              },
+              {
+                new: true,
+              }
+            )
+              .then((newOrder) => {
+                if (newOrder) {
+                  return res.status(200).send({
+                    data: newOrder,
+                    message: "Successfully updated Order status..!",
+                    success: true,
+                  });
+                }
+              })
+              .catch((error) => {
+                console.log("error", error);
+                let errormessage = error.message;
+                return res.status(404).send({
+                  dat: [],
+                  message: "error",
+                  status: false,
+                });
+              });
+          }
+        });
       } else {
         return res.status(200).send({
           data: [],

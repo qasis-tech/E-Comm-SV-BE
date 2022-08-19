@@ -176,7 +176,7 @@ module.exports = {
         limit = parseInt(req.query.limit);
         skip = parseInt(req.query.skip);
       }
-      let count=await User.find({role:"user"}).count()
+      let count = await User.find({ role: "user" }).count();
       await User.find({
         role: "user",
       })
@@ -194,7 +194,7 @@ module.exports = {
             data: users,
             message: "Successfully fetched users..!",
             success: true,
-            count:count
+            count: count,
           });
         })
         .catch((err) => {
@@ -229,31 +229,31 @@ module.exports = {
               success: false,
             });
           } else {
-         User.findByIdAndUpdate(
-          req.params.id,
-          {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            mobileNumber: req.body.mobileNumber,
-            email: req.body.email,
-            gender: req.body.gender,
-            dob: req.body.dob,
-            pinCode: req.body.pinCode,
-          },
-          {
-            new: true,
+            User.findByIdAndUpdate(
+              req.params.id,
+              {
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                mobileNumber: req.body.mobileNumber,
+                email: req.body.email,
+                gender: req.body.gender,
+                dob: req.body.dob,
+                pinCode: req.body.pinCode,
+              },
+              {
+                new: true,
+              }
+            ).then((user) => {
+              res.status(200).send({
+                data: user,
+                message: "Successfully updated user..!",
+                success: true,
+              });
+            });
           }
-        ).then((user) => {
-          res.status(200).send({
-            data: user,
-            message: "Successfully updated user..!",
-            success: true,
-          });
         });
-      }
-    })
-          } else {
-          return res.status(404).send({
+      } else {
+        return res.status(404).send({
           data: [],
           message: "user not found with id " + req.params.id,
           success: false,
@@ -281,17 +281,17 @@ module.exports = {
               success: false,
             });
           } else {
-         User.findByIdAndRemove(req.params.id).then((user) => {
-          res.status(200).send({
-            data: user,
-            message: "Successfully deleted user..!",
-            success: true,
-          });
+            User.findByIdAndRemove(req.params.id).then((user) => {
+              res.status(200).send({
+                data: user,
+                message: "Successfully deleted user..!",
+                success: true,
+              });
+            });
+          }
         });
-      }
-    })
       } else {
-         return res.status(200).send({
+        return res.status(200).send({
           data: [],
           message: "user not found with id " + req.params.id,
           success: false,
@@ -319,28 +319,26 @@ module.exports = {
               success: false,
             });
           } else {
-         User.findByIdAndUpdate(
-          req.params.id,
-          {
-            location: req.body.location,
-            primaryAddress: req.body.primaryAddress,
-            otherAddress: req.body.otherAddress,
-            pinCode: req.body.pinCode,
-          },
-          {
-            new: true,
+            User.findByIdAndUpdate(
+              req.params.id,
+              {
+                location: req.body.location,
+                primaryAddress: req.body.primaryAddress,
+                otherAddress: req.body.otherAddress,
+                pinCode: req.body.pinCode,
+              },
+              {
+                new: true,
+              }
+            ).then((user) => {
+              res.status(200).send({
+                data: user,
+                message: "Successfully updated user..!",
+                success: true,
+              });
+            });
           }
-        ).then((user) => {
-          res.status(200).send({
-            data: user,
-            message: "Successfully updated user..!",
-            success: true,
-          });
         });
-
-      }
-    })
-
       } else {
         console.log("error", error);
         return res.status(404).send({
@@ -371,34 +369,33 @@ module.exports = {
               success: false,
             });
           } else {
-         User.findById({ _id: req.params.id })
-          .then((user) => {
-            if (user.length === 0) {
-              return res.status(200).send({
-                data: [],
-                message: "No user found..!",
-                success: false,
+            User.findById({ _id: req.params.id })
+              .then((user) => {
+                if (user.length === 0) {
+                  return res.status(200).send({
+                    data: [],
+                    message: "No user found..!",
+                    success: false,
+                  });
+                }
+                return res.status(200).send({
+                  data: user,
+                  message: "Successfully fetched user details..!",
+                  success: true,
+                });
+              })
+              .catch((err) => {
+                console.log("error", err);
+                let errormessage = err.message;
+                return res.status(404).send({
+                  data: [],
+                  message: "error",
+                  errormessage,
+                  status: false,
+                });
               });
-            }
-            return res.status(200).send({
-              data: user,
-              message: "Successfully fetched user details..!",
-              success: true,
-            });
-          })
-          .catch((err) => {
-            console.log("error", err);
-            let errormessage = err.message;
-            return res.status(404).send({
-              data: [],
-              message: "error",
-              errormessage,
-              status: false,
-            });
-          });
-
-        }
-      })
+          }
+        });
       } else {
         return res.status(200).send({
           data: [],

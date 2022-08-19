@@ -93,7 +93,7 @@ module.exports = {
               data: stock,
               message: "Successfully fetched stock..!",
               success: true,
-              count:stock.length
+              count: stock.length,
             });
           })
           .catch((err) => {
@@ -121,7 +121,7 @@ module.exports = {
               data: stocks,
               message: "Successfully fetched stocks..!",
               success: true,
-              count:stocks.length
+              count: stocks.length,
             });
           })
           .catch((error) => {
