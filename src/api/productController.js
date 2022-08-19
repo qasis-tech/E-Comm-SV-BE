@@ -205,7 +205,7 @@ module.exports = {
                         "/" +
                         file.path.replaceAll("\\", "/"),
                     });
-                    console.log("video", req?.files[0]?.mimetype);
+                    // console.log("video", req?.files[0]?.mimetype);
                   }
                 });
                 if (imgResult.length) {
