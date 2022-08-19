@@ -16,6 +16,19 @@ exports.usersignup = Joi.object().keys({
     pinCode: Joi.string().required(),   
     password: Joi.string().min(8).required(),
 });
+exports.userEditsignup = Joi.object().keys({
+    firstName: Joi.string().required(),
+    lastName: Joi.string().required(),
+    mobileNumber: Joi.string()
+    .length(10)
+    .pattern(/^[0-9]+$/)
+    .required(),
+    email: Joi.string().email().lowercase().required(),
+    gender: Joi.string().required(),
+    dob: Joi.date().required(),
+    pinCode: Joi.string().required(),   
+   
+});
 exports.googleAuth = Joi.object().keys({
     email: Joi.string().email().lowercase().required(),
     name: Joi.string().required(),

@@ -228,7 +228,7 @@ module.exports = {
               return res.status(200).send({
                 data: [],
                 message: "No categories found..!",
-                success: true,
+                success: false,
               });
             }
             return res.status(200).send({
@@ -255,7 +255,7 @@ module.exports = {
               return res.status(200).send({
                 data: [],
                 message: "No categories found..!",
-                success: true,
+                success: false,
               });
             }
             return res.status(200).send({
@@ -289,7 +289,7 @@ module.exports = {
   editCategory: async (req, res) => {
     try {
       const hostname = req.headers.host;
-      fileUpload(req, res, (err) => {
+      await fileUpload(req, res, (err) => {
         if (err) {
           return res.status(200).send({
             data: [],
@@ -324,47 +324,53 @@ module.exports = {
             fileFormat,
             success: false,
           });
-        }
-        const subCategory = [];
-        req?.files?.forEach((image) => {
-          if (image.fieldname !== "image") {
-            subCategory.push({
-              label: image.fieldname,
-              subCategoryImage:
-                "http://" + hostname + "/" + image.path.replaceAll("\\", "/"),
-            });
-          }
-        });
+        }    
         if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-          const newCategory = Category.findByIdAndUpdate(
-            req.params.id,
-            {
-              label: req.body.label,
-              image:
-                "http://" +
-                hostname +
-                "/" +
-                req.files[0].path.replaceAll("\\", "/"),
-              subCategory: subCategory,
-            },
-            {
-              new: true,
-            }
-          ).then((newCategories) => {
-            if (newCategories) {
+           Category.find({ _id: req.params.id})
+          .then((categories) => {
+            if (categories.length === 0) {
               return res.status(200).send({
-                data: newCategories,
-                message: "Successfully updated Categories..!",
-                success: true,
-              });
-            } else {
-              return res.status(404).send({
                 data: [],
-                message: "Invalid Id",
-                status: false,
+                message: "No categories found with given id..!",
+                success: false,
               });
             }
-          });
+            else{
+              const subCategory = [];
+              req?.files?.forEach((image) => {
+                if (image.fieldname !== "image") {
+                  subCategory.push({
+                    label: image.fieldname,
+                    subCategoryImage:
+                      "http://" + hostname + "/" + image.path.replaceAll("\\", "/"),
+                  });
+                }
+              });
+              const newCategory =Category.findByIdAndUpdate(
+                req.params.id,
+                {
+                  label: req.body.label,
+                  image:
+                    "http://" +
+                    hostname +
+                    "/" +
+                    req.files[0].path.replaceAll("\\", "/"),
+                  subCategory: subCategory,
+                },
+                {
+                  new: true,
+                }
+              ).then((newCategories) => {
+                if (newCategories) {
+                  return res.status(200).send({
+                    data: newCategories,
+                    message: "Successfully updated Categories..!",
+                    success: true,
+                  });
+                }
+              });
+            }
+          })        
         } else {
           return res.status(200).send({
             data: [],
@@ -387,32 +393,44 @@ module.exports = {
   viewCategoryDetails: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-        await Category.findById({ _id: req.params.id })
-          .then((category) => {
-            if (category.length === 0) {
+        Category.find({ _id: req.params.id})
+        .then((categories) => {
+          if (categories.length === 0) {
+            return res.status(200).send({
+              data: [],
+              message: "No categories found with given id..!",
+              success: false,
+            });
+          }
+          else{
+            Category.findById({ _id: req.params.id })
+            .then((category) => {
+              if (category.length === 0) {
+                return res.status(200).send({
+                  data: [],
+                  message: "No category found..!",
+                  success: false,
+                });
+              }
               return res.status(200).send({
-                data: [],
-                message: "No category found..!",
+                data: category,
+                message: "Successfully fetched category details..!",
                 success: true,
               });
-            }
-            return res.status(200).send({
-              data: category,
-              message: "Successfully fetched category details..!",
-              success: true,
+            })
+            .catch((err) => {
+              console.log("error", err);
+              let errormessage = err.message;
+              return res.status(404).send({
+                data: [],
+                message: "error",
+                errormessage,
+                status: false,
+              });
             });
-          })
-          .catch((err) => {
-            console.log("error", err);
-            let errormessage = err.message;
-            return res.status(404).send({
-              data: [],
-              message: "error",
-              errormessage,
-              status: false,
-            });
-          });
-      } else {
+          }       
+      })     
+     } else {
         return res.status(200).send({
           data: [],
           message: "Cannot find category with id " + req.params.id,

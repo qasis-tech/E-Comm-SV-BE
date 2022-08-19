@@ -86,13 +86,14 @@ module.exports = {
               return res.status(200).send({
                 data: [],
                 message: "No Stock found..!",
-                success: true,
+                success: false,
               });
             }
             return res.status(200).send({
               data: stock,
               message: "Successfully fetched stock..!",
               success: true,
+              count:stock.length
             });
           })
           .catch((err) => {
@@ -113,13 +114,14 @@ module.exports = {
               return res.status(200).send({
                 data: [],
                 message: "No stock found..!",
-                success: true,
+                success: false,
               });
             }
             return res.status(200).send({
               data: stocks,
               message: "Successfully fetched stocks..!",
               success: true,
+              count:stocks.length
             });
           })
           .catch((error) => {
@@ -148,7 +150,7 @@ module.exports = {
               return res.status(200).send({
                 data: [],
                 message: "No stock available..!",
-                success: true,
+                success: false,
               });
             }
             Stock.find({
@@ -165,7 +167,7 @@ module.exports = {
                   },
                   message: "Successfully fetched stock..!",
                   success: true,
-                  count:count
+                  count: count,
                 });
               });
             });
@@ -192,37 +194,46 @@ module.exports = {
       });
     }
   },
-
   editStock: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-        const newStock = Stock.findByIdAndUpdate(
-          req.params.id,
-          {
-            $inc: { quantity: req.body.quantity },
-          },
-          {
-            new: true,
-          }
-        )
-          .then((newStock) => {
-            if (newStock) {
-              return res.status(200).send({
-                data: newStock,
-                message: "Successfully updated Stock..!",
-                success: true,
-              });
-            }
-          })
-          .catch((error) => {
-            console.log("error", error);
-            let errormessage = error.message;
-            return res.status(404).send({
-              dat: [],
-              message: "error",
-              status: false,
+        Stock.find({ _id: req.params.id }).then((stock) => {
+          if (stock.length === 0) {
+            return res.status(200).send({
+              data: [],
+              message: "No stock found with given id..!",
+              success: false,
             });
-          });
+          } else {
+            const newStock = Stock.findByIdAndUpdate(
+              req.params.id,
+              {
+                $inc: { quantity: req.body.quantity },
+              },
+              {
+                new: true,
+              }
+            )
+              .then((newStock) => {
+                if (newStock) {
+                  return res.status(200).send({
+                    data: newStock,
+                    message: "Successfully updated Stock..!",
+                    success: true,
+                  });
+                }
+              })
+              .catch((error) => {
+                console.log("error", error);
+                let errormessage = error.message;
+                return res.status(404).send({
+                  dat: [],
+                  message: "error",
+                  status: false,
+                });
+              });
+          }
+        });
       } else {
         return res.status(200).send({
           data: [],
@@ -244,21 +255,31 @@ module.exports = {
   deleteStock: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-      await Stock.findByIdAndRemove(req.params.id)
-        .then((stock) => {
-          res.status(200).send({
-            data: stock,
-            message: "Successfully deleted stock..!",
-            success: true,
-          });
-        })
-        .catch((error) => {
-          console.log("error", error);
-          return res.status(200).send({
-            data: [],
-            message: "stock not found with id " + req.params.id,
-            success: false,
-          });
+        Stock.find({ _id: req.params.id }).then((stock) => {
+          if (stock.length === 0) {
+            return res.status(200).send({
+              data: [],
+              message: "No Stock found with given id..!",
+              success: false,
+            });
+          } else {
+            Stock.findByIdAndRemove(req.params.id)
+              .then((stock) => {
+                res.status(200).send({
+                  data: stock,
+                  message: "Successfully deleted stock..!",
+                  success: true,
+                });
+              })
+              .catch((error) => {
+                console.log("error", error);
+                return res.status(200).send({
+                  data: [],
+                  message: "stock not found with id " + req.params.id,
+                  success: false,
+                });
+              });
+          }
         });
       } else {
         return res.status(200).send({

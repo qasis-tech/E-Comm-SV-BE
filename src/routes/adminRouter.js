@@ -22,7 +22,7 @@ router.post(
 router.get("/signup", userController.viewUsers);
 router.put(
   "/signup/:id",
-  validate(validation.usersignup),
+  validate(validation.userEditsignup),
   userController.editUsers
 );
 router.delete("/signup/:id", userController.deleteUsers);

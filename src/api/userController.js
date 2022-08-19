@@ -187,7 +187,7 @@ module.exports = {
             return res.status(200).send({
               data: [],
               message: "No Users found..!",
-              success: true,
+              success: false,
             });
           }
           res.status(200).send({
@@ -221,7 +221,15 @@ module.exports = {
   editUsers: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-        await User.findByIdAndUpdate(
+        User.find({ _id: req.params.id }).then((user) => {
+          if (user.length === 0) {
+            return res.status(200).send({
+              data: [],
+              message: "No user found with given id..!",
+              success: false,
+            });
+          } else {
+         User.findByIdAndUpdate(
           req.params.id,
           {
             firstName: req.body.firstName,
@@ -242,9 +250,10 @@ module.exports = {
             success: true,
           });
         });
-      } else {
-        console.log("error", error);
-        return res.status(404).send({
+      }
+    })
+          } else {
+          return res.status(404).send({
           data: [],
           message: "user not found with id " + req.params.id,
           success: false,
@@ -264,16 +273,25 @@ module.exports = {
   deleteUsers: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-        await User.findByIdAndRemove(req.params.id).then((user) => {
+        User.find({ _id: req.params.id }).then((user) => {
+          if (user.length === 0) {
+            return res.status(200).send({
+              data: [],
+              message: "No user found with given id..!",
+              success: false,
+            });
+          } else {
+         User.findByIdAndRemove(req.params.id).then((user) => {
           res.status(200).send({
             data: user,
             message: "Successfully deleted user..!",
             success: true,
           });
         });
+      }
+    })
       } else {
-        console.log("error", error);
-        return res.status(200).send({
+         return res.status(200).send({
           data: [],
           message: "user not found with id " + req.params.id,
           success: false,
@@ -293,7 +311,15 @@ module.exports = {
   addUserDetails: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-        await User.findByIdAndUpdate(
+        User.find({ _id: req.params.id }).then((user) => {
+          if (user.length === 0) {
+            return res.status(200).send({
+              data: [],
+              message: "No user found with given id..!",
+              success: false,
+            });
+          } else {
+         User.findByIdAndUpdate(
           req.params.id,
           {
             location: req.body.location,
@@ -311,6 +337,10 @@ module.exports = {
             success: true,
           });
         });
+
+      }
+    })
+
       } else {
         console.log("error", error);
         return res.status(404).send({
@@ -333,13 +363,21 @@ module.exports = {
   viewUserDetails: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-        await User.findById({ _id: req.params.id })
+        User.find({ _id: req.params.id }).then((user) => {
+          if (user.length === 0) {
+            return res.status(200).send({
+              data: [],
+              message: "No user found with given id..!",
+              success: false,
+            });
+          } else {
+         User.findById({ _id: req.params.id })
           .then((user) => {
             if (user.length === 0) {
               return res.status(200).send({
                 data: [],
                 message: "No user found..!",
-                success: true,
+                success: false,
               });
             }
             return res.status(200).send({
@@ -358,6 +396,9 @@ module.exports = {
               status: false,
             });
           });
+
+        }
+      })
       } else {
         return res.status(200).send({
           data: [],
