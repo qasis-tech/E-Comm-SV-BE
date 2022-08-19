@@ -62,7 +62,7 @@ module.exports = {
               success: false,
             });
           }
-          if (unitList.indexOf(req.body.unit)) {
+          if (unitList.indexOf(req.body.unit)===-1) {
             return res.status(200).send({
               data: [],
               message: "allowed units",
@@ -119,7 +119,7 @@ module.exports = {
               success: false,
             });
           }
-          if (unitList.indexOf(req.body.offerUnit)) {
+          if (unitList.indexOf(req.body.offerUnit)===-1) {
             return res.status(200).send({
               data: [],
               message: "allowed offer units",
@@ -398,7 +398,7 @@ module.exports = {
             success: false,
           });
         }
-        if (unitList.indexOf(req.body.unit)) {
+        if (unitList.indexOf(req.body.unit)===-1) {
           return res.status(200).send({
             data: [],
             message: "allowed units",
@@ -455,7 +455,7 @@ module.exports = {
             success: false,
           });
         }
-        if (unitList.indexOf(req.body.offerUnit)) {
+        if (unitList.indexOf(req.body.offerUnit)===-1) {
           return res.status(200).send({
             data: [],
             message: "allowed offer units",

@@ -77,7 +77,7 @@ module.exports = {
                 const newOrder = Order.create({
                   product: items,
                   user: userDetails[0],
-                  status: "pending",
+                  status: "Order Pending",
                   orderId: makeid(),
                 })
                   .then((newOrder) => {
@@ -193,12 +193,12 @@ module.exports = {
                   });
                 }
                 Order.find({
-                  status: "pending",
+                  status: "Order Pending",
                 })
                   .count()
                   .then((pendingOrders) => {
                     Order.find({
-                      status: "completed",
+                      status: "Delivered",
                     })
                       .count()
                       .then((completedOrders) => {
@@ -274,13 +274,33 @@ module.exports = {
       });
     }
   },
-  editOrder:async (req, res) => {
+  editOrder: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-        const newOrder= await Order.findByIdAndUpdate(
+        const orderStatus = [
+          "Awaiting order confirming",
+          "Awaiting payment",
+          "Order Pending",
+          "Order received",
+          "Awaiting pickup",
+          "Shipped",
+          "Cancelled",
+          "Awaiting refunding",
+          "Refunded",
+          "Delivered",
+        ];
+        if (orderStatus.indexOf(req.body.status)===-1) {
+          return res.status(200).send({
+            data: [],
+            message: "allowed status",
+            orderStatus,
+            success: false,
+          });
+        }
+        const newOrder = await Order.findByIdAndUpdate(
           req.params.id,
           {
-          status: req.body.status
+            status: req.body.status,
           },
           {
             new: true,
@@ -322,5 +342,4 @@ module.exports = {
       });
     }
   },
-
 };
