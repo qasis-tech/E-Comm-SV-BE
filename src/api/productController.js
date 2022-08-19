@@ -356,7 +356,7 @@ module.exports = {
   editProduct: async (req, res) => {
     try {
       const hostname = req.headers.host;
-       fileUpload(req, res, (err) => {
+      fileUpload(req, res, (err) => {
         if (err) {
           console.log("error in image upload", err);
           return res.status(200).send({
@@ -365,7 +365,15 @@ module.exports = {
           });
         }
         if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-             const unitList = ["kg", "g", "ltr", "no"];
+          Product.find({ _id: req.params.id }).then((products) => {
+            if (products.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No product found with given id..!",
+                success: false,
+              });
+            } else {
+              const unitList = ["kg", "g", "ltr", "no"];
               if (!req.body.name) {
                 return res.status(200).send({
                   data: [],
@@ -387,7 +395,6 @@ module.exports = {
                   success: false,
                 });
               }
-
               if (!req.body.unit) {
                 return res.status(200).send({
                   data: [],
@@ -506,75 +513,72 @@ module.exports = {
                     message: "Product already exists..!",
                     success: false,
                   });
-                }
-              });
-              const imageArray = [];
-              const videoArray = [];
-              req.files.forEach((file) => {
-                if (file.fieldname === "productImage") {
-                  imageArray.push({
-                    image:
-                      "http://" +
-                      hostname +
-                      "/" +
-                      file.path.replaceAll("\\", "/"),
-                  });
                 } else {
-                  videoArray.push({
-                    video:
-                      "http://" +
-                      hostname +
-                      "/" +
-                      file.path.replaceAll("\\", "/"),
+                  const imageArray = [];
+                  const videoArray = [];
+                  req.files.forEach((file) => {
+                    if (file.fieldname === "productImage") {
+                      imageArray.push({
+                        image:
+                          "http://" +
+                          hostname +
+                          "/" +
+                          file.path.replaceAll("\\", "/"),
+                      });
+                    } else {
+                      videoArray.push({
+                        video:
+                          "http://" +
+                          hostname +
+                          "/" +
+                          file.path.replaceAll("\\", "/"),
+                      });
+                    }
                   });
+                  const newProduct = Product.findByIdAndUpdate(
+                    req.params.id,
+                    {
+                      name: req.body.name,
+                      category: req.body.category,
+                      subCategory: req.body.subCategory,
+                      unit: req.body.unit,
+                      quantity: req.body.quantity,
+                      description: req.body.description,
+                      features: req.body.features,
+                      price: req.body.price,
+                      offerUnit: req.body.offerUnit,
+                      offerQuantity: req.body.offerQuantity,
+                      offerPrice: req.body.offerPrice,
+                      productImage: imageArray,
+                      productVideo: videoArray,
+                    },
+                    {
+                      new: true,
+                    }
+                  )
+                    .then((newProducts) => {
+                      if (newProducts) {
+                        return res.status(200).send({
+                          data: newProducts,
+                          message: "Successfully updated Products..!",
+                          success: true,
+                        });
+                      }
+                    })
+                    .catch((err) => {
+                      console.log("error", err);
+                      let errormessage = err.message;
+                      return res.status(404).send({
+                        data: [],
+                        message: "error",
+                        errormessage,
+                        status: false,
+                      });
+                    });
                 }
               });
-              const newProduct = Product.findByIdAndUpdate(
-                req.params.id,
-                {
-                  name: req.body.name,
-                  category: req.body.category,
-                  subCategory: req.body.subCategory,
-                  unit: req.body.unit,
-                  quantity: req.body.quantity,
-                  description: req.body.description,
-                  features: req.body.features,
-                  price: req.body.price,
-                  offerUnit: req.body.offerUnit,
-                  offerQuantity: req.body.offerQuantity,
-                  offerPrice: req.body.offerPrice,
-                  productImage: imageArray,
-                  productVideo: videoArray,
-                },
-                {
-                  new: true,
-                }
-              )
-                .then((newProducts) => {
-                  if (newProducts) {
-                    return res.status(200).send({
-                      data: newProducts,
-                      message: "Successfully updated Products..!",
-                      success: true,
-                    });
-                  } else {
-                    return res.status(404).send({
-                      data: [],
-                      message: "Product not found with given Id",
-                      status: false,
-                    });
-                  }
-                })
-                .catch((err) => {
-                  console.log("error", err);
-                  let errormessage = err.message;
-                  return res.status(404).send({
-                    data: [],
-                    message: "error",
-                    errormessage,
-                    status: false,
-                  });
-                });
+            }
+          });
         } else {
           return res.status(200).send({
             data: [],
