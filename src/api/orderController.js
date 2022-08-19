@@ -178,43 +178,34 @@ module.exports = {
           limit = parseInt(req.query.limit);
           skip = parseInt(req.query.skip);
         }
+        const totalOrders = await Order.find().count();
+        const pendingOrders =await Order.find({
+          status: "Order Pending",
+        }).count();
+        const completedOrders =await Order.find({
+          status: "Delivered",
+        }).count();
         await Order.find()
           .skip(skip)
           .limit(limit)
           .then((orders) => {
-            Order.find()
-              .count()
-              .then((orderCount) => {
-                if (orders.length === 0) {
-                  return res.status(200).send({
-                    data: [],
-                    message: "No orders yet..!",
-                    success: true,
-                  });
-                }
-                Order.find({
-                  status: "Order Pending",
-                })
-                  .count()
-                  .then((pendingOrders) => {
-                    Order.find({
-                      status: "Delivered",
-                    })
-                      .count()
-                      .then((completedOrders) => {
-                        res.status(200).send({
-                          data: orders,
-                          shorthanddetails: {
-                            totalorders: orderCount,
-                            pendingOrders: pendingOrders,
-                            completedOrders: completedOrders,
-                          },
-                          message: "Successfully fetched orders..!",
-                          success: true,
-                        });
-                      });
-                  });
+            if (orders.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No orders yet..!",
+                success: true,
               });
+            }
+            res.status(200).send({
+              data: orders,
+              shorthanddetails: {
+                totalorders: totalOrders,
+                pendingOrders: pendingOrders,
+                completedOrders: completedOrders,
+              },
+              message: "Successfully fetched orders..!",
+              success: true,
+            });
           });
       }
     } catch (error) {
@@ -289,7 +280,7 @@ module.exports = {
           "Refunded",
           "Delivered",
         ];
-        if (orderStatus.indexOf(req.body.status)===-1) {
+        if (orderStatus.indexOf(req.body.status) === -1) {
           return res.status(200).send({
             data: [],
             message: "allowed status",
