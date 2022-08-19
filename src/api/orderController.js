@@ -274,4 +274,53 @@ module.exports = {
       });
     }
   },
+  editOrder:async (req, res) => {
+    try {
+      if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
+        const newOrder= await Order.findByIdAndUpdate(
+          req.params.id,
+          {
+          status: req.body.status
+          },
+          {
+            new: true,
+          }
+        )
+          .then((newOrder) => {
+            if (newOrder) {
+              return res.status(200).send({
+                data: newOrder,
+                message: "Successfully updated Order status..!",
+                success: true,
+              });
+            }
+          })
+          .catch((error) => {
+            console.log("error", error);
+            let errormessage = error.message;
+            return res.status(404).send({
+              dat: [],
+              message: "error",
+              status: false,
+            });
+          });
+      } else {
+        return res.status(200).send({
+          data: [],
+          message: "Cannot find order with id " + req.params.id,
+          success: false,
+        });
+      }
+    } catch (error) {
+      console.log("error", error);
+      let errormessage = error.message;
+      return res.status(404).send({
+        dat: [],
+        message: "error",
+        errormessage,
+        status: false,
+      });
+    }
+  },
+
 };

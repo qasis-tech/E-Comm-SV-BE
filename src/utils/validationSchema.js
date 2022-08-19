@@ -32,7 +32,9 @@ exports.stockValid = Joi.object().keys({
     quantity: Joi.number().required(),
     unit: Joi.string().required(),
 });
-
+exports.orderEditValid = Joi.object().keys({
+   status: Joi.string().required(),    
+});
 
 
 

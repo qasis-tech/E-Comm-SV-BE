@@ -76,6 +76,13 @@ router.get(
   tokenAuth.verifyMyToken,
   orderController.viewTotalOrder
 );
+router.put(
+  "/order/:id",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  validate(validation.orderEditValid),
+  orderController.editOrder
+);
 router.post(
   "/stock",
   tokenAuth.verifyToken,
