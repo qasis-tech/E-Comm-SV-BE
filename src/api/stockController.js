@@ -144,6 +144,12 @@ module.exports = {
           skip = parseInt(req.query.skip);
         }
         let count = await Stock.count();
+        const inStockCount= await Stock.find({
+          quantity: { $gte: 10 },
+        }).count()
+        const outStockCount=await Stock.find({
+          quantity: { $lt: 10 },
+        }).count()
         await Stock.find()
           .skip(skip)
           .limit(limit)
@@ -156,12 +162,7 @@ module.exports = {
                 count: count,
               });
             }
-            const inStockCount=  Stock.find({
-              quantity: { $gte: 10 },
-            }).count()
-            const outStockCount= Stock.find({
-              quantity: { $lt: 10 },
-            }).count()
+           
             Stock.find({
               quantity: { $gte: 10 },
             }).then((inStock) => {

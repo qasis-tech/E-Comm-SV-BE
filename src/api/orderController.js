@@ -1,6 +1,5 @@
 const { exist } = require("joi");
 const mongoose = require("mongoose");
-const order = require("../config/model/order");
 const Order = require("../config/model/order");
 const Product = require("../config/model/product");
 const User = require("../config/model/user");
@@ -175,6 +174,72 @@ module.exports = {
               count: orderList.length,
             });
           });
+      } else if (req.query.status) {
+        const status = req.query.status;
+        await Order.find({ status: status })
+          .then((orders) => {
+            if (!orders.length) {
+              return res.status(200).send({
+                data: [],
+                message: "No order found..!",
+                success: false,
+                count: orders.length,
+              });
+            }
+            return res.status(200).send({
+              data: orders,
+              message: "Successfully fetched orders..!",
+              success: true,
+              count: orders.length,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            let errormessage = err.message;
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              errormessage,
+              status: false,
+            });
+          });
+      } else if (req.query.category) {
+        const categoryName = req.query.category;
+        Order.find({
+          product: { $elemMatch: { category: categoryName } },
+        }).then((orders)=>{
+          res.send(orders);
+        })
+      
+
+    
+        // await Order.find({ product.category: categoryName })
+        // .then((orders) => {
+        //   if (!orders.length) {
+        //     return res.status(200).send({
+        //       data: [],
+        //       message: "No order found..!",
+        //       success: false,
+        //       count: orders.length,
+        //     });
+        //   }
+        //   return res.status(200).send({
+        //     data: orders,
+        //     message: "Successfully fetched orders..!",
+        //     success: true,
+        //     count: orders.length,
+        //   });
+        // })
+        // .catch((err) => {
+        //   console.log("error", err);
+        //   let errormessage = err.message;
+        //   return res.status(404).send({
+        //     data: [],
+        //     message: "error",
+        //     errormessage,
+        //     status: false,
+        //   });
+        // });
       } else {
         let limit = 10;
         let skip = 0;
@@ -198,7 +263,7 @@ module.exports = {
                 data: [],
                 message: "No orders yet..!",
                 success: false,
-                count:totalOrders
+                count: totalOrders,
               });
             }
             res.status(200).send({
@@ -210,7 +275,7 @@ module.exports = {
               },
               message: "Successfully fetched orders..!",
               success: true,
-              count:totalOrders
+              count: totalOrders,
             });
           });
       }

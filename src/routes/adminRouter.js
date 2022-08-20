@@ -63,6 +63,7 @@ router.put(
   tokenAuth.verifyMyToken,
   productController.editProduct
 );
+router.delete("/product/:id", productController.deleteProduct);
 router.post(
   "/order",
   tokenAuth.verifyToken,

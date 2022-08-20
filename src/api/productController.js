@@ -656,4 +656,51 @@ module.exports = {
       });
     }
   },
+  deleteProduct: async (req, res) => {
+    try {
+      if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
+        Product.find({ _id: req.params.id }).then((product) => {
+          if (product.length === 0) {
+            return res.status(200).send({
+              data: [],
+              message: "No Product found with given id..!",
+              success: false,
+            });
+          } else {
+            Product.findByIdAndRemove(req.params.id)
+              .then((product) => {
+                res.status(200).send({
+                  data: product,
+                  message: "Successfully deleted product..!",
+                  success: true,
+                });
+              })
+              .catch((error) => {
+                console.log("error", error);
+                return res.status(200).send({
+                  data: [],
+                  message: "product not found with id " + req.params.id,
+                  success: false,
+                });
+              });
+          }
+        });
+      } else {
+        return res.status(200).send({
+          data: [],
+          message: "Cannot find product with id " + req.params.id,
+          success: false,
+        });
+      }
+    } catch (error) {
+      console.log("error", error);
+      let errormessage = error.message;
+      return res.status(404).send({
+        data: [],
+        message: "error",
+        errormessage,
+        status: false,
+      });
+    }
+  },
 };
