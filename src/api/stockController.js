@@ -91,7 +91,7 @@ module.exports = {
               });
             }
             return res.status(200).send({
-              data: stock,
+              data: {totalStock: stock},
               message: "Successfully fetched stock..!",
               success: true,
               count: stock.length,
@@ -120,7 +120,7 @@ module.exports = {
               });
             }
             return res.status(200).send({
-              data: stocks,
+              data: {totalStock: stocks},
               message: "Successfully fetched stocks..!",
               success: true,
               count: stocks.length,

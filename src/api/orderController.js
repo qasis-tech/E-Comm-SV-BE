@@ -203,44 +203,79 @@ module.exports = {
               status: false,
             });
           });
-      } else if (req.query.category) {
-        const categoryName = req.query.category;
-        Order.find({
-          product: { $elemMatch: { category: categoryName } },
-        }).then((orders)=>{
-          res.send(orders);
-        })
+      } 
+      // else if (req.query.category) {
+      //   const categoryName = req.query.category;
+      //   Order.aggregate([
+      //     {
+      //        "$match" : {
+      //            "product" : {
+      //               "$elemMatch" : {
+      //                   "category" : categoryName
+      //               }
+      //            },
+      //        }
+      //     },
+      //     {
+      //        "$project" : {
+      //            "product" : 1, "user" : 1,
+      //            "product" : {
+      //               "$filter" : {
+      //                  "input" : "$product",
+      //                  "as" : "product",
+      //                  "cond" : {                        
+      //                         "$eq" : [ "$product.category", categoryName ] ,                          
+                        
+      //                  }
+      //               }
+      //            }
+      //        }
+      //     }
+      //     ]).pretty();
+
+
+
+
+
+      // //  const neworder= await Order.find({
+      // //     product: { $elemMatch: { category: categoryName } },
+      // //   })
+      //     res.send(neworder);
+      
       
 
     
-        // await Order.find({ product.category: categoryName })
-        // .then((orders) => {
-        //   if (!orders.length) {
-        //     return res.status(200).send({
-        //       data: [],
-        //       message: "No order found..!",
-        //       success: false,
-        //       count: orders.length,
-        //     });
-        //   }
-        //   return res.status(200).send({
-        //     data: orders,
-        //     message: "Successfully fetched orders..!",
-        //     success: true,
-        //     count: orders.length,
-        //   });
-        // })
-        // .catch((err) => {
-        //   console.log("error", err);
-        //   let errormessage = err.message;
-        //   return res.status(404).send({
-        //     data: [],
-        //     message: "error",
-        //     errormessage,
-        //     status: false,
-        //   });
-        // });
-      } else {
+      //   // await Order.find({ product.category: categoryName })
+      //   // .then((orders) => {
+      //   //   if (!orders.length) {
+      //   //     return res.status(200).send({
+      //   //       data: [],
+      //   //       message: "No order found..!",
+      //   //       success: false,
+      //   //       count: orders.length,
+      //   //     });
+      //   //   }
+      //   //   return res.status(200).send({
+      //   //     data: orders,
+      //   //     message: "Successfully fetched orders..!",
+      //   //     success: true,
+      //   //     count: orders.length,
+      //   //   });
+      //   // })
+      //   // .catch((err) => {
+      //   //   console.log("error", err);
+      //   //   let errormessage = err.message;
+      //   //   return res.status(404).send({
+      //   //     data: [],
+      //   //     message: "error",
+      //   //     errormessage,
+      //   //     status: false,
+      //   //   });
+      //   // });
+      // } 
+      
+      
+      else {
         let limit = 10;
         let skip = 0;
         if (req.query.limit && req.query.skip) {
