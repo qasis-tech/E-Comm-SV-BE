@@ -130,6 +130,7 @@ module.exports = {
                 data: [],
                 message: "No order found..!",
                 success: false,
+                count: orders.length,
               });
             }
             return res.status(200).send({
@@ -164,6 +165,7 @@ module.exports = {
                 data: [],
                 message: "No orders yet..!",
                 success: false,
+                count: orderList.length,
               });
             }
             res.status(200).send({
@@ -196,6 +198,7 @@ module.exports = {
                 data: [],
                 message: "No orders yet..!",
                 success: false,
+                count:totalOrders
               });
             }
             res.status(200).send({
@@ -207,6 +210,7 @@ module.exports = {
               },
               message: "Successfully fetched orders..!",
               success: true,
+              count:totalOrders
             });
           });
       }

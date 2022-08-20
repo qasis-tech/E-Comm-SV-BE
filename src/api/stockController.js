@@ -87,6 +87,7 @@ module.exports = {
                 data: [],
                 message: "No Stock found..!",
                 success: false,
+                count: stock.length,
               });
             }
             return res.status(200).send({
@@ -115,6 +116,7 @@ module.exports = {
                 data: [],
                 message: "No stock found..!",
                 success: false,
+                count: stocks.length,
               });
             }
             return res.status(200).send({
@@ -151,8 +153,15 @@ module.exports = {
                 data: [],
                 message: "No stock available..!",
                 success: false,
+                count: count,
               });
             }
+            const inStockCount=  Stock.find({
+              quantity: { $gte: 10 },
+            }).count()
+            const outStockCount= Stock.find({
+              quantity: { $lt: 10 },
+            }).count()
             Stock.find({
               quantity: { $gte: 10 },
             }).then((inStock) => {
@@ -168,6 +177,11 @@ module.exports = {
                   message: "Successfully fetched stock..!",
                   success: true,
                   count: count,
+                  shorthanddetails: {
+                    totalstock: count,
+                    inStock:inStockCount,
+                    outStock: outStockCount,
+                  },
                 });
               });
             });

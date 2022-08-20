@@ -2,6 +2,7 @@ const User = require("../config/model/user");
 const mongoose = require("mongoose");
 const UtilService = require("../utils/utilService");
 const JWTService = require("../utils/JWTService");
+
 module.exports = {
   login: async function (req, res) {
     try {
@@ -38,9 +39,12 @@ module.exports = {
           },
         }
       );
-      const newUser = await User.findOne({
-        email: email,
-      });
+      const newUser = await User.findOne(
+        {
+          email: email,
+        },
+        { password: 0 }
+      );
       if (newUser.role === "admin") {
         return res.status(200).send({
           data: newUser,
@@ -89,6 +93,7 @@ module.exports = {
           password: encryptedPassword,
           role: "user",
           token: null,
+          status: "active",          
         });
         if (!newUser) {
           return res.status(200).send({
@@ -177,9 +182,12 @@ module.exports = {
         skip = parseInt(req.query.skip);
       }
       let count = await User.find({ role: "user" }).count();
-      await User.find({
-        role: "user",
-      })
+      await User.find(
+        {
+          role: "user",
+        },
+        { password: 0 }
+      )
         .skip(skip)
         .limit(limit)
         .then((users) => {
@@ -188,6 +196,7 @@ module.exports = {
               data: [],
               message: "No Users found..!",
               success: false,
+              count: count,
             });
           }
           res.status(200).send({
@@ -221,37 +230,38 @@ module.exports = {
   editUsers: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-        User.find({ _id: req.params.id }).then((user) => {
-          if (user.length === 0) {
-            return res.status(200).send({
-              data: [],
-              message: "No user found with given id..!",
-              success: false,
-            });
-          } else {
-            User.findByIdAndUpdate(
-              req.params.id,
-              {
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
-                mobileNumber: req.body.mobileNumber,
-                email: req.body.email,
-                gender: req.body.gender,
-                dob: req.body.dob,
-                pinCode: req.body.pinCode,
-              },
-              {
-                new: true,
-              }
-            ).then((user) => {
+        const user = User.find({ _id: req.params.id });
+        if (user.length === 0) {
+          return res.status(200).send({
+            data: [],
+            message: "No user found with given id..!",
+            success: false,
+          });
+        } else {
+          User.findByIdAndUpdate(
+            req.params.id,
+            {
+              firstName: req.body.firstName,
+              lastName: req.body.lastName,
+              mobileNumber: req.body.mobileNumber,
+              email: req.body.email,
+              gender: req.body.gender,
+              dob: req.body.dob,
+              pinCode: req.body.pinCode,
+            },
+            {
+              new: true,
+            }
+          )
+            .select("-password")
+            .then((user) => {
               res.status(200).send({
                 data: user,
                 message: "Successfully updated user..!",
                 success: true,
               });
             });
-          }
-        });
+        }
       } else {
         return res.status(404).send({
           data: [],
@@ -281,13 +291,15 @@ module.exports = {
               success: false,
             });
           } else {
-            User.findByIdAndRemove(req.params.id).then((user) => {
-              res.status(200).send({
-                data: user,
-                message: "Successfully deleted user..!",
-                success: true,
+            User.findByIdAndRemove(req.params.id)
+              .select("-password")
+              .then((user) => {
+                res.status(200).send({
+                  data: user,
+                  message: "Successfully deleted user..!",
+                  success: true,
+                });
               });
-            });
           }
         });
       } else {
@@ -330,13 +342,15 @@ module.exports = {
               {
                 new: true,
               }
-            ).then((user) => {
-              res.status(200).send({
-                data: user,
-                message: "Successfully updated user..!",
-                success: true,
+            )
+              .select("-password")
+              .then((user) => {
+                res.status(200).send({
+                  data: user,
+                  message: "Successfully updated user..!",
+                  success: true,
+                });
               });
-            });
           }
         });
       } else {
@@ -369,7 +383,7 @@ module.exports = {
               success: false,
             });
           } else {
-            User.findById({ _id: req.params.id })
+            User.findById({ _id: req.params.id }, { password: 0 })
               .then((user) => {
                 if (user.length === 0) {
                   return res.status(200).send({

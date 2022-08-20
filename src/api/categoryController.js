@@ -225,6 +225,7 @@ module.exports = {
                 data: [],
                 message: "No categories found..!",
                 success: false,
+                count:count
               });
             }
             return res.status(200).send({
@@ -252,6 +253,7 @@ module.exports = {
                 data: [],
                 message: "No categories found..!",
                 success: false,
+                count:categories.length
               });
             }
             return res.status(200).send({

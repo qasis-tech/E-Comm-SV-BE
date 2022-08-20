@@ -48,6 +48,9 @@ const userSchema = mongoose.Schema({
   token: {
     type: String,
   },
+  status: {
+    type: String,
+  },
 },
 {
   timestamps: true,

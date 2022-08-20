@@ -13,19 +13,19 @@ const { JWT } = require("google-auth-library");
 router.get("/", function (req, res, next) {
   res.send("welcome to adminPanel");
 });
-router.post("/signup", validate(validation.usersignup), userController.addUser);
+router.post("/user", validate(validation.usersignup), userController.addUser);
 router.post(
   "/google",
   validate(validation.googleAuth),
   userController.googleAuth
 );
-router.get("/signup", userController.viewUsers);
+router.get("/user", userController.viewUsers);
 router.put(
-  "/signup/:id",
+  "/user/:id",
   validate(validation.userEditsignup),
   userController.editUsers
 );
-router.delete("/signup/:id", userController.deleteUsers);
+router.delete("/user/:id", userController.deleteUsers);
 router.post("/login", validate(validation.signin), userController.login);
 router.post(
   "/category",
@@ -112,6 +112,6 @@ router.delete(
 router.put("/addUser/:id", userController.addUserDetails);
 router.get("/product/:id", productController.viewProductDetails);
 router.get("/order/:id", orderController.viewOrderDetails);
-router.get("/signup/:id", userController.viewUserDetails);
+router.get("/user/:id", userController.viewUserDetails);
 router.get("/category/:id", categoryController.viewCategoryDetails);
 module.exports = router;

@@ -292,6 +292,7 @@ module.exports = {
                 data: [],
                 message: "No Products found..!",
                 success: false,
+                count: count,
               });
             }
             return res.status(200).send({
@@ -322,6 +323,7 @@ module.exports = {
                 data: [],
                 message: "No products found..!",
                 success: false,
+                count: products.length,
               });
             }
             return res.status(200).send({
