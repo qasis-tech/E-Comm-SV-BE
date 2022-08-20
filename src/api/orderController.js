@@ -205,42 +205,26 @@ module.exports = {
           });
       } 
       // else if (req.query.category) {
-      //   const categoryName = req.query.category;
-      //   Order.aggregate([
-      //     {
-      //        "$match" : {
-      //            "product" : {
-      //               "$elemMatch" : {
-      //                   "category" : categoryName
-      //               }
-      //            },
-      //        }
-      //     },
-      //     {
-      //        "$project" : {
-      //            "product" : 1, "user" : 1,
-      //            "product" : {
-      //               "$filter" : {
-      //                  "input" : "$product",
-      //                  "as" : "product",
-      //                  "cond" : {                        
-      //                         "$eq" : [ "$product.category", categoryName ] ,                          
-                        
-      //                  }
-      //               }
-      //            }
-      //        }
-      //     }
-      //     ]).pretty();
+      //   const category=req.query.category
+      //   const productsArray=[]
+      //  Order.find().then((orderDetails)=>{
+      //   orderDetails.forEach((orders)=>{
+      //    productsArray.push(orders.product)
+         
+      //     })
+      //     productsArray.find({category:category}).then((cate))
 
-
-
+      //     res.send(productsArray)
+      //  })
+       
+      //   // const categoryName = req.query.category;
+      
 
 
       // //  const neworder= await Order.find({
       // //     product: { $elemMatch: { category: categoryName } },
       // //   })
-      //     res.send(neworder);
+         
       
       
 

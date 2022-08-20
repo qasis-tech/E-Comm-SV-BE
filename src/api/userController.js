@@ -175,47 +175,81 @@ module.exports = {
   },
   viewUsers: async (req, res) => {
     try {
-      let limit = 10;
-      let skip = 0;
-      if (req.query.limit && req.query.skip) {
-        limit = parseInt(req.query.limit);
-        skip = parseInt(req.query.skip);
-      }
-      let count = await User.find({ role: "user" }).count();
-      await User.find(
-        {
-          role: "user",
-        },
-        { password: 0 }
-      )
-        .skip(skip)
-        .limit(limit)
+      if(req.query.search)
+      {
+        await User.find({ firstName: { $regex: req.query.search } })
         .then((users) => {
           if (users.length === 0) {
             return res.status(200).send({
               data: [],
-              message: "No Users found..!",
+              message: "No User found..!",
               success: false,
-              count: count,
+              count:users.length
             });
           }
-          res.status(200).send({
+          return res.status(200).send({
             data: users,
             message: "Successfully fetched users..!",
             success: true,
-            count: count,
+            count: users.length,
           });
         })
         .catch((err) => {
-          console.log("error", err);
+          console.log("error 1", err);
           let errormessage = err.message;
-          res.status(404).send({
+          return res.status(404).send({
             data: [],
-            message: "Error..!",
+            message: "error",
             errormessage,
-            success: false,
+            status: false,
           });
         });
+      }
+      else{
+        let limit = 10;
+        let skip = 0;
+        if (req.query.limit && req.query.skip) {
+          limit = parseInt(req.query.limit);
+          skip = parseInt(req.query.skip);
+        }
+        let count = await User.find({ role: "user" }).count();
+        await User.find(
+          {
+            role: "user",
+          },
+          { password: 0 }
+        )
+          .skip(skip)
+          .limit(limit)
+          .then((users) => {
+            if (users.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No Users found..!",
+                success: false,
+                count: count,
+              });
+            }
+            res.status(200).send({
+              data: users,
+              message: "Successfully fetched users..!",
+              success: true,
+              count: count,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            let errormessage = err.message;
+            res.status(404).send({
+              data: [],
+              message: "Error..!",
+              errormessage,
+              success: false,
+            });
+          });
+
+      }
+    
     } catch (error) {
       console.log("error", error);
       let errormessage = error.message;
