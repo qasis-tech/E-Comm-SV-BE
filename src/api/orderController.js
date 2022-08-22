@@ -1,5 +1,6 @@
 const { exist } = require("joi");
 const mongoose = require("mongoose");
+const order = require("../config/model/order");
 const Order = require("../config/model/order");
 const Product = require("../config/model/product");
 const User = require("../config/model/user");
@@ -203,63 +204,52 @@ module.exports = {
               status: false,
             });
           });
-      } 
-      // else if (req.query.category) {
-      //   const category=req.query.category
-      //   const productsArray=[]
-      //  Order.find().then((orderDetails)=>{
-      //   orderDetails.forEach((orders)=>{
-      //    productsArray.push(orders.product)
-         
-      //     })
-      //     productsArray.find({category:category}).then((cate))
-
-      //     res.send(productsArray)
-      //  })
-       
-      //   // const categoryName = req.query.category;
-      
-
-
-      // //  const neworder= await Order.find({
-      // //     product: { $elemMatch: { category: categoryName } },
-      // //   })
-         
-      
-      
-
-    
-      //   // await Order.find({ product.category: categoryName })
-      //   // .then((orders) => {
-      //   //   if (!orders.length) {
-      //   //     return res.status(200).send({
-      //   //       data: [],
-      //   //       message: "No order found..!",
-      //   //       success: false,
-      //   //       count: orders.length,
-      //   //     });
-      //   //   }
-      //   //   return res.status(200).send({
-      //   //     data: orders,
-      //   //     message: "Successfully fetched orders..!",
-      //   //     success: true,
-      //   //     count: orders.length,
-      //   //   });
-      //   // })
-      //   // .catch((err) => {
-      //   //   console.log("error", err);
-      //   //   let errormessage = err.message;
-      //   //   return res.status(404).send({
-      //   //     data: [],
-      //   //     message: "error",
-      //   //     errormessage,
-      //   //     status: false,
-      //   //   });
-      //   // });
-      // } 
-      
-      
-      else {
+      } else if (req.query.category) {
+        const categoryName = req.query.category;
+        Order.find(
+          { product: { $elemMatch: { category: categoryName } } },
+          { "product.$": 1, user: 1, status: 1, orderId: 1, createdAt: 1 }
+        )
+          // Order.aggregate([
+          //   {
+          //     $project: {
+          //       product: {
+          //         $filter: {
+          //           input: "$product",
+          //           as: "product",
+          //           cond: { $gte: [ "$$product.price", 500 ] }
+          //           },
+          //       },
+          //     },
+          //   },
+          // ])
+          .then((orders) => {
+            if (!orders.length) {
+              return res.status(200).send({
+                data: [],
+                message: "No order found..!",
+                success: false,
+                count: orders.length,
+              });
+            }
+            return res.status(200).send({
+              data: orders,
+              message: "Successfully fetched orders..!",
+              success: true,
+              count: orders.length,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            let errormessage = err.message;
+            return res.status(404).send({
+              data: [],
+              message: "error",
+              errormessage,
+              status: false,
+            });
+          });
+      } else {
         let limit = 10;
         let skip = 0;
         if (req.query.limit && req.query.skip) {

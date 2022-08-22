@@ -302,13 +302,15 @@ module.exports = {
             success: false,
           });
         }
-        if (req?.files[0]?.path === undefined) {
-          return res.status(200).send({
-            data: [],
-            message: "category Image required!",
-            success: false,
-          });
-        }
+        // if (req?.files[0]?.path === undefined) {
+        //   return res.status(200).send({
+        //     data: [],
+        //     message: "category Image required!",
+        //     success: false,
+        //   });
+        // }
+        if (req?.files[0]?.path)
+        {
         const fileFormat = [
           "image/jpeg",
           "image/jpg",
@@ -323,6 +325,7 @@ module.exports = {
             success: false,
           });
         }
+      }
         if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
           Category.find({ _id: req.params.id }).then((categories) => {
             if (categories.length === 0) {
@@ -345,29 +348,52 @@ module.exports = {
                   });
                 }
               });
-              const newCategory = Category.findByIdAndUpdate(
-                req.params.id,
-                {
-                  label: req.body.label,
-                  image:
-                    "http://" +
-                    hostname +
-                    "/" +
-                    req.files[0].path.replaceAll("\\", "/"),
-                  subCategory: subCategory,
-                },
-                {
-                  new: true,
-                }
-              ).then((newCategories) => {
-                if (newCategories) {
-                  return res.status(200).send({
-                    data: newCategories,
-                    message: "Successfully updated Categories..!",
-                    success: true,
-                  });
-                }
-              });
+              if (req?.files[0]?.path)
+              {
+                Category.findByIdAndUpdate(
+                  req.params.id,
+                  {
+                    label: req.body.label,
+                    image:
+                      "http://" +
+                      hostname +
+                      "/" +
+                      req?.files[0]?.path.replaceAll("\\", "/"),
+                    subCategory: subCategory,
+                  },
+                  {
+                    new: true,
+                  }
+                ).then((newCategories) => {
+                  if (newCategories) {
+                    return res.status(200).send({
+                      data: newCategories,
+                      message: "Successfully updated Categories..!",
+                      success: true,
+                    });
+                  }
+                });
+              }  
+              else{
+                Category.findByIdAndUpdate(
+                  req.params.id,
+                  {
+                    label: req.body.label,
+                    subCategory: subCategory,
+                  },
+                  {
+                    new: true,
+                  }
+                ).then((newCategories) => {
+                  if (newCategories) {
+                    return res.status(200).send({
+                      data: newCategories,
+                      message: "Successfully updated Categories..!",
+                      success: true,
+                    });
+                  }
+                });
+              }         
             }
           });
         } else {
