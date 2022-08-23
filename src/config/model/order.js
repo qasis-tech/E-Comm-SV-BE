@@ -17,9 +17,10 @@ const orderSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-},
-  {
-    timestamps: true
-  }
+  regDate: {
+    type: String,
+    required: true,
+  },
+}
  );
  module.exports = mongoose.model("order", orderSchema);

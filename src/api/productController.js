@@ -497,88 +497,108 @@ module.exports = {
                   success: false,
                 });
               }
-              if (req?.files[0]?.path === undefined) {
-                return res.status(200).send({
-                  data: [],
-                  message: "product Image required!",
-                  success: false,
-                });
-              }
-              Product.find({
-                name: req.body.name,
-                category: req.body.category,
-                subCategory: req.body.subCategory,
-              }).then((oldProduct) => {
-                if (oldProduct.length) {
-                  return res.status(200).send({
-                    data: [],
-                    message: "Product already exists..!",
-                    success: false,
+              const imageArray = [];
+              const videoArray = [];
+              req?.files?.forEach((file) => {
+                if (file.fieldname === "productImage") {
+                  imageArray.push({
+                    image:
+                      "http://" +
+                      hostname +
+                      "/" +
+                      file.path.replaceAll("\\", "/"),
                   });
                 } else {
-                  const imageArray = [];
-                  const videoArray = [];
-                  req.files.forEach((file) => {
-                    if (file.fieldname === "productImage") {
-                      imageArray.push({
-                        image:
-                          "http://" +
-                          hostname +
-                          "/" +
-                          file.path.replaceAll("\\", "/"),
-                      });
-                    } else {
-                      videoArray.push({
-                        video:
-                          "http://" +
-                          hostname +
-                          "/" +
-                          file.path.replaceAll("\\", "/"),
-                      });
-                    }
+                  videoArray.push({
+                    video:
+                      "http://" +
+                      hostname +
+                      "/" +
+                      file.path.replaceAll("\\", "/"),
                   });
-                  const newProduct = Product.findByIdAndUpdate(
-                    req.params.id,
-                    {
-                      name: req.body.name,
-                      category: req.body.category,
-                      subCategory: req.body.subCategory,
-                      unit: req.body.unit,
-                      quantity: req.body.quantity,
-                      description: req.body.description,
-                      features: req.body.features,
-                      price: req.body.price,
-                      offerUnit: req.body.offerUnit,
-                      offerQuantity: req.body.offerQuantity,
-                      offerPrice: req.body.offerPrice,
-                      productImage: imageArray,
-                      productVideo: videoArray,
-                    },
-                    {
-                      new: true,
-                    }
-                  )
-                    .then((newProducts) => {
-                      if (newProducts) {
-                        return res.status(200).send({
-                          data: newProducts,
-                          message: "Successfully updated Products..!",
-                          success: true,
-                        });
-                      }
-                    })
-                    .catch((err) => {
-                      console.log("error", err);
-                      let errormessage = err.message;
-                      return res.status(404).send({
-                        data: [],
-                        message: "error",
-                        errormessage,
-                        status: false,
-                      });
-                    });
                 }
               });
+              if (req?.files[0]?.path) {
+                const newProduct = Product.findByIdAndUpdate(
+                  req.params.id,
+                  {
+                    name: req.body.name,
+                    category: req.body.category,
+                    subCategory: req.body.subCategory,
+                    unit: req.body.unit,
+                    quantity: req.body.quantity,
+                    description: req.body.description,
+                    features: req.body.features,
+                    price: req.body.price,
+                    offerUnit: req.body.offerUnit,
+                    offerQuantity: req.body.offerQuantity,
+                    offerPrice: req.body.offerPrice,
+                    productImage: imageArray,
+                    productVideo: videoArray,
+                  },
+                  {
+                    new: true,
+                  }
+                )
+                  .then((newProducts) => {
+                    if (newProducts) {
+                      return res.status(200).send({
+                        data: newProducts,
+                        message: "Successfully updated Products..!",
+                        success: true,
+                      });
+                    }
+                  })
+                  .catch((err) => {
+                    console.log("error", err);
+                    let errormessage = err.message;
+                    return res.status(404).send({
+                      data: [],
+                      message: "error",
+                      errormessage,
+                      status: false,
+                    });
+                  });
+              } else {
+                const newProduct = Product.findByIdAndUpdate(
+                  req.params.id,
+                  {
+                    name: req.body.name,
+                    category: req.body.category,
+                    subCategory: req.body.subCategory,
+                    unit: req.body.unit,
+                    quantity: req.body.quantity,
+                    description: req.body.description,
+                    features: req.body.features,
+                    price: req.body.price,
+                    offerUnit: req.body.offerUnit,
+                    offerQuantity: req.body.offerQuantity,
+                    offerPrice: req.body.offerPrice,
+                  },
+                  {
+                    new: true,
+                  }
+                )
+                  .then((newProducts) => {
+                    if (newProducts) {
+                      return res.status(200).send({
+                        data: newProducts,
+                        message: "Successfully updated Products..!",
+                        success: true,
+                      });
+                    }
+                  })
+                  .catch((err) => {
+                    console.log("error", err);
+                    let errormessage = err.message;
+                    return res.status(404).send({
+                      data: [],
+                      message: "error",
+                      errormessage,
+                      status: false,
+                    });
+                  });
+              }
             }
           });
         } else {

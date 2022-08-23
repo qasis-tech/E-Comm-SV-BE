@@ -79,6 +79,7 @@ module.exports = {
                   user: userDetails[0],
                   status: "Order Pending",
                   orderId: makeid(),
+                  regDate:new Date()
                 })
                   .then((newOrder) => {
                     return res.status(200).send({
@@ -121,108 +122,48 @@ module.exports = {
   },
   viewTotalOrder: async (req, res) => {
     try {
-      if (req.query.search) {
-        const search = req.query.search;
-        await Order.find({ orderId: { $regex: search } })
-          .then((orders) => {
-            if (!orders.length) {
-              return res.status(200).send({
-                data: [],
-                message: "No order found..!",
-                success: false,
-                count: orders.length,
-              });
-            }
-            return res.status(200).send({
-              data: orders,
-              message: "Successfully fetched orders..!",
-              success: true,
-              count: orders.length,
-            });
-          })
-          .catch((err) => {
-            console.log("error", err);
-            let errormessage = err.message;
-            return res.status(404).send({
-              data: [],
-              message: "error",
-              errormessage,
-              status: false,
-            });
-          });
-      } else if (req.query.startDate && req.query.endDate) {
-        const { startDate, endDate } = req.query;
-        await Order.find({
-          createdAt: {
-            $gte: new Date(new Date(startDate).setHours(00, 00, 00)),
-            $lt: new Date(new Date(endDate).setHours(23, 59, 59)),
+      if (req.query) {
+        let categoryArray = [];
+        let dateArray=[]
+        let subCategoryArray = [];
+        let searchArray = [];
+        let statusArray = [];
+        if (req.query.category) {
+          categoryArray = req.query.category.split(",");          
+        }       
+        if (req.query.date) {
+        dateArray = req.query.date.split(',');
+        }
+        console.log('date',dateArray)
+        if (req.query.subcategory) {
+          subCategoryArray = req.query.subcategory.split(",");        
+        }
+        if (req.query.search) {
+          searchArray = req.query.search.split(",");
+        }
+        if (req.query.status) {
+          statusArray = req.query.status.split(",");
+          // statusArray = Object.values(req.query.status);
+          // statusArray = statusArray.filter(function (item) {
+          //   return item !== ",";
+          // });
+        }
+        Order.aggregate([
+          { $unwind: "$product" },
+          {
+            $match: {
+              $or: [
+                { "product.category": { $in: categoryArray } },
+                { createdAt: { $in: dateArray } },
+                { "product.subCategory": { $in: subCategoryArray } },
+                { orderId: { $in: searchArray } },
+                {
+                  status: { $in: statusArray },
+                },
+              ],
+            },
           },
-        })
-          .sort({ createdAt: "asc" })
-          .then((orderList) => {
-            if (orderList.length === 0) {
-              return res.status(200).send({
-                data: [],
-                message: "No orders yet..!",
-                success: false,
-                count: orderList.length,
-              });
-            }
-            res.status(200).send({
-              data: orderList,
-              message: "Successfully fetched orders..!",
-              success: true,
-              count: orderList.length,
-            });
-          });
-      } else if (req.query.status) {
-        const status = req.query.status;
-        await Order.find({ status: status })
-          .then((orders) => {
-            if (!orders.length) {
-              return res.status(200).send({
-                data: [],
-                message: "No order found..!",
-                success: false,
-                count: orders.length,
-              });
-            }
-            return res.status(200).send({
-              data: orders,
-              message: "Successfully fetched orders..!",
-              success: true,
-              count: orders.length,
-            });
-          })
-          .catch((err) => {
-            console.log("error", err);
-            let errormessage = err.message;
-            return res.status(404).send({
-              data: [],
-              message: "error",
-              errormessage,
-              status: false,
-            });
-          });
-      } else if (req.query.category) {
-        const categoryName = req.query.category;
-        Order.find(
-          { product: { $elemMatch: { category: categoryName } } },
-          { "product.$": 1, user: 1, status: 1, orderId: 1, createdAt: 1 }
-        )
-          // Order.aggregate([
-          //   {
-          //     $project: {
-          //       product: {
-          //         $filter: {
-          //           input: "$product",
-          //           as: "product",
-          //           cond: { $gte: [ "$$product.price", 500 ] }
-          //           },
-          //       },
-          //     },
-          //   },
-          // ])
+        ])
           .then((orders) => {
             if (!orders.length) {
               return res.status(200).send({
