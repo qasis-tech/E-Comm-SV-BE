@@ -22,7 +22,6 @@ module.exports = {
       fileUpload(req, res, (err) => {
         if (err) {
           console.log("error in file uploading", err);
-          let errormessage = err.message;
           return res.status(200).send({
             data: [],
             message: `Error in image uploading..! ${err.message}`,
@@ -52,8 +51,7 @@ module.exports = {
         if (fileFormat.indexOf(req?.files[0]?.mimetype) === -1) {
           return res.status(200).send({
             data: [],
-            message: "allowed file format",
-            fileFormat,
+            message: `allowed file format..! ${fileFormat}`,
             success: false,
           });
         }
@@ -126,11 +124,9 @@ module.exports = {
                   })
                   .catch((err) => {
                     console.log("error 4", err);
-                    let errormessage = err.message;
                     return res.status(404).send({
                       data: [],
-                      message: "error",
-                      errormessage,
+                      message: `error..! ${err.message}`,
                       status: false,
                     });
                   });
@@ -179,10 +175,9 @@ module.exports = {
                 })
                 .catch((err) => {
                   console.log("error 4", err);
-                  let errormessage = err.message;
                   return res.status(404).send({
                     data: [],
-                    message: errormessage,
+                    message: `error..! ${err.message}`,
                     status: false,
                   });
                 });
@@ -198,10 +193,9 @@ module.exports = {
       });
     } catch (error) {
       console.log("error 5", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -225,7 +219,7 @@ module.exports = {
                 data: [],
                 message: "No categories found..!",
                 success: false,
-                count:count
+                count: count,
               });
             }
             return res.status(200).send({
@@ -237,11 +231,9 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error 3", err);
-            let errormessage = err.message;
             return res.status(404).send({
               data: [],
-              message: "error",
-              errormessage,
+              message: `error..! ${err.message}`,
               status: false,
             });
           });
@@ -253,7 +245,7 @@ module.exports = {
                 data: [],
                 message: "No categories found..!",
                 success: false,
-                count:categories.length
+                count: categories.length,
               });
             }
             return res.status(200).send({
@@ -265,21 +257,18 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error 1", err);
-            let errormessage = err.message;
             return res.status(404).send({
               data: [],
-              message: "error",
-              errormessage,
+              message: `error..! ${err.message}`,
               status: false,
             });
           });
       }
     } catch (error) {
       console.log("error 2", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -302,30 +291,21 @@ module.exports = {
             success: false,
           });
         }
-        // if (req?.files[0]?.path === undefined) {
-        //   return res.status(200).send({
-        //     data: [],
-        //     message: "category Image required!",
-        //     success: false,
-        //   });
-        // }
-        if (req?.files[0]?.path)
-        {
-        const fileFormat = [
-          "image/jpeg",
-          "image/jpg",
-          "image/png",
-          "image/svg",
-        ];
-        if (fileFormat.indexOf(req?.files[0]?.mimetype) === -1) {
-          return res.status(200).send({
-            data: [],
-            message: "allowed file format",
-            fileFormat,
-            success: false,
-          });
+        if (req?.files[0]?.path) {
+          const fileFormat = [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/svg",
+          ];
+          if (fileFormat.indexOf(req?.files[0]?.mimetype) === -1) {
+            return res.status(200).send({
+              data: [],
+              message: `allowed file format..! ${fileFormat}`,
+              success: false,
+            });
+          }
         }
-      }
         if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
           Category.find({ _id: req.params.id }).then((categories) => {
             if (categories.length === 0) {
@@ -348,8 +328,7 @@ module.exports = {
                   });
                 }
               });
-              if (req?.files[0]?.path)
-              {
+              if (req?.files[0]?.path) {
                 Category.findByIdAndUpdate(
                   req.params.id,
                   {
@@ -373,8 +352,7 @@ module.exports = {
                     });
                   }
                 });
-              }  
-              else{
+              } else {
                 Category.findByIdAndUpdate(
                   req.params.id,
                   {
@@ -393,24 +371,22 @@ module.exports = {
                     });
                   }
                 });
-              }         
+              }
             }
           });
         } else {
           return res.status(200).send({
             data: [],
-            message: "Cannot find category with id " + req.params.id,
+            message: `Cannot find category with id ${req.params.id}`,
             success: false,
           });
         }
       });
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -443,11 +419,9 @@ module.exports = {
               })
               .catch((err) => {
                 console.log("error", err);
-                let errormessage = err.message;
                 return res.status(404).send({
                   data: [],
-                  message: "error",
-                  errormessage,
+                  message: `error..! ${err.message}`,
                   status: false,
                 });
               });
@@ -456,17 +430,15 @@ module.exports = {
       } else {
         return res.status(200).send({
           data: [],
-          message: "Cannot find category with id " + req.params.id,
+          message: `Cannot find category with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }

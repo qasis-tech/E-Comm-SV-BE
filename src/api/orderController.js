@@ -20,8 +20,7 @@ module.exports = {
       if (unitArray.length) {
         res.status(200).send({
           data: [],
-          message:
-            "Allowed units for product id " + productArray + " are " + unitList,
+          message: `Allowed units for product id  ${productArray} are ${unitList}`,
           success: false,
         });
       } else {
@@ -79,7 +78,6 @@ module.exports = {
                   user: userDetails[0],
                   status: "Order Pending",
                   orderId: makeid(),
-                  regDate:new Date()
                 })
                   .then((newOrder) => {
                     return res.status(200).send({
@@ -90,11 +88,9 @@ module.exports = {
                   })
                   .catch((error) => {
                     console.log("error", error);
-                    let errormessage = error.message;
                     return res.status(200).send({
                       data: [],
-                      message: "Failed to place order..!",
-                      errormessage,
+                      message: `Failed to place order  ${error.message}`,
                       success: false,
                     });
                   });
@@ -104,57 +100,63 @@ module.exports = {
         } else {
           return res.status(200).send({
             data: [],
-            message: "Cannot find user with id " + req.body.userId,
+            message: `Cannot find user with id ${req.body.userId}`,
             success: false,
           });
         }
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error ${error.message}`,
         status: false,
       });
     }
   },
   viewTotalOrder: async (req, res) => {
     try {
-      if (req.query) {
+      if (
+        req.query.category ||
+        (req.query.startDate && req.query.endDate) ||
+        req.query.subcategory ||
+        req.query.search ||
+        req.query.status
+      ) {
         let categoryArray = [];
-        let dateArray=[]
         let subCategoryArray = [];
         let searchArray = [];
         let statusArray = [];
+        let startDate = "";
+        let endDate = "";
         if (req.query.category) {
-          categoryArray = req.query.category.split(",");          
-        }       
-        if (req.query.date) {
-        dateArray = req.query.date.split(',');
+          categoryArray = req.query.category.split(",");
         }
-        console.log('date',dateArray)
+        if (req.query.startDate && req.query.endDate) {
+          startDate = req.query.startDate;
+          endDate = req.query.endDate;
+        }
         if (req.query.subcategory) {
-          subCategoryArray = req.query.subcategory.split(",");        
+          subCategoryArray = req.query.subcategory.split(",");
         }
         if (req.query.search) {
           searchArray = req.query.search.split(",");
         }
         if (req.query.status) {
           statusArray = req.query.status.split(",");
-          // statusArray = Object.values(req.query.status);
-          // statusArray = statusArray.filter(function (item) {
-          //   return item !== ",";
-          // });
         }
-        Order.aggregate([
+        await Order.aggregate([
           { $unwind: "$product" },
           {
             $match: {
               $or: [
                 { "product.category": { $in: categoryArray } },
-                { createdAt: { $in: dateArray } },
+                {
+                  createdAt: {
+                    $gte: new Date(new Date(startDate).setHours(00, 00, 00)),
+                    $lt: new Date(new Date(endDate).setHours(23, 59, 59)),
+                  },
+                },
                 { "product.subCategory": { $in: subCategoryArray } },
                 { orderId: { $in: searchArray } },
                 {
@@ -182,11 +184,9 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error", err);
-            let errormessage = err.message;
             return res.status(404).send({
               data: [],
-              message: "error",
-              errormessage,
+              message: `error ${err.message}`,
               status: false,
             });
           });
@@ -231,11 +231,9 @@ module.exports = {
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error ${error.message}`,
         status: false,
       });
     }
@@ -268,11 +266,9 @@ module.exports = {
               })
               .catch((err) => {
                 console.log("error", err);
-                let errormessage = err.message;
                 return res.status(404).send({
                   data: [],
-                  message: "error",
-                  errormessage,
+                  message: `error ${err.message}`,
                   status: false,
                 });
               });
@@ -281,17 +277,15 @@ module.exports = {
       } else {
         return res.status(200).send({
           data: [],
-          message: "Cannot find order with id " + req.params.id,
+          message: `Cannot find order with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error ${error.message}`,
         status: false,
       });
     }
@@ -322,8 +316,7 @@ module.exports = {
             if (orderStatus.indexOf(req.body.status) === -1) {
               return res.status(200).send({
                 data: [],
-                message: "allowed status",
-                orderStatus,
+                message: `allowed status ${orderStatus}`,
                 success: false,
               });
             }
@@ -347,10 +340,9 @@ module.exports = {
               })
               .catch((error) => {
                 console.log("error", error);
-                let errormessage = error.message;
                 return res.status(404).send({
-                  dat: [],
-                  message: "error",
+                  data: [],
+                  message: `error ${error.message}`,
                   status: false,
                 });
               });
@@ -359,17 +351,15 @@ module.exports = {
       } else {
         return res.status(200).send({
           data: [],
-          message: "Cannot find order with id " + req.params.id,
+          message: `Cannot find order with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
-        dat: [],
-        message: "error",
-        errormessage,
+        data: [],
+        message: `error ${error.message}`,
         status: false,
       });
     }

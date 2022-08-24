@@ -5,11 +5,10 @@ module.exports = {
     try {
       const { product, category, subCategory, quantity, unit } = req.body;
       const unitList = ["kg", "g", "ltr", "no"];
-      if (unitList.indexOf(unit)) {
+      if (unitList.indexOf(unit) === -1) {
         return res.status(200).send({
           data: [],
-          message: "allowed units",
-          unitList,
+          message: `allowed units ${unitList}`,
           success: false,
         });
       } else {
@@ -53,11 +52,9 @@ module.exports = {
               })
               .catch((err) => {
                 console.log("error", err);
-                let errormessage = err.message;
                 return res.status(404).send({
                   data: [],
-                  message: "error",
-                  errormessage,
+                  message: `error..! ${err.message}`,
                   status: false,
                 });
               });
@@ -66,11 +63,9 @@ module.exports = {
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -91,7 +86,7 @@ module.exports = {
               });
             }
             return res.status(200).send({
-              data: {totalStock: stock},
+              data: { totalStock: stock },
               message: "Successfully fetched stock..!",
               success: true,
               count: stock.length,
@@ -99,11 +94,9 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error", err);
-            let errormessage = err.message;
             return res.status(404).send({
               data: [],
-              message: "error",
-              errormessage,
+              message: `error..! ${err.message}`,
               status: false,
             });
           });
@@ -120,7 +113,7 @@ module.exports = {
               });
             }
             return res.status(200).send({
-              data: {totalStock: stocks},
+              data: { totalStock: stocks },
               message: "Successfully fetched stocks..!",
               success: true,
               count: stocks.length,
@@ -128,11 +121,9 @@ module.exports = {
           })
           .catch((error) => {
             console.log("error", error);
-            let errormessage = error.message;
             return res.status(404).send({
-              dat: [],
-              message: "error",
-              errormessage,
+              data: [],
+              message: `error..! ${error.message}`,
               status: false,
             });
           });
@@ -144,12 +135,12 @@ module.exports = {
           skip = parseInt(req.query.skip);
         }
         let count = await Stock.count();
-        const inStockCount= await Stock.find({
+        const inStockCount = await Stock.find({
           quantity: { $gte: 10 },
-        }).count()
-        const outStockCount=await Stock.find({
+        }).count();
+        const outStockCount = await Stock.find({
           quantity: { $lt: 10 },
-        }).count()
+        }).count();
         await Stock.find()
           .skip(skip)
           .limit(limit)
@@ -162,7 +153,6 @@ module.exports = {
                 count: count,
               });
             }
-           
             Stock.find({
               quantity: { $gte: 10 },
             }).then((inStock) => {
@@ -180,7 +170,7 @@ module.exports = {
                   count: count,
                   shorthanddetails: {
                     totalstock: count,
-                    inStock:inStockCount,
+                    inStock: inStockCount,
                     outStock: outStockCount,
                   },
                 });
@@ -189,22 +179,18 @@ module.exports = {
           })
           .catch((error) => {
             console.log("error", error);
-            let errormessage = error.message;
             return res.status(404).send({
               data: [],
-              message: "error..!",
-              errormessage,
+              message: `error..! ${error.message}`,
               success: false,
             });
           });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -240,10 +226,9 @@ module.exports = {
               })
               .catch((error) => {
                 console.log("error", error);
-                let errormessage = error.message;
                 return res.status(404).send({
-                  dat: [],
-                  message: "error",
+                  data: [],
+                  message: `error..! ${error.message}`,
                   status: false,
                 });
               });
@@ -252,17 +237,15 @@ module.exports = {
       } else {
         return res.status(200).send({
           data: [],
-          message: "Cannot find Stock with id " + req.params.id,
+          message: `Cannot find Stock with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
-        dat: [],
-        message: "error",
-        errormessage,
+        data: [],
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -290,7 +273,7 @@ module.exports = {
                 console.log("error", error);
                 return res.status(200).send({
                   data: [],
-                  message: "stock not found with id " + req.params.id,
+                  message: `Cannot find Stock with id ${req.params.id}`,
                   success: false,
                 });
               });
@@ -299,17 +282,15 @@ module.exports = {
       } else {
         return res.status(200).send({
           data: [],
-          message: "Cannot find stock with id " + req.params.id,
+          message: `Cannot find Stock with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }

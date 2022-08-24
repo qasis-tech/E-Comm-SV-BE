@@ -2,7 +2,6 @@ const User = require("../config/model/user");
 const mongoose = require("mongoose");
 const UtilService = require("../utils/utilService");
 const JWTService = require("../utils/JWTService");
-
 module.exports = {
   login: async function (req, res) {
     try {
@@ -28,7 +27,7 @@ module.exports = {
           success: false,
         });
       }
-      const token = await JWTService.issuer({ email: user.email }, "10 day");
+      const token = await JWTService.issuer({ email: user.email }, "365 day");
       const login = await User.updateOne(
         {
           email: email,
@@ -59,11 +58,9 @@ module.exports = {
       });
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: error,
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -93,7 +90,7 @@ module.exports = {
           password: encryptedPassword,
           role: "user",
           token: null,
-          status: "active",          
+          status: "active",
         });
         if (!newUser) {
           return res.status(200).send({
@@ -110,11 +107,9 @@ module.exports = {
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -164,48 +159,42 @@ module.exports = {
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
   },
   viewUsers: async (req, res) => {
     try {
-      if(req.query.search)
-      {
+      if (req.query.search) {
         await User.find({ firstName: { $regex: req.query.search } })
-        .then((users) => {
-          if (users.length === 0) {
+          .then((users) => {
+            if (users.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No User found..!",
+                success: false,
+                count: users.length,
+              });
+            }
             return res.status(200).send({
-              data: [],
-              message: "No User found..!",
-              success: false,
-              count:users.length
+              data: users,
+              message: "Successfully fetched users..!",
+              success: true,
+              count: users.length,
             });
-          }
-          return res.status(200).send({
-            data: users,
-            message: "Successfully fetched users..!",
-            success: true,
-            count: users.length,
+          })
+          .catch((err) => {
+            console.log("error 1", err);
+            return res.status(404).send({
+              data: [],
+              message: `error..! ${err.message}`,
+              status: false,
+            });
           });
-        })
-        .catch((err) => {
-          console.log("error 1", err);
-          let errormessage = err.message;
-          return res.status(404).send({
-            data: [],
-            message: "error",
-            errormessage,
-            status: false,
-          });
-        });
-      }
-      else{
+      } else {
         let limit = 10;
         let skip = 0;
         if (req.query.limit && req.query.skip) {
@@ -239,24 +228,18 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error", err);
-            let errormessage = err.message;
             res.status(404).send({
               data: [],
-              message: "Error..!",
-              errormessage,
+              message: `error..! ${err.message}`,
               success: false,
             });
           });
-
       }
-    
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -299,17 +282,15 @@ module.exports = {
       } else {
         return res.status(404).send({
           data: [],
-          message: "user not found with id " + req.params.id,
+          message: `user not found with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -339,17 +320,15 @@ module.exports = {
       } else {
         return res.status(200).send({
           data: [],
-          message: "user not found with id " + req.params.id,
+          message: `user not found with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -391,17 +370,15 @@ module.exports = {
         console.log("error", error);
         return res.status(404).send({
           data: [],
-          message: "user not found with id " + req.params.id,
+          message: `user not found with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -434,11 +411,9 @@ module.exports = {
               })
               .catch((err) => {
                 console.log("error", err);
-                let errormessage = err.message;
                 return res.status(404).send({
                   data: [],
-                  message: "error",
-                  errormessage,
+                  message: `error..! ${err.message}`,
                   status: false,
                 });
               });
@@ -447,17 +422,15 @@ module.exports = {
       } else {
         return res.status(200).send({
           data: [],
-          message: "Cannot find user with id " + req.params.id,
+          message: `Cannot find user with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
