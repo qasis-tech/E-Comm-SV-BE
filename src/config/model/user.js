@@ -51,6 +51,9 @@ const userSchema = mongoose.Schema({
   status: {
     type: String,
   },
+  accountOtp: {
+    type: String,
+  },
 },
 {
   timestamps: true,

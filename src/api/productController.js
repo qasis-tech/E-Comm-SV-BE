@@ -150,13 +150,13 @@ module.exports = {
               success: false,
             });
           }
-          if (req?.files[0]?.path === undefined) {
-            return res.status(200).send({
-              data: [],
-              message: "product Image required!",
-              success: false,
-            });
-          }
+          // if (req?.files[0]?.path === undefined) {
+          //   return res.status(200).send({
+          //     data: [],
+          //     message: "product Image required!",
+          //     success: false,
+          //   });
+          // }
           Product.find({
             name: req.body.name,
             category: req.body.category,

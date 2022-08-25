@@ -2,6 +2,14 @@ const User = require("../config/model/user");
 const mongoose = require("mongoose");
 const UtilService = require("../utils/utilService");
 const JWTService = require("../utils/JWTService");
+const nodemailer = require("nodemailer");
+const otpGenerator = require("otp-generator");
+const myOtp = otpGenerator.generate(6, {
+  digits: true,
+  lowerCaseAlphabets: false,
+  upperCaseAlphabets: false,
+  specialChars: false,
+});
 module.exports = {
   login: async function (req, res) {
     try {
@@ -91,6 +99,7 @@ module.exports = {
           role: "user",
           token: null,
           status: "active",
+          accountOtp: null,
         });
         if (!newUser) {
           return res.status(200).send({
@@ -99,11 +108,49 @@ module.exports = {
             success: false,
           });
         }
-        return res.status(200).send({
-          data: newUser,
-          message: "Successfully created your account..!",
-          success: true,
-        });
+        const resetOtp = await User.updateOne(
+          { email: email },
+          { $set: { accountOtp: myOtp } }
+        );
+        if (resetOtp) {
+          const msg = {
+            from: "veenavijayan38@gmail.com",
+            to: email,
+            subject: "OTP for verify your account",
+
+            html:
+              "This is the One Time Password to verify your account.<br><br><b><u><h1>" +
+              myOtp +
+              "</h1></b></u><br><br>Thank You..",
+          };
+          nodemailer
+            .createTransport({
+              service: "gmail",
+              auth: {
+                user: "veenavijayan38@gmail.com",
+                pass: "rqdpilsciczoskpw",
+              },
+              port: 465,
+              host: "smtp.gmail.com",
+              from: "veenavijayan38@gmail.com",
+            })
+            .sendMail(msg, (err) => {
+              if (err) {
+                return res.status(404).send({
+                  data: [err],
+                  message: "Error in sending mail",
+                  success: false,
+                });
+              } else {
+                res.status(200).send({
+                  data: [],
+                  message:
+                    "OTP Sent Successfully ..please wait for otp verification!",
+                  success: true,
+                });
+              }
+            });
+        }
       }
     } catch (error) {
       console.log("error", error);
@@ -255,6 +302,7 @@ module.exports = {
             success: false,
           });
         } else {
+          const encryptedPassword = await UtilService.hashPassword(req.body.password);
           User.findByIdAndUpdate(
             req.params.id,
             {
@@ -265,6 +313,7 @@ module.exports = {
               gender: req.body.gender,
               dob: req.body.dob,
               pinCode: req.body.pinCode,
+              password: encryptedPassword,
             },
             {
               new: true,
@@ -435,4 +484,154 @@ module.exports = {
       });
     }
   },
+  verifyOtp: async (req, res) => {
+    try {
+      const { otp, email } = req.body;
+      const user = await User.findOne(
+        {
+          email: req.body.email,
+        },
+      );
+     if (!user) {
+        res.status(404).send({
+          data: [],
+          message: "No user found..!",
+          success: false,
+        });
+      }
+      else{
+        if (user.accountOtp !== otp) {
+          res.status(404).send({
+            data: [],
+            message: "OTP mismatch..!",
+            success: false,
+          });
+        }
+        else{
+          res.status(200).send({
+            data: [],
+            message:
+              "Account created successfully...",
+            success: true,
+          });
+        }
+      }    
+   
+    } catch (error) {
+      console.log("error", error);
+      return res.status(404).send({
+        data: [],
+        message: `error ${error.message}`,
+        status: false,
+      });
+    }
+  },
+  resetPassword: async (req, res) => {
+    try {
+      const { email } = req.body;
+      const oldUser = await User.findOne({
+        email: email,
+      });
+      if (!oldUser) {
+        return res.status(200).send({
+          data: [],
+          message: "User not found..!",
+          success: false,
+        });
+      } else {
+        const resetOtp = await User.updateOne(
+          { email: email },
+          { $set: { accountOtp: myOtp } }
+        );
+        if (resetOtp) {
+          const msg = {
+            from: "veenavijayan38@gmail.com",
+            to: email,
+            subject: "OTP for reset your password",
+
+            html:
+              "This is the One Time Password to reset your password.<br><br><b><u><h1>" +
+              myOtp +
+              "</h1></b></u><br><br>Thank You..",
+          };
+          nodemailer
+            .createTransport({
+              service: "gmail",
+              auth: {
+                user: "veenavijayan38@gmail.com",
+                pass: "rqdpilsciczoskpw",
+              },
+              port: 465,
+              host: "smtp.gmail.com",
+              from: "veenavijayan38@gmail.com",
+            })
+            .sendMail(msg, (err) => {
+              if (err) {
+                return res.status(404).send({
+                  data: [err],
+                  message: "Error in sending mail",
+                  success: false,
+                });
+              } else {
+                res.status(200).send({
+                  data: [],
+                  message:
+                    "OTP Sent Successfully ..please wait for otp verification!",
+                  success: true,
+                });
+              }
+            });
+        }
+      }
+    } catch (error) {
+      console.log("error", error);
+      return res.status(404).send({
+        data: [],
+        message: `error ${error.message}`,
+        status: false,
+      });
+    }
+  },
+ verifyResetPasswordOtp: async (req, res) => {
+    try {
+      const {email,otp } = req.body;
+      const user = await User.findOne(
+        {
+          email: req.body.email,
+        },
+      );
+     if (!user) {
+        res.status(404).send({
+          data: [],
+          message: "No user found..!",
+          success: false,
+        });
+      }
+      else{
+        if (user.accountOtp !== otp) {
+          res.status(404).send({
+            data: [],
+            message: "OTP mismatch..!",
+            success: false,
+          });
+        }
+        else{
+          res.status(200).send({
+            data: [],
+            message:
+              "OTP verified successfully...",
+            success: true,
+          });
+        }
+      }       
+    } catch (error) {
+      console.log("error", error);
+      return res.status(404).send({
+        data: [],
+        message: `error ${error.message}`,
+        status: false,
+      });
+    }
+  },
+
 };

@@ -28,6 +28,27 @@ router.put(
 router.delete("/user/:id", userController.deleteUsers);
 router.post("/login", validate(validation.signin), userController.login);
 router.post(
+  "/verifyOtp",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  validate(validation.otpValid),
+  userController.verifyOtp
+);
+router.post(
+  "/resetOtp",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  validate(validation.resetValid),
+  userController.resetPassword
+);
+router.post(
+  "/verifyResetOtp",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  validate(validation.resetOtpValid),
+  userController.verifyResetPasswordOtp
+);
+router.post(
   "/category",
   tokenAuth.verifyToken,
   tokenAuth.verifyMyToken,

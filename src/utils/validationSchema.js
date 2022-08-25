@@ -27,6 +27,7 @@ exports.userEditsignup = Joi.object().keys({
   gender: Joi.string().required(),
   dob: Joi.date().required(),
   pinCode: Joi.string().required(),
+  password: Joi.string().min(8).required(),
 });
 exports.googleAuth = Joi.object().keys({
   email: Joi.string().email().lowercase().required(),
@@ -46,4 +47,15 @@ exports.stockValid = Joi.object().keys({
 });
 exports.orderEditValid = Joi.object().keys({
   status: Joi.string().required(),
+});
+exports.otpValid = Joi.object().keys({
+  otp: Joi.string().required(),
+  email: Joi.string().email().lowercase().required(),
+});
+exports.resetValid = Joi.object().keys({ 
+  email: Joi.string().email().lowercase().required(),
+});
+exports.resetOtpValid = Joi.object().keys({ 
+  email: Joi.string().email().lowercase().required(),
+  otp: Joi.string().required(), 
 });
