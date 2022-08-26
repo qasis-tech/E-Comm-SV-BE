@@ -45,13 +45,7 @@ module.exports = {
               success: false,
             });
           }
-          if (!req.body.subCategory) {
-            return res.status(200).send({
-              data: [],
-              message: "subCategory required!",
-              success: false,
-            });
-          }
+        
           if (!req.body.unit) {
             return res.status(200).send({
               data: [],
@@ -150,13 +144,13 @@ module.exports = {
               success: false,
             });
           }
-          // if (req?.files[0]?.path === undefined) {
-          //   return res.status(200).send({
-          //     data: [],
-          //     message: "product Image required!",
-          //     success: false,
-          //   });
-          // }
+          if (req?.files[0]?.path === undefined) {
+            return res.status(200).send({
+              data: [],
+              message: "product Image required!",
+              success: false,
+            });
+          }
           Product.find({
             name: req.body.name,
             category: req.body.category,
@@ -429,14 +423,7 @@ module.exports = {
                   success: false,
                 });
               }
-              if (!req.body.subCategory) {
-                return res.status(200).send({
-                  data: [],
-                  message: "subCategory required!",
-                  success: false,
-                });
-              }
-              if (!req.body.unit) {
+                if (!req.body.unit) {
                 return res.status(200).send({
                   data: [],
                   message: "unit required!",
