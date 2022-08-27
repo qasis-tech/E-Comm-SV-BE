@@ -317,7 +317,7 @@ module.exports = {
             } else {
               const subCategory = [];
               req?.files?.forEach((image) => {
-                if (image.fieldname !== "image") {
+                if (image?.fieldname !== "image") {
                   subCategory.push({
                     label: image.fieldname,
                     subCategoryImage:

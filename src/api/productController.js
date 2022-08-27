@@ -151,6 +151,7 @@ module.exports = {
               success: false,
             });
           }
+          console.log('file==>',req.files[0].path)
           Product.find({
             name: req.body.name,
             category: req.body.category,
@@ -203,7 +204,7 @@ module.exports = {
                     success: false,
                   });
                 }
-                const newProduct = new Product({
+                  const newProduct = new Product({
                   name: req.body.name,
                   category: req.body.category,
                   subCategory: req.body.subCategory,
