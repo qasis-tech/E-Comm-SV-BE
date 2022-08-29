@@ -9,7 +9,7 @@ app.use(cors({ origin: true, credentials: true }));
 require("dotenv").config();
 app.use(
   bodyParser.urlencoded({
-    extended: false,
+    extended: true,
   })
 );
 app.use(bodyParser.json());

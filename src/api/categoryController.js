@@ -20,6 +20,7 @@ module.exports = {
     try {
       const { host } = req.headers;
       fileUpload(req, res, (err) => {
+        console.log("name", req.body.label);
         if (err) {
           console.log("error in file uploading", err);
           return res.status(200).send({
@@ -275,12 +276,12 @@ module.exports = {
   },
   editCategory: async (req, res) => {
     try {
-      const hostname = req.headers.host;
+      const { host } = req.headers;
       fileUpload(req, res, (err) => {
         if (err) {
           return res.status(200).send({
             data: [],
-            message: "Error in image uploading..!",
+            message: `Error in image uploading..! ${err.message}`,
             success: false,
           });
         }
@@ -315,61 +316,149 @@ module.exports = {
                 success: false,
               });
             } else {
-              const subCategory = [];
-              req?.files?.forEach((image) => {
-                if (image?.fieldname !== "image") {
-                  subCategory.push({
+              const subCategory = req?.files
+                ?.filter((fl) => fl?.fieldname !== "image")
+                .map((image) => {
+                  return {
                     label: image.fieldname,
-                    subCategoryImage:
-                      "http://" +
-                      hostname +
-                      "/" +
-                      image.path.replaceAll("\\", "/"),
+                    subCategoryImage: `http://${host}/${image?.path?.replaceAll(
+                      "\\",
+                      "/"
+                    )}`,
+                  };
+                });
+              let temp = [];
+              if (subCategory.length) {
+                for (let index = 0; index < subCategory.length; index++) {
+                  let i = temp?.findIndex(
+                    (fi) => fi?.label === subCategory[index]?.label
+                  );
+                  if (i === -1) {
+                    temp.push(subCategory[index]);
+                  }
+                }
+              }
+              if (
+                temp.length > 0 &&
+                subCategory.length > 0 &&
+                temp.length === subCategory.length
+              ) {
+                if (temp.length) {
+                  Category.findOne({
+                    label: req.body.label,
+                  }).then((newCategory) => {
+                    if (newCategory) {
+                      const newsubCategory = Category.findByIdAndUpdate(
+                        newCategory._id,
+                        {
+                          subCategory: subCategory,
+                        },
+                        {
+                          new: true,
+                        }
+                      ).then((newsubCategory) => {
+                        if (newsubCategory) {
+                          return res.status(200).send({
+                            data: newsubCategory,
+                            message: "Successfully updated sub Categories..!",
+                            success: true,
+                          });
+                        }
+                      });
+                    } else {
+                      if (req?.files[0]?.path) {
+                        Category.findByIdAndUpdate(
+                          req.params.id,
+                          {
+                            label: req.body.label,
+                            image: `http://${host}/${req?.files[0]?.path?.replaceAll(
+                              "\\",
+                              "/"
+                            )}`,
+                            subCategory: subCategory,
+                          },
+                          {
+                            new: true,
+                          }
+                        ).then((newCategories) => {
+                          if (newCategories) {
+                            return res.status(200).send({
+                              data: newCategories,
+                              message: "Successfully updated Categories..!",
+                              success: true,
+                            });
+                          }
+                        });
+                      } else {
+                        Category.findByIdAndUpdate(
+                          req.params.id,
+                          {
+                            label: req.body.label,
+                            subCategory: subCategory,
+                          },
+                          {
+                            new: true,
+                          }
+                        ).then((newCategories) => {
+                          if (newCategories) {
+                            return res.status(200).send({
+                              data: newCategories,
+                              message: "Successfully updated Categories..!",
+                              success: true,
+                            });
+                          }
+                        });
+                      }
+                    }
+                  });
+                } else {
+                  Category.findOne({
+                    label: req.body.label,
+                  }).then((newCategory) => {
+                    if (newCategory) {
+                      res.send({
+                        data: [],
+                        message: "Category already exists...!",
+                        success: false,
+                      });
+                    }
                   });
                 }
-              });
-              if (req?.files[0]?.path) {
+              } else if (temp.length === 0 && subCategory.length === 0) {
                 Category.findByIdAndUpdate(
                   req.params.id,
                   {
                     label: req.body.label,
-                    image:
-                      "http://" +
-                      hostname +
-                      "/" +
-                      req?.files[0]?.path.replaceAll("\\", "/"),
+                    image: `http://${host}/${req?.files[0]?.path?.replaceAll(
+                      "\\",
+                      "/"
+                    )}`,
                     subCategory: subCategory,
                   },
                   {
                     new: true,
                   }
-                ).then((newCategories) => {
-                  if (newCategories) {
+                )
+                  .then((Category) => {
                     return res.status(200).send({
-                      data: newCategories,
-                      message: "Successfully updated Categories..!",
+                      data: Category,
+                      message: "Successfully updated Category..!",
                       success: true,
                     });
-                  }
-                });
+                  })
+                  .catch((err) => {
+                    console.log("error 4", err);
+                    return res.status(404).send({
+                      data: [],
+                      message: `error..! ${err.message}`,
+                      status: false,
+                    });
+                  });
               } else {
-                Category.findByIdAndUpdate(
-                  req.params.id,
-                  {
-                    label: req.body.label,
-                    subCategory: subCategory,
-                  },
-                  {
-                    new: true,
-                  }
-                ).then((newCategories) => {
-                  if (newCategories) {
-                    return res.status(200).send({
-                      data: newCategories,
-                      message: "Successfully updated Categories..!",
-                      success: true,
-                    });
-                  }
+                res.send({
+                  data: [],
+                  message: "Duplication of Subcategory not allowed...!",
+                  success: false,
                 });
               }
             }
