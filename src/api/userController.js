@@ -618,7 +618,7 @@ module.exports = {
         }
         else{
           res.status(200).send({
-            data: [user],
+            data: user,
             message:
               "OTP verified successfully...",
             success: true,
