@@ -411,50 +411,53 @@ module.exports = {
                       }
                     }
                   });
-                } else {
-                  Category.findOne({
-                    label: req.body.label,
-                  }).then((newCategory) => {
-                    if (newCategory) {
-                      res.send({
-                        data: [],
-                        message: "Category already exists...!",
-                        success: false,
-                      });
-                    }
-                  });
-                }
-              } else if (temp.length === 0 && subCategory.length === 0) {
-                Category.findByIdAndUpdate(
-                  req.params.id,
-                  {
-                    label: req.body.label,
-                    image: `http://${host}/${req?.files[0]?.path?.replaceAll(
-                      "\\",
-                      "/"
-                    )}`,
-                    subCategory: subCategory,
-                  },
-                  {
-                    new: true,
-                  }
-                )
-                  .then((Category) => {
+                } 
+              } 
+              else if (temp.length === 0 && subCategory.length === 0) {
+                Category.findOne({
+                  label: req.body.label,
+                }).then((cat) => {
+                  if (cat) {
                     return res.status(200).send({
-                      data: Category,
-                      message: "Successfully updated Category..!",
-                      success: true,
-                    });
-                  })
-                  .catch((err) => {
-                    console.log("error 4", err);
-                    return res.status(404).send({
                       data: [],
-                      message: `error..! ${err.message}`,
-                      status: false,
+                      message: "Category already exists...!",
+                      success: false,
                     });
-                  });
-              } else {
+                  } else {
+                    Category.findByIdAndUpdate(
+                      req.params.id,
+                      {
+                        label: req.body.label,
+                        image: `http://${host}/${req?.files[0]?.path?.replaceAll(
+                          "\\",
+                          "/"
+                        )}`,
+                        subCategory: subCategory,
+                      },
+                      {
+                        new: true,
+                      }
+                    )
+                      .then((Category) => {
+                        return res.status(200).send({
+                          data: Category,
+                          message: "Successfully updated Category..!",
+                          success: true,
+                        });
+                      })
+                      .catch((err) => {
+                        console.log("error 4", err);
+                        return res.status(404).send({
+                          data: [],
+                          message: `error..! ${err.message}`,
+                          status: false,
+                        });
+                      });
+                  }
+                });
+              } 
+              
+              else {
                 res.send({
                   data: [],
                   message: "Duplication of Subcategory not allowed...!",
