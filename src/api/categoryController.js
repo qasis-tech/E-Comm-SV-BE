@@ -10,6 +10,13 @@ const Storage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(null, file.originalname);
   },
+  onError : function(err, next) {
+    console.log('error', err);
+    next(err);
+  }
+  // function(req, res) {
+  //   res.status(204).end();
+  // }
 
 });
 const upload = multer({
