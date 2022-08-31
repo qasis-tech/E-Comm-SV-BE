@@ -21,7 +21,7 @@ const userSchema = mongoose.Schema({
     type: String,
   },
   pinCode: {
-    type: Number,
+    type: String,
   },
   location: {
     default:null,

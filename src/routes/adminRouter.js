@@ -72,20 +72,20 @@ router.post(
   tokenAuth.verifyMyToken,
   productController.addProduct
 );
-// router.get(
-//   "/product",
-//   tokenAuth.verifyToken,
-//   tokenAuth.verifyMyToken,
-//   productController.viewProduct
-// );
-// router.put(
-//   "/product/:id",
-//   tokenAuth.verifyToken,
-//   tokenAuth.verifyMyToken,
-//   productController.editProduct
-// );
-// router.delete("/product/:id", tokenAuth.verifyToken,
-// tokenAuth.verifyMyToken, productController.deleteProduct);
+router.get(
+  "/product",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  productController.viewProduct
+);
+router.put(
+  "/product/:id",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  productController.editProduct
+);
+router.delete("/product/:id", tokenAuth.verifyToken,
+tokenAuth.verifyMyToken, productController.deleteProduct);
 router.post(
   "/order",
   tokenAuth.verifyToken,
