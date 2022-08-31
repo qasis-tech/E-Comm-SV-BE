@@ -10,6 +10,7 @@ const Storage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(null, file.originalname);
   },
+
 });
 const upload = multer({
   storage: Storage,
@@ -20,8 +21,7 @@ module.exports = {
     try {
       const { host } = req.headers;
       fileUpload(req, res, (err) => {
-        console.log("name", req.body.label);
-        if (err) {
+      if (err) {
           console.log("error in file uploading", err);
           return res.status(200).send({
             data: [],
@@ -138,7 +138,7 @@ module.exports = {
               label: req.body.label,
             }).then((newCategory) => {
               if (newCategory) {
-                res.send({
+                  res.send({
                   data: [],
                   message: "Category already exists...!",
                   success: false,

@@ -12,7 +12,7 @@ const Storage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
   },
-});
+ });
 const upload = multer({
   storage: Storage,
 });
@@ -151,7 +151,7 @@ module.exports = {
             return res.status(200).send({
               data: [],
               message: "product Image required!",
-              success: false,
+              success: false,              
             });
           }
           console.log('file==>',req.files[0].path)
@@ -162,10 +162,11 @@ module.exports = {
           })
             .then((oldProduct) => {
               if (oldProduct.length) {
-                return res.status(200).send({
+                  return res.status(200).send({
                   data: [],
                   message: "Product already exists..!",
                   success: false,
+                 
                 });
               } else {
                 const imageArray = [];

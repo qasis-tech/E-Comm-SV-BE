@@ -599,6 +599,7 @@ module.exports = {
         {
           email: req.body.email,
         },
+        { password: 0 }
       );
      if (!user) {
         res.status(404).send({
@@ -617,7 +618,7 @@ module.exports = {
         }
         else{
           res.status(200).send({
-            data: [],
+            data: [user],
             message:
               "OTP verified successfully...",
             success: true,
