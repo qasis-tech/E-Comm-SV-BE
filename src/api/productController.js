@@ -15,18 +15,27 @@ const Storage = multer.diskStorage({
  });
 const upload = multer({
   storage: Storage,
+  fileFilter:(req,file,cb)=>{
+    if(file.mimetype=="image/png" ||
+    file.mimetype=="image/jpg" ||
+    file.mimetype=="image/jpeg" ||
+    file.mimetype=="image/svg" ||
+    file.mimetype=="video/mp4"
+    ){
+      cb(null,true)
+    }else{
+      cb(null,false)
+      return cb(new Error("Only .png,.jpg,.jpeg and .svg format allowed for images , mp4 for videos"))
+    }
+  }
 });
 const fileUpload = upload.any();
 module.exports = {
   addProduct: async (req, res) => {
     try {
       const hostname = req.headers.host;
-      
-      // console.log('name',req.body.name)
-      fileUpload(req, res, (err) => {
-        
+      fileUpload(req, res, (err) => {        
         if (err) {
-          console.log("error in image upload", err);
           return res.status(200).send({
             data: [],
             message: `Error in image uploading..! ${err.message}`,
@@ -154,7 +163,6 @@ module.exports = {
               success: false,              
             });
           }
-          console.log('file==>',req.files[0].path)
           Product.find({
             name: req.body.name,
             category: req.body.category,
@@ -172,17 +180,8 @@ module.exports = {
                 const imageArray = [];
                 const videoArray = [];
                 const imgResult = [];
-                const fileFormat = [
-                  "image/jpeg",
-                  "image/jpg",
-                  "image/png",
-                  "image/svg",
-                ];
-                req.files.forEach((file) => {
+                 req.files.forEach((file) => {
                   if (file.fieldname === "productImage") {
-                    if (fileFormat.indexOf(req?.files[0]?.mimetype) === -1) {
-                      imgResult.push(req?.files[0]?.mimetype);
-                    }
                     imageArray.push({
                       image:
                         "http://" +
@@ -198,16 +197,8 @@ module.exports = {
                         "/" +
                         file.path.replaceAll("\\", "/"),
                     });
-                    // console.log("video", req?.files[0]?.mimetype);
                   }
                 });
-                if (imgResult.length) {
-                  return res.status(200).send({
-                    data: [],
-                    message: `allowed file format ${fileFormat}`,
-                    success: false,
-                  });
-                }
                   const newProduct = new Product({
                   name: req.body.name,
                   category: req.body.category,
@@ -398,9 +389,8 @@ module.exports = {
       const hostname = req.headers.host;
       fileUpload(req, res, (err) => {
         if (err) {
-          console.log("error in image upload", err);
           return res.status(200).send({
-            message: "Error in image uploading..!",
+            message: `Error in image uploading..! ${err.message}`,
             success: false,
           });
         }

@@ -10,26 +10,29 @@ const Storage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(null, file.originalname);
   },
-  onError : function(err, next) {
-    console.log('error', err);
-    next(err);
-  }
-  // function(req, res) {
-  //   res.status(204).end();
-  // }
-
 });
 const upload = multer({
   storage: Storage,
-});
+  fileFilter:(req,file,cb)=>{
+    if(file.mimetype=="image/png" ||
+    file.mimetype=="image/jpg" ||
+    file.mimetype=="image/jpeg" ||
+    file.mimetype=="image/svg"
+    ){
+      cb(null,true)
+    }else{
+      cb(null,false)
+      return cb(new Error("Only .png,.jpg,.jpeg and .svg format allowed"))      
+    }
+  },
+ });
 const fileUpload = upload.any();
 module.exports = {
   addCategory: async (req, res) => {
     try {
       const { host } = req.headers;
       fileUpload(req, res, (err) => {
-      if (err) {
-          console.log("error in file uploading", err);
+        if (err) {
           return res.status(200).send({
             data: [],
             message: `Error in image uploading..! ${err.message}`,
@@ -50,20 +53,7 @@ module.exports = {
             success: false,
           });
         }
-        const fileFormat = [
-          "image/jpeg",
-          "image/jpg",
-          "image/png",
-          "image/svg",
-        ];
-        if (fileFormat.indexOf(req?.files[0]?.mimetype) === -1) {
-          return res.status(200).send({
-            data: [],
-            message: `allowed file format..! ${fileFormat}`,
-            success: false,
-          });
-        }
-        const subCategory = req?.files
+       const subCategory = req?.files
           ?.filter((fl) => fl?.fieldname !== "image")
           .map((image) => {
             return {
@@ -145,7 +135,7 @@ module.exports = {
               label: req.body.label,
             }).then((newCategory) => {
               if (newCategory) {
-                  res.send({
+              return res.send({
                   data: [],
                   message: "Category already exists...!",
                   success: false,
@@ -298,21 +288,6 @@ module.exports = {
             message: "Category name required!",
             success: false,
           });
-        }
-        if (req?.files[0]?.path) {
-          const fileFormat = [
-            "image/jpeg",
-            "image/jpg",
-            "image/png",
-            "image/svg",
-          ];
-          if (fileFormat.indexOf(req?.files[0]?.mimetype) === -1) {
-            return res.status(200).send({
-              data: [],
-              message: `allowed file format..! ${fileFormat}`,
-              success: false,
-            });
-          }
         }
         if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
           Category.find({ _id: req.params.id }).then((categories) => {
