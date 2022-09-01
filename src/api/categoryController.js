@@ -33,6 +33,7 @@ module.exports = {
       const { host } = req.headers;
       fileUpload(req, res, (err) => {
         if (err) {
+          // console.log('error',err)
           return res.status(200).send({
             data: [],
             message: `Error in image uploading..! ${err.message}`,
