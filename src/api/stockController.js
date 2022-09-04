@@ -295,4 +295,56 @@ module.exports = {
       });
     }
   },
+  viewStockDetails: async (req, res) => {
+    try {
+      if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
+        Stock.find({ _id: req.params.id }).then((stocks) => {
+          if (stocks.length === 0) {
+            return res.status(200).send({
+              data: [],
+              message: "No stock found with given id..!",
+              success: false,
+            });
+          } else {
+            Stock.findById({ _id: req.params.id })
+              .then((stocks) => {
+                if (stocks.length === 0) {
+                  return res.status(200).send({
+                    data: [],
+                    message: "No Stock found..!",
+                    success: false,
+                  });
+                }
+                return res.status(200).send({
+                  data: stocks,
+                  message: "Successfully fetched stock details..!",
+                  success: true,
+                });
+              })
+              .catch((err) => {
+                console.log("error", err);
+                return res.status(404).send({
+                  data: [],
+                  message: `error..! ${err.message}`,
+                  status: false,
+                });
+              });
+          }
+        });
+      } else {
+        return res.status(200).send({
+          data: [],
+          message: `Cannot find stock with id ${req.params.id}`,
+          success: false,
+        });
+      }
+    } catch (error) {
+      console.log("error", error);
+      return res.status(404).send({
+        data: [],
+        message: `error..! ${error.message}`,
+        status: false,
+      });
+    }
+  },
 };
