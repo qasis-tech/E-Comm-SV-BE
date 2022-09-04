@@ -118,10 +118,8 @@ module.exports = {
             to: email,
             subject: "OTP for verify your account",
 
-            html:
-              "This is the One Time Password to verify your account.<br><br><b><u><h1>" +
-              myOtp +
-              "</h1></b></u><br><br>Thank You..",
+            html:`This is the One Time Password to verify your account.<br><br><b><u><h1> ${myOtp} </h1></b></u><br><br>Thank You..`
+            
           };
           nodemailer
             .createTransport({
@@ -549,10 +547,8 @@ module.exports = {
             to: email,
             subject: "OTP for reset your password",
 
-            html:
-              "This is the One Time Password to reset your password.<br><br><b><u><h1>" +
-              myOtp +
-              "</h1></b></u><br><br>Thank You..",
+            html:`This is the One Time Password to reset your password.<br><br><b><u><h1> ${myOtp} </h1></b></u><br><br>Thank You..`
+             
           };
           nodemailer
             .createTransport({
@@ -623,6 +619,10 @@ module.exports = {
               "OTP verified successfully...",
             success: true,
           });
+          const expireOtp = await User.updateOne(
+            { email: email },
+            { $set: { accountOtp: null } }
+          );
         }
       }       
     } catch (error) {

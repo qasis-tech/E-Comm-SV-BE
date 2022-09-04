@@ -137,4 +137,5 @@ router.get("/product/:id", productController.viewProductDetails);
 router.get("/order/:id", orderController.viewOrderDetails);
 router.get("/user/:id", userController.viewUserDetails);
 router.get("/category/:id", categoryController.viewCategoryDetails);
+router.get("/stock/:id", stockController.viewStockDetails);
 module.exports = router;
