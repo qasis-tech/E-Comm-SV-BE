@@ -209,7 +209,7 @@ module.exports = {
           skip = parseInt(req.query.skip);
         }
         let count = await Category.count();
-        await Category.find()
+        await Category.find().sort({_id:-1})
           .skip(skip)
           .limit(limit)
           .then((categories) => {

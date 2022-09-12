@@ -204,7 +204,7 @@ module.exports = {
         const completedOrders = await Order.find({
           status: "Delivered",
         }).count();
-        await Order.find()
+        await Order.find().sort({_id:-1})
           .skip(skip)
           .limit(limit)
           .then((orders) => {

@@ -35,7 +35,7 @@ module.exports = {
           success: false,
         });
       }
-      const token = await JWTService.issuer({ email: user.email }, "365 day");
+      const token = await JWTService.issuer({ email: user.email }, "300 days");
       const login = await User.updateOne(
         {
           email: email,
@@ -252,7 +252,7 @@ module.exports = {
             role: "user",
           },
           { password: 0 }
-        )
+        ).sort({_id:-1})
           .skip(skip)
           .limit(limit)
           .then((users) => {

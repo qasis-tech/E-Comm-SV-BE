@@ -339,7 +339,7 @@ module.exports = {
           skip = parseInt(req.query.skip);
         }
         let count = await Product.count();
-        await Product.find()
+        await Product.find().sort({_id:-1})
           .skip(skip)
           .limit(limit)
           .then((products) => {

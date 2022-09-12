@@ -141,7 +141,7 @@ module.exports = {
         const outStockCount = await Stock.find({
           quantity: { $lt: 10 },
         }).count();
-        await Stock.find()
+        await Stock.find().sort({_id:-1})
           .skip(skip)
           .limit(limit)
           .then((stock) => {
