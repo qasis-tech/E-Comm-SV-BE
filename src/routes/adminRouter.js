@@ -6,6 +6,7 @@ const categoryController = require("../api/categoryController");
 const productController = require("../api/productController");
 const orderController = require("../api/orderController");
 const stockController = require("../api/stockController");
+const sliderController = require("../api/sliderController");
 const { validate } = require("../utils/validation");
 const validation = require("../utils/validationSchema");
 const tokenAuth = require("../utils/JWTService");
@@ -84,8 +85,12 @@ router.put(
   tokenAuth.verifyMyToken,
   productController.editProduct
 );
-router.delete("/product/:id", tokenAuth.verifyToken,
-tokenAuth.verifyMyToken, productController.deleteProduct);
+router.delete(
+  "/product/:id",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  productController.deleteProduct
+);
 router.post(
   "/order",
   tokenAuth.verifyToken,
@@ -138,4 +143,28 @@ router.get("/order/:id", orderController.viewOrderDetails);
 router.get("/user/:id", userController.viewUserDetails);
 router.get("/category/:id", categoryController.viewCategoryDetails);
 router.get("/stock/:id", stockController.viewStockDetails);
+router.post(
+  "/slider",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  sliderController.addSlider
+);
+router.get(
+  "/slider",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  sliderController.viewSlider
+);
+router.post(
+  "/deal",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  sliderController.addDeal
+);
+router.get(
+  "/deal",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  sliderController.viewDeal
+);
 module.exports = router;
