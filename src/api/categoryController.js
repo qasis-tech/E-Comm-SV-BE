@@ -13,19 +13,20 @@ const Storage = multer.diskStorage({
 });
 const upload = multer({
   storage: Storage,
-  fileFilter:(req,file,cb)=>{
-    if(file.mimetype=="image/png" ||
-    file.mimetype=="image/jpg" ||
-    file.mimetype=="image/jpeg" ||
-    file.mimetype=="image/svg"
-    ){
-      cb(null,true)
-    }else{
-      cb(null,false)
-      return cb(new Error("Only .png,.jpg,.jpeg and .svg format allowed"))      
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype == "image/png" ||
+      file.mimetype == "image/jpg" ||
+      file.mimetype == "image/jpeg" ||
+      file.mimetype == "image/svg"
+    ) {
+      cb(null, true);
+    } else {
+      cb(null, false);
+      return cb(new Error("Only .png,.jpg,.jpeg and .svg format allowed"));
     }
   },
- });
+});
 const fileUpload = upload.any();
 export default {
   addCategory: async (req, res) => {
@@ -54,7 +55,7 @@ export default {
             success: false,
           });
         }
-       const subCategory = req?.files
+        const subCategory = req?.files
           ?.filter((fl) => fl?.fieldname !== "image")
           .map((image) => {
             return {
@@ -136,7 +137,7 @@ export default {
               label: req.body.label,
             }).then((newCategory) => {
               if (newCategory) {
-              return res.send({
+                return res.send({
                   data: [],
                   message: "Category already exists...!",
                   success: false,
@@ -209,7 +210,8 @@ export default {
           skip = parseInt(req.query.skip);
         }
         let count = await Category.count();
-        await Category.find().sort({_id:-1})
+        await Category.find()
+          .sort({ _id: -1 })
           .skip(skip)
           .limit(limit)
           .then((categories) => {
@@ -394,9 +396,8 @@ export default {
                       }
                     }
                   });
-                } 
-              } 
-              else if (temp.length === 0 && subCategory.length === 0) {
+                }
+              } else if (temp.length === 0 && subCategory.length === 0) {
                 Category.findOne({
                   label: req.body.label,
                 }).then((cat) => {
@@ -438,9 +439,7 @@ export default {
                       });
                   }
                 });
-              } 
-              
-              else {
+              } else {
                 res.send({
                   data: [],
                   message: "Duplication of Subcategory not allowed...!",
