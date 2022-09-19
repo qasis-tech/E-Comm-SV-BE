@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const categorySchema = mongoose.Schema({
   label: {
     type: String,
@@ -19,4 +19,4 @@ const categorySchema = mongoose.Schema({
 
  );
 
- module.exports = mongoose.model("category", categorySchema);
+export default mongoose.model("category", categorySchema);

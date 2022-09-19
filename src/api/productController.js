@@ -1,9 +1,7 @@
-const multer = require("multer");
-const path = require("path");
-const mongoose = require("mongoose");
-const Product = require("../config/model/product");
-const { json } = require("body-parser");
-const { features } = require("process");
+import multer from "multer";
+import path from "path";
+import mongoose from "mongoose";
+import Product from "../config/model/product.js";
 const imageURL = "public/uploads";
 const Storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -30,7 +28,7 @@ const upload = multer({
   }
 });
 const fileUpload = upload.any();
-module.exports = {
+export default {
   addProduct: async (req, res) => {
     try {
       const hostname = req.headers.host;

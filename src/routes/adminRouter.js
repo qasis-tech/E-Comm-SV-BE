@@ -1,16 +1,14 @@
-var express = require("express");
+import express from "express";
 const router = express.Router();
-const jwt = require("jsonwebtoken");
-const userController = require("../api/userController");
-const categoryController = require("../api/categoryController");
-const productController = require("../api/productController");
-const orderController = require("../api/orderController");
-const stockController = require("../api/stockController");
-const sliderController = require("../api/sliderController");
-const { validate } = require("../utils/validation");
-const validation = require("../utils/validationSchema");
-const tokenAuth = require("../utils/JWTService");
-const { JWT } = require("google-auth-library");
+import userController from "../api/userController.js";
+import categoryController from "../api/categoryController.js";
+import productController from "../api/productController.js";
+import orderController from "../api/orderController.js";
+import stockController from "../api/stockController.js";
+import sliderController from "../api/sliderController.js";
+import validate from "../utils/validation.js";
+import validation from "../utils/validationSchema.js";
+import tokenAuth from "../utils/JWTService.js";
 router.get("/", function (req, res, next) {
   res.send("welcome to adminPanel");
 });
@@ -167,4 +165,4 @@ router.get(
   tokenAuth.verifyMyToken,
   sliderController.viewDeal
 );
-module.exports = router;
+export default router;

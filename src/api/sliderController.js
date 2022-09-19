@@ -1,9 +1,8 @@
-const multer = require("multer");
-const path = require("path");
-const mongoose = require("mongoose");
-const Slider = require("../config/model/slider");
-const Deal = require("../config/model/deal");
-const { json } = require("body-parser");
+import multer from "multer";
+import path from "path";
+import mongoose from "mongoose";
+import Slider from "../config/model/slider.js";
+import Deal from "../config/model/deal.js";
 const imageURL = "public/uploads";
 const Storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -55,7 +54,7 @@ const upload1 = multer({
 });
 const fileUpload = upload.any();
 const uploadSingle = upload1.single("image");
-module.exports = {
+export default {
   addSlider: async (req, res) => {
     try {
       const hostname = req.headers.host;

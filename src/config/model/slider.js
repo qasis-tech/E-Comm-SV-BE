@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const sliderSchema = mongoose.Schema({
   sliderImage: {
     type: Array,
@@ -9,4 +9,4 @@ const sliderSchema = mongoose.Schema({
     timestamps: true
   }
  );
- module.exports = mongoose.model("slider", sliderSchema);
+export default mongoose.model("slider", sliderSchema);

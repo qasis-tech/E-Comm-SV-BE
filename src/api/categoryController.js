@@ -1,7 +1,7 @@
-const multer = require("multer");
-const path = require("path");
-const mongoose = require("mongoose");
-const Category = require("../config/model/category");
+import multer from "multer";
+import path from "path";
+import mongoose from "mongoose";
+import Category from "../config/model/category.js";
 const imageURL = "public/uploads";
 const Storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -27,7 +27,7 @@ const upload = multer({
   },
  });
 const fileUpload = upload.any();
-module.exports = {
+export default {
   addCategory: async (req, res) => {
     try {
       const { host } = req.headers;

@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
-const Stock = require("../config/model/stock");
-module.exports = {
+import mongoose from "mongoose";
+import Stock from "../config/model/stock.js";
+export default {
   addStock: async (req, res) => {
     try {
       const { product, category, subCategory, quantity, unit } = req.body;

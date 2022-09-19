@@ -1,10 +1,8 @@
-const { exist } = require("joi");
-const mongoose = require("mongoose");
-const order = require("../config/model/order");
-const Order = require("../config/model/order");
-const Product = require("../config/model/product");
-const User = require("../config/model/user");
-module.exports = {
+import mongoose from "mongoose";
+import Order from "../config/model/order.js";
+import Product from "../config/model/product.js";
+import User from "../config/model/user.js";
+export default {
   addOrder: async (req, res) => {
     try {
       const products = req.body.productId;
@@ -151,12 +149,12 @@ module.exports = {
             $match: {
               $or: [
                 { "product.category": { $in: categoryArray } },
-                {
-                  createdAt: {
-                    $gte: new Date(new Date(startDate).setHours(00, 00, 00)),
-                    $lt: new Date(new Date(endDate).setHours(23, 59, 59)),
-                  },
-                },
+                // {
+                //   createdAt: {
+                //     $gte: new Date(new Date(startDate).setHours(00, 00, 00)),
+                //     $lt: new Date(new Date(endDate).setHours(23, 59, 59)),
+                //   },
+                // },
                 { "product.subCategory": { $in: subCategoryArray } },
                 { orderId: { $in: searchArray } },
                 {

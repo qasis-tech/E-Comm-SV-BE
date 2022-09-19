@@ -1,16 +1,16 @@
-const User = require("../config/model/user");
-const mongoose = require("mongoose");
-const UtilService = require("../utils/utilService");
-const JWTService = require("../utils/JWTService");
-const nodemailer = require("nodemailer");
-const otpGenerator = require("otp-generator");
+import User from "../config/model/user.js";
+import mongoose from "mongoose";
+import UtilService from "../utils/utilService.js";
+import JWTService from "../utils/JWTService.js";
+import nodemailer from "nodemailer";
+import otpGenerator from "otp-generator";
 const myOtp = otpGenerator.generate(6, {
   digits: true,
   lowerCaseAlphabets: false,
   upperCaseAlphabets: false,
   specialChars: false,
 });
-module.exports = {
+export default {
   login: async function (req, res) {
     try {
       const { email, password } = req.body;

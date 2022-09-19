@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const dealSchema = mongoose.Schema({
   startDate: {
     type: String,
@@ -25,4 +25,4 @@ const dealSchema = mongoose.Schema({
     timestamps: true
   }
  );
- module.exports = mongoose.model("deal", dealSchema);
+ export default mongoose.model("deal", dealSchema);
