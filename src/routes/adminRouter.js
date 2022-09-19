@@ -1,32 +1,52 @@
-var express = require("express");
+import express from "express";
 const router = express.Router();
-const jwt = require("jsonwebtoken");
-const userController = require("../api/userController");
-const categoryController = require("../api/categoryController");
-const productController = require("../api/productController");
-const orderController = require("../api/orderController");
-const stockController = require("../api/stockController");
-const { validate } = require("../utils/validation");
-const validation = require("../utils/validationSchema");
-const tokenAuth = require("../utils/JWTService");
-const { JWT } = require("google-auth-library");
+import userController from "../api/userController.js";
+import categoryController from "../api/categoryController.js";
+import productController from "../api/productController.js";
+import orderController from "../api/orderController.js";
+import stockController from "../api/stockController.js";
+import sliderController from "../api/sliderController.js";
+import validate from "../utils/validation.js";
+import validation from "../utils/validationSchema.js";
+import tokenAuth from "../utils/JWTService.js";
 router.get("/", function (req, res, next) {
   res.send("welcome to adminPanel");
 });
-router.post("/signup", validate(validation.usersignup), userController.addUser);
+router.post("/user", validate(validation.usersignup), userController.addUser);
 router.post(
   "/google",
   validate(validation.googleAuth),
   userController.googleAuth
 );
-router.get("/signup", userController.viewUsers);
+router.get("/user", userController.viewUsers);
 router.put(
-  "/signup/:id",
+  "/user/:id",
   validate(validation.userEditsignup),
   userController.editUsers
 );
-router.delete("/signup/:id", userController.deleteUsers);
+router.delete("/user/:id", userController.deleteUsers);
 router.post("/login", validate(validation.signin), userController.login);
+router.post(
+  "/verifyOtp",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  validate(validation.otpValid),
+  userController.verifyOtp
+);
+router.post(
+  "/resetOtp",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  validate(validation.resetValid),
+  userController.resetPassword
+);
+router.post(
+  "/verifyResetOtp",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  validate(validation.resetOtpValid),
+  userController.verifyResetPasswordOtp
+);
 router.post(
   "/category",
   tokenAuth.verifyToken,
@@ -62,6 +82,12 @@ router.put(
   tokenAuth.verifyToken,
   tokenAuth.verifyMyToken,
   productController.editProduct
+);
+router.delete(
+  "/product/:id",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  productController.deleteProduct
 );
 router.post(
   "/order",
@@ -112,6 +138,31 @@ router.delete(
 router.put("/addUser/:id", userController.addUserDetails);
 router.get("/product/:id", productController.viewProductDetails);
 router.get("/order/:id", orderController.viewOrderDetails);
-router.get("/signup/:id", userController.viewUserDetails);
+router.get("/user/:id", userController.viewUserDetails);
 router.get("/category/:id", categoryController.viewCategoryDetails);
-module.exports = router;
+router.get("/stock/:id", stockController.viewStockDetails);
+router.post(
+  "/slider",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  sliderController.addSlider
+);
+router.get(
+  "/slider",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  sliderController.viewSlider
+);
+router.post(
+  "/deal",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  sliderController.addDeal
+);
+router.get(
+  "/deal",
+  tokenAuth.verifyToken,
+  tokenAuth.verifyMyToken,
+  sliderController.viewDeal
+);
+export default router;

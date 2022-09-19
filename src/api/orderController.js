@@ -1,10 +1,8 @@
-const { exist } = require("joi");
-const mongoose = require("mongoose");
-const order = require("../config/model/order");
-const Order = require("../config/model/order");
-const Product = require("../config/model/product");
-const User = require("../config/model/user");
-module.exports = {
+import mongoose from "mongoose";
+import Order from "../config/model/order.js";
+import Product from "../config/model/product.js";
+import User from "../config/model/user.js";
+export default {
   addOrder: async (req, res) => {
     try {
       const products = req.body.productId;
@@ -20,8 +18,7 @@ module.exports = {
       if (unitArray.length) {
         res.status(200).send({
           data: [],
-          message:
-            "Allowed units for product id " + productArray + " are " + unitList,
+          message: `Allowed units for product id  ${productArray} are ${unitList}`,
           success: false,
         });
       } else {
@@ -89,11 +86,9 @@ module.exports = {
                   })
                   .catch((error) => {
                     console.log("error", error);
-                    let errormessage = error.message;
                     return res.status(200).send({
                       data: [],
-                      message: "Failed to place order..!",
-                      errormessage,
+                      message: `Failed to place order  ${error.message}`,
                       success: false,
                     });
                   });
@@ -103,33 +98,79 @@ module.exports = {
         } else {
           return res.status(200).send({
             data: [],
-            message: "Cannot find user with id " + req.body.userId,
+            message: `Cannot find user with id ${req.body.userId}`,
             success: false,
           });
         }
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error ${error.message}`,
         status: false,
       });
     }
   },
   viewTotalOrder: async (req, res) => {
     try {
-      if (req.query.search) {
-        const search = req.query.search;
-        await Order.find({ orderId: { $regex: search } })
+      if (
+        req.query.category ||
+        (req.query.startDate && req.query.endDate) ||
+        req.query.subcategory ||
+        req.query.search ||
+        req.query.status
+      ) {
+        let categoryArray = [];
+        let subCategoryArray = [];
+        let searchArray = [];
+        let statusArray = [];
+        let startDate = "";
+        let endDate = "";
+        if (req.query.category) {
+          categoryArray = req.query.category.split(",");
+        }
+        if (req.query.startDate && req.query.endDate) {
+          startDate = req.query.startDate;
+          endDate = req.query.endDate;
+        }
+        if (req.query.subcategory) {
+          subCategoryArray = req.query.subcategory.split(",");
+        }
+        if (req.query.search) {
+          searchArray = req.query.search.split(",");
+        }
+        if (req.query.status) {
+          statusArray = req.query.status.split(",");
+        }
+        await Order.aggregate([
+          { $unwind: "$product" },
+          {
+            $match: {
+              $or: [
+                { "product.category": { $in: categoryArray } },
+                // {
+                //   createdAt: {
+                //     $gte: new Date(new Date(startDate).setHours(00, 00, 00)),
+                //     $lt: new Date(new Date(endDate).setHours(23, 59, 59)),
+                //   },
+                // },
+                { "product.subCategory": { $in: subCategoryArray } },
+                { orderId: { $in: searchArray } },
+                {
+                  status: { $in: statusArray },
+                },
+              ],
+            },
+          },
+        ])
           .then((orders) => {
             if (!orders.length) {
               return res.status(200).send({
                 data: [],
                 message: "No order found..!",
                 success: false,
+                count: orders.length,
               });
             }
             return res.status(200).send({
@@ -141,36 +182,10 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error", err);
-            let errormessage = err.message;
             return res.status(404).send({
               data: [],
-              message: "error",
-              errormessage,
+              message: `error ${err.message}`,
               status: false,
-            });
-          });
-      } else if (req.query.startDate && req.query.endDate) {
-        const { startDate, endDate } = req.query;
-        await Order.find({
-          createdAt: {
-            $gte: new Date(new Date(startDate).setHours(00, 00, 00)),
-            $lt: new Date(new Date(endDate).setHours(23, 59, 59)),
-          },
-        })
-          .sort({ createdAt: "asc" })
-          .then((orderList) => {
-            if (orderList.length === 0) {
-              return res.status(200).send({
-                data: [],
-                message: "No orders yet..!",
-                success: false,
-              });
-            }
-            res.status(200).send({
-              data: orderList,
-              message: "Successfully fetched orders..!",
-              success: true,
-              count: orderList.length,
             });
           });
       } else {
@@ -187,7 +202,7 @@ module.exports = {
         const completedOrders = await Order.find({
           status: "Delivered",
         }).count();
-        await Order.find()
+        await Order.find().sort({_id:-1})
           .skip(skip)
           .limit(limit)
           .then((orders) => {
@@ -196,6 +211,7 @@ module.exports = {
                 data: [],
                 message: "No orders yet..!",
                 success: false,
+                count: totalOrders,
               });
             }
             res.status(200).send({
@@ -207,16 +223,15 @@ module.exports = {
               },
               message: "Successfully fetched orders..!",
               success: true,
+              count: totalOrders,
             });
           });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error ${error.message}`,
         status: false,
       });
     }
@@ -249,11 +264,9 @@ module.exports = {
               })
               .catch((err) => {
                 console.log("error", err);
-                let errormessage = err.message;
                 return res.status(404).send({
                   data: [],
-                  message: "error",
-                  errormessage,
+                  message: `error ${err.message}`,
                   status: false,
                 });
               });
@@ -262,17 +275,15 @@ module.exports = {
       } else {
         return res.status(200).send({
           data: [],
-          message: "Cannot find order with id " + req.params.id,
+          message: `Cannot find order with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error ${error.message}`,
         status: false,
       });
     }
@@ -303,8 +314,7 @@ module.exports = {
             if (orderStatus.indexOf(req.body.status) === -1) {
               return res.status(200).send({
                 data: [],
-                message: "allowed status",
-                orderStatus,
+                message: `allowed status ${orderStatus}`,
                 success: false,
               });
             }
@@ -328,10 +338,9 @@ module.exports = {
               })
               .catch((error) => {
                 console.log("error", error);
-                let errormessage = error.message;
                 return res.status(404).send({
-                  dat: [],
-                  message: "error",
+                  data: [],
+                  message: `error ${error.message}`,
                   status: false,
                 });
               });
@@ -340,17 +349,15 @@ module.exports = {
       } else {
         return res.status(200).send({
           data: [],
-          message: "Cannot find order with id " + req.params.id,
+          message: `Cannot find order with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
-        dat: [],
-        message: "error",
-        errormessage,
+        data: [],
+        message: `error ${error.message}`,
         status: false,
       });
     }

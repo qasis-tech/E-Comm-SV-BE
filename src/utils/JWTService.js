@@ -1,11 +1,12 @@
-const jwt = require("jsonwebtoken");
-const SECRET = "QUASIS_TECH";
-module.exports = {
+import jwt from "jsonwebtoken"
+import dotenv from 'dotenv';
+dotenv.config();
+export default {
   issuer(payload, expiredIn) {
-    return jwt.sign(payload, SECRET, { expiresIn: expiredIn });
+    return jwt.sign(payload, process.env.SECRET, { expiresIn: expiredIn });
   },
   verify(token) {
-    return jwt.verify(token, SECRET, {});
+    return jwt.verify(token, process.env.SECRET, {});
   },
   verifyToken(req, res, next) {
     const bearerHeader = req.headers["authorization"];
@@ -19,7 +20,7 @@ module.exports = {
     }
   },
   verifyMyToken(req, res, next) {
-    jwt.verify(req.headers["authorization"], SECRET, (err, authData) => {
+    jwt.verify(req.headers["authorization"], process.env.SECRET, (err, authData) => {
       if (err) {
         res.sendStatus(401);
       } else {
@@ -28,3 +29,5 @@ module.exports = {
     });
   },
 };
+
+

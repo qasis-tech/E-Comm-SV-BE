@@ -1,15 +1,25 @@
-const express = require("express");
+import express from 'express'
 const app = express();
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const adminRouter = require("./src/routes/adminRouter");
-const dbCon = require("./src/config/connections/connection");
-const cors = require("cors");
+import mongoose from 'mongoose';
+import bodyParser from 'body-parser'
+import adminRouter from './src/routes/adminRouter.js'
+// import dbCon from "./src/config/connections/connection.js";
+import cors from 'cors'
 app.use(cors({ origin: true, credentials: true }));
-require("dotenv").config();
+import dotenv from 'dotenv';
+dotenv.config();
+mongoose.connect(process.env.DB_BASE_URL, {
+  useNewUrlParser: true,
+})
+.then(() => {
+  console.log(`DB Connected...!`);
+})
+.catch((err) => {
+  console.log(`Could not connect to the database. Exiting now...${err}`);
+});
 app.use(
   bodyParser.urlencoded({
-    extended: false,
+    extended: true,
   })
 );
 app.use(bodyParser.json());
@@ -19,4 +29,5 @@ app.use("/", adminRouter);
 const port = process.env.PORT || 7000;
 app.listen(port, () => {
   console.log("Server is listening on port ", port);
+  
 });

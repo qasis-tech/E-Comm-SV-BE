@@ -1,7 +1,7 @@
-const multer = require("multer");
-const path = require("path");
-const mongoose = require("mongoose");
-const Category = require("../config/model/category");
+import multer from "multer";
+import path from "path";
+import mongoose from "mongoose";
+import Category from "../config/model/category.js";
 const imageURL = "public/uploads";
 const Storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -13,16 +13,28 @@ const Storage = multer.diskStorage({
 });
 const upload = multer({
   storage: Storage,
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype == "image/png" ||
+      file.mimetype == "image/jpg" ||
+      file.mimetype == "image/jpeg" ||
+      file.mimetype == "image/svg"
+    ) {
+      cb(null, true);
+    } else {
+      cb(null, false);
+      return cb(new Error("Only .png,.jpg,.jpeg and .svg format allowed"));
+    }
+  },
 });
 const fileUpload = upload.any();
-module.exports = {
+export default {
   addCategory: async (req, res) => {
     try {
       const { host } = req.headers;
       fileUpload(req, res, (err) => {
         if (err) {
-          console.log("error in file uploading", err);
-          let errormessage = err.message;
+          // console.log('error',err)
           return res.status(200).send({
             data: [],
             message: `Error in image uploading..! ${err.message}`,
@@ -40,20 +52,6 @@ module.exports = {
           return res.status(200).send({
             data: [],
             message: "category Image required!",
-            success: false,
-          });
-        }
-        const fileFormat = [
-          "image/jpeg",
-          "image/jpg",
-          "image/png",
-          "image/svg",
-        ];
-        if (fileFormat.indexOf(req?.files[0]?.mimetype) === -1) {
-          return res.status(200).send({
-            data: [],
-            message: "allowed file format",
-            fileFormat,
             success: false,
           });
         }
@@ -126,11 +124,9 @@ module.exports = {
                   })
                   .catch((err) => {
                     console.log("error 4", err);
-                    let errormessage = err.message;
                     return res.status(404).send({
                       data: [],
-                      message: "error",
-                      errormessage,
+                      message: `error..! ${err.message}`,
                       status: false,
                     });
                   });
@@ -141,7 +137,7 @@ module.exports = {
               label: req.body.label,
             }).then((newCategory) => {
               if (newCategory) {
-                res.send({
+                return res.send({
                   data: [],
                   message: "Category already exists...!",
                   success: false,
@@ -179,10 +175,9 @@ module.exports = {
                 })
                 .catch((err) => {
                   console.log("error 4", err);
-                  let errormessage = err.message;
                   return res.status(404).send({
                     data: [],
-                    message: errormessage,
+                    message: `error..! ${err.message}`,
                     status: false,
                   });
                 });
@@ -198,10 +193,9 @@ module.exports = {
       });
     } catch (error) {
       console.log("error 5", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -217,6 +211,7 @@ module.exports = {
         }
         let count = await Category.count();
         await Category.find()
+          .sort({ _id: -1 })
           .skip(skip)
           .limit(limit)
           .then((categories) => {
@@ -225,6 +220,7 @@ module.exports = {
                 data: [],
                 message: "No categories found..!",
                 success: false,
+                count: count,
               });
             }
             return res.status(200).send({
@@ -236,11 +232,9 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error 3", err);
-            let errormessage = err.message;
             return res.status(404).send({
               data: [],
-              message: "error",
-              errormessage,
+              message: `error..! ${err.message}`,
               status: false,
             });
           });
@@ -252,6 +246,7 @@ module.exports = {
                 data: [],
                 message: "No categories found..!",
                 success: false,
+                count: categories.length,
               });
             }
             return res.status(200).send({
@@ -263,33 +258,30 @@ module.exports = {
           })
           .catch((err) => {
             console.log("error 1", err);
-            let errormessage = err.message;
             return res.status(404).send({
               data: [],
-              message: "error",
-              errormessage,
+              message: `error..! ${err.message}`,
               status: false,
             });
           });
       }
     } catch (error) {
       console.log("error 2", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
   },
   editCategory: async (req, res) => {
     try {
-      const hostname = req.headers.host;
+      const { host } = req.headers;
       fileUpload(req, res, (err) => {
         if (err) {
           return res.status(200).send({
             data: [],
-            message: "Error in image uploading..!",
+            message: `Error in image uploading..! ${err.message}`,
             success: false,
           });
         }
@@ -297,27 +289,6 @@ module.exports = {
           return res.status(200).send({
             data: [],
             message: "Category name required!",
-            success: false,
-          });
-        }
-        if (req?.files[0]?.path === undefined) {
-          return res.status(200).send({
-            data: [],
-            message: "category Image required!",
-            success: false,
-          });
-        }
-        const fileFormat = [
-          "image/jpeg",
-          "image/jpg",
-          "image/png",
-          "image/svg",
-        ];
-        if (fileFormat.indexOf(req?.files[0]?.mimetype) === -1) {
-          return res.status(200).send({
-            data: [],
-            message: "allowed file format",
-            fileFormat,
             success: false,
           });
         }
@@ -330,59 +301,166 @@ module.exports = {
                 success: false,
               });
             } else {
-              const subCategory = [];
-              req?.files?.forEach((image) => {
-                if (image.fieldname !== "image") {
-                  subCategory.push({
+              const subCategory = req?.files
+                ?.filter((fl) => fl?.fieldname !== "image")
+                .map((image) => {
+                  return {
                     label: image.fieldname,
-                    subCategoryImage:
-                      "http://" +
-                      hostname +
-                      "/" +
-                      image.path.replaceAll("\\", "/"),
+                    subCategoryImage: `http://${host}/${image?.path?.replaceAll(
+                      "\\",
+                      "/"
+                    )}`,
+                  };
+                });
+              let temp = [];
+              if (subCategory.length) {
+                for (let index = 0; index < subCategory.length; index++) {
+                  let i = temp?.findIndex(
+                    (fi) => fi?.label === subCategory[index]?.label
+                  );
+                  if (i === -1) {
+                    temp.push(subCategory[index]);
+                  }
+                }
+              }
+              if (
+                temp.length > 0 &&
+                subCategory.length > 0 &&
+                temp.length === subCategory.length
+              ) {
+                if (temp.length) {
+                  Category.findOne({
+                    label: req.body.label,
+                  }).then((newCategory) => {
+                    if (newCategory) {
+                      const newsubCategory = Category.findByIdAndUpdate(
+                        newCategory._id,
+                        {
+                          subCategory: subCategory,
+                        },
+                        {
+                          new: true,
+                        }
+                      ).then((newsubCategory) => {
+                        if (newsubCategory) {
+                          return res.status(200).send({
+                            data: newsubCategory,
+                            message: "Successfully updated sub Categories..!",
+                            success: true,
+                          });
+                        }
+                      });
+                    } else {
+                      if (req?.files[0]?.path) {
+                        Category.findByIdAndUpdate(
+                          req.params.id,
+                          {
+                            label: req.body.label,
+                            image: `http://${host}/${req?.files[0]?.path?.replaceAll(
+                              "\\",
+                              "/"
+                            )}`,
+                            subCategory: subCategory,
+                          },
+                          {
+                            new: true,
+                          }
+                        ).then((newCategories) => {
+                          if (newCategories) {
+                            return res.status(200).send({
+                              data: newCategories,
+                              message: "Successfully updated Categories..!",
+                              success: true,
+                            });
+                          }
+                        });
+                      } else {
+                        Category.findByIdAndUpdate(
+                          req.params.id,
+                          {
+                            label: req.body.label,
+                            subCategory: subCategory,
+                          },
+                          {
+                            new: true,
+                          }
+                        ).then((newCategories) => {
+                          if (newCategories) {
+                            return res.status(200).send({
+                              data: newCategories,
+                              message: "Successfully updated Categories..!",
+                              success: true,
+                            });
+                          }
+                        });
+                      }
+                    }
                   });
                 }
-              });
-              const newCategory = Category.findByIdAndUpdate(
-                req.params.id,
-                {
+              } else if (temp.length === 0 && subCategory.length === 0) {
+                Category.findOne({
                   label: req.body.label,
-                  image:
-                    "http://" +
-                    hostname +
-                    "/" +
-                    req.files[0].path.replaceAll("\\", "/"),
-                  subCategory: subCategory,
-                },
-                {
-                  new: true,
-                }
-              ).then((newCategories) => {
-                if (newCategories) {
-                  return res.status(200).send({
-                    data: newCategories,
-                    message: "Successfully updated Categories..!",
-                    success: true,
-                  });
-                }
-              });
+                }).then((cat) => {
+                  if (cat) {
+                    return res.status(200).send({
+                      data: [],
+                      message: "Category already exists...!",
+                      success: false,
+                    });
+                  } else {
+                    Category.findByIdAndUpdate(
+                      req.params.id,
+                      {
+                        label: req.body.label,
+                        image: `http://${host}/${req?.files[0]?.path?.replaceAll(
+                          "\\",
+                          "/"
+                        )}`,
+                        subCategory: subCategory,
+                      },
+                      {
+                        new: true,
+                      }
+                    )
+                      .then((Category) => {
+                        return res.status(200).send({
+                          data: Category,
+                          message: "Successfully updated Category..!",
+                          success: true,
+                        });
+                      })
+                      .catch((err) => {
+                        console.log("error 4", err);
+                        return res.status(404).send({
+                          data: [],
+                          message: `error..! ${err.message}`,
+                          status: false,
+                        });
+                      });
+                  }
+                });
+              } else {
+                res.send({
+                  data: [],
+                  message: "Duplication of Subcategory not allowed...!",
+                  success: false,
+                });
+              }
             }
           });
         } else {
           return res.status(200).send({
             data: [],
-            message: "Cannot find category with id " + req.params.id,
+            message: `Cannot find category with id ${req.params.id}`,
             success: false,
           });
         }
       });
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -415,11 +493,9 @@ module.exports = {
               })
               .catch((err) => {
                 console.log("error", err);
-                let errormessage = err.message;
                 return res.status(404).send({
                   data: [],
-                  message: "error",
-                  errormessage,
+                  message: `error..! ${err.message}`,
                   status: false,
                 });
               });
@@ -428,17 +504,15 @@ module.exports = {
       } else {
         return res.status(200).send({
           data: [],
-          message: "Cannot find category with id " + req.params.id,
+          message: `Cannot find category with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }

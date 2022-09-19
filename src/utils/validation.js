@@ -1,4 +1,4 @@
-exports.validate = (schema) => (req, res, next) => {
+const validate = (schema) => (req, res, next) => {
     const {
         error
     } = schema.validate(req.body);
@@ -9,3 +9,4 @@ exports.validate = (schema) => (req, res, next) => {
     }
 };
 
+export default validate

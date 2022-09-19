@@ -1,6 +1,4 @@
-const { date } = require("joi");
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 const userSchema = mongoose.Schema({
   firstName: {
     type: String,
@@ -21,7 +19,7 @@ const userSchema = mongoose.Schema({
     type: String,
   },
   pinCode: {
-    type: Number,
+    type: String,
   },
   location: {
     default:null,
@@ -48,9 +46,15 @@ const userSchema = mongoose.Schema({
   token: {
     type: String,
   },
+  status: {
+    type: String,
+  },
+  accountOtp: {
+    type: String,
+  },
 },
 {
   timestamps: true,
 }
 );
-module.exports = mongoose.model("users", userSchema);
+export default mongoose.model("users", userSchema);

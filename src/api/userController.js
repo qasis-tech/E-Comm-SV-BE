@@ -1,8 +1,16 @@
-const User = require("../config/model/user");
-const mongoose = require("mongoose");
-const UtilService = require("../utils/utilService");
-const JWTService = require("../utils/JWTService");
-module.exports = {
+import User from "../config/model/user.js";
+import mongoose from "mongoose";
+import UtilService from "../utils/utilService.js";
+import JWTService from "../utils/JWTService.js";
+import nodemailer from "nodemailer";
+import otpGenerator from "otp-generator";
+const myOtp = otpGenerator.generate(6, {
+  digits: true,
+  lowerCaseAlphabets: false,
+  upperCaseAlphabets: false,
+  specialChars: false,
+});
+export default {
   login: async function (req, res) {
     try {
       const { email, password } = req.body;
@@ -27,7 +35,7 @@ module.exports = {
           success: false,
         });
       }
-      const token = await JWTService.issuer({ email: user.email }, "10 day");
+      const token = await JWTService.issuer({ email: user.email }, "300 days");
       const login = await User.updateOne(
         {
           email: email,
@@ -38,9 +46,12 @@ module.exports = {
           },
         }
       );
-      const newUser = await User.findOne({
-        email: email,
-      });
+      const newUser = await User.findOne(
+        {
+          email: email,
+        },
+        { password: 0 }
+      );
       if (newUser.role === "admin") {
         return res.status(200).send({
           data: newUser,
@@ -55,11 +66,9 @@ module.exports = {
       });
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: error,
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -89,6 +98,8 @@ module.exports = {
           password: encryptedPassword,
           role: "user",
           token: null,
+          status: "active",
+          accountOtp: null,
         });
         if (!newUser) {
           return res.status(200).send({
@@ -97,19 +108,53 @@ module.exports = {
             success: false,
           });
         }
-        return res.status(200).send({
-          data: newUser,
-          message: "Successfully created your account..!",
-          success: true,
-        });
+        const resetOtp = await User.updateOne(
+          { email: email },
+          { $set: { accountOtp: myOtp } }
+        );
+        if (resetOtp) {
+          const msg = {
+            from: "veenavijayan38@gmail.com",
+            to: email,
+            subject: "OTP for verify your account",
+
+            html:`This is the One Time Password to verify your account.<br><br><b><u><h1> ${myOtp} </h1></b></u><br><br>Thank You..`
+            
+          };
+          nodemailer
+            .createTransport({
+              service: "gmail",
+              auth: {
+                user: "veenavijayan38@gmail.com",
+                pass: "rqdpilsciczoskpw",
+              },
+              port: 465,
+              host: "smtp.gmail.com",
+              from: "veenavijayan38@gmail.com",
+            })
+            .sendMail(msg, (err) => {
+              if (err) {
+                return res.status(404).send({
+                  data: [err],
+                  message: "Error in sending mail",
+                  success: false,
+                });
+              } else {
+                res.status(200).send({
+                  data: [],
+                  message:
+                    "OTP Sent Successfully ..please wait for otp verification!",
+                  success: true,
+                });
+              }
+            });
+        }
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -159,61 +204,87 @@ module.exports = {
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
   },
   viewUsers: async (req, res) => {
     try {
-      let limit = 10;
-      let skip = 0;
-      if (req.query.limit && req.query.skip) {
-        limit = parseInt(req.query.limit);
-        skip = parseInt(req.query.skip);
-      }
-      let count = await User.find({ role: "user" }).count();
-      await User.find({
-        role: "user",
-      })
-        .skip(skip)
-        .limit(limit)
-        .then((users) => {
-          if (users.length === 0) {
+      if (req.query.search) {
+        await User.find({ firstName: { $regex: req.query.search } })
+          .then((users) => {
+            if (users.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No User found..!",
+                success: false,
+                count: users.length,
+              });
+            }
             return res.status(200).send({
+              data: users,
+              message: "Successfully fetched users..!",
+              success: true,
+              count: users.length,
+            });
+          })
+          .catch((err) => {
+            console.log("error 1", err);
+            return res.status(404).send({
               data: [],
-              message: "No Users found..!",
+              message: `error..! ${err.message}`,
+              status: false,
+            });
+          });
+      } else {
+        let limit = 10;
+        let skip = 0;
+        if (req.query.limit && req.query.skip) {
+          limit = parseInt(req.query.limit);
+          skip = parseInt(req.query.skip);
+        }
+        let count = await User.find({ role: "user" }).count();
+        await User.find(
+          {
+            role: "user",
+          },
+          { password: 0 }
+        ).sort({_id:-1})
+          .skip(skip)
+          .limit(limit)
+          .then((users) => {
+            if (users.length === 0) {
+              return res.status(200).send({
+                data: [],
+                message: "No Users found..!",
+                success: false,
+                count: count,
+              });
+            }
+            res.status(200).send({
+              data: users,
+              message: "Successfully fetched users..!",
+              success: true,
+              count: count,
+            });
+          })
+          .catch((err) => {
+            console.log("error", err);
+            res.status(404).send({
+              data: [],
+              message: `error..! ${err.message}`,
               success: false,
             });
-          }
-          res.status(200).send({
-            data: users,
-            message: "Successfully fetched users..!",
-            success: true,
-            count: count,
           });
-        })
-        .catch((err) => {
-          console.log("error", err);
-          let errormessage = err.message;
-          res.status(404).send({
-            data: [],
-            message: "Error..!",
-            errormessage,
-            success: false,
-          });
-        });
+      }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -221,51 +292,52 @@ module.exports = {
   editUsers: async (req, res) => {
     try {
       if (mongoose.Types.ObjectId.isValid(req.params.id) === true) {
-        User.find({ _id: req.params.id }).then((user) => {
-          if (user.length === 0) {
-            return res.status(200).send({
-              data: [],
-              message: "No user found with given id..!",
-              success: false,
-            });
-          } else {
-            User.findByIdAndUpdate(
-              req.params.id,
-              {
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
-                mobileNumber: req.body.mobileNumber,
-                email: req.body.email,
-                gender: req.body.gender,
-                dob: req.body.dob,
-                pinCode: req.body.pinCode,
-              },
-              {
-                new: true,
-              }
-            ).then((user) => {
+        const user = User.find({ _id: req.params.id });
+        if (user.length === 0) {
+          return res.status(200).send({
+            data: [],
+            message: "No user found with given id..!",
+            success: false,
+          });
+        } else {
+          const encryptedPassword = await UtilService.hashPassword(req.body.password);
+          User.findByIdAndUpdate(
+            req.params.id,
+            {
+              firstName: req.body.firstName,
+              lastName: req.body.lastName,
+              mobileNumber: req.body.mobileNumber,
+              email: req.body.email,
+              gender: req.body.gender,
+              dob: req.body.dob,
+              pinCode: req.body.pinCode,
+              password: encryptedPassword,
+            },
+            {
+              new: true,
+            }
+          )
+            .select("-password")
+            .then((user) => {
               res.status(200).send({
                 data: user,
                 message: "Successfully updated user..!",
                 success: true,
               });
             });
-          }
-        });
+        }
       } else {
         return res.status(404).send({
           data: [],
-          message: "user not found with id " + req.params.id,
+          message: `user not found with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -281,29 +353,29 @@ module.exports = {
               success: false,
             });
           } else {
-            User.findByIdAndRemove(req.params.id).then((user) => {
-              res.status(200).send({
-                data: user,
-                message: "Successfully deleted user..!",
-                success: true,
+            User.findByIdAndRemove(req.params.id)
+              .select("-password")
+              .then((user) => {
+                res.status(200).send({
+                  data: user,
+                  message: "Successfully deleted user..!",
+                  success: true,
+                });
               });
-            });
           }
         });
       } else {
         return res.status(200).send({
           data: [],
-          message: "user not found with id " + req.params.id,
+          message: `user not found with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -330,30 +402,30 @@ module.exports = {
               {
                 new: true,
               }
-            ).then((user) => {
-              res.status(200).send({
-                data: user,
-                message: "Successfully updated user..!",
-                success: true,
+            )
+              .select("-password")
+              .then((user) => {
+                res.status(200).send({
+                  data: user,
+                  message: "Successfully updated user..!",
+                  success: true,
+                });
               });
-            });
           }
         });
       } else {
         console.log("error", error);
         return res.status(404).send({
           data: [],
-          message: "user not found with id " + req.params.id,
+          message: `user not found with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
@@ -369,7 +441,7 @@ module.exports = {
               success: false,
             });
           } else {
-            User.findById({ _id: req.params.id })
+            User.findById({ _id: req.params.id }, { password: 0 })
               .then((user) => {
                 if (user.length === 0) {
                   return res.status(200).send({
@@ -386,11 +458,9 @@ module.exports = {
               })
               .catch((err) => {
                 console.log("error", err);
-                let errormessage = err.message;
                 return res.status(404).send({
                   data: [],
-                  message: "error",
-                  errormessage,
+                  message: `error..! ${err.message}`,
                   status: false,
                 });
               });
@@ -399,19 +469,170 @@ module.exports = {
       } else {
         return res.status(200).send({
           data: [],
-          message: "Cannot find user with id " + req.params.id,
+          message: `Cannot find user with id ${req.params.id}`,
           success: false,
         });
       }
     } catch (error) {
       console.log("error", error);
-      let errormessage = error.message;
       return res.status(404).send({
         data: [],
-        message: "error",
-        errormessage,
+        message: `error..! ${error.message}`,
         status: false,
       });
     }
   },
+  verifyOtp: async (req, res) => {
+    try {
+      const { otp, email } = req.body;
+      const user = await User.findOne(
+        {
+          email: req.body.email,
+        },
+      );
+     if (!user) {
+        res.status(404).send({
+          data: [],
+          message: "No user found..!",
+          success: false,
+        });
+      }
+      else{
+        if (user.accountOtp !== otp) {
+          res.status(404).send({
+            data: [],
+            message: "OTP mismatch..!",
+            success: false,
+          });
+        }
+        else{
+          res.status(200).send({
+            data: [],
+            message:
+              "Account created successfully...",
+            success: true,
+          });
+        }
+      }    
+   
+    } catch (error) {
+      console.log("error", error);
+      return res.status(404).send({
+        data: [],
+        message: `error ${error.message}`,
+        status: false,
+      });
+    }
+  },
+  resetPassword: async (req, res) => {
+    try {
+      const { email } = req.body;
+      const oldUser = await User.findOne({
+        email: email,
+      });
+      if (!oldUser) {
+        return res.status(200).send({
+          data: [],
+          message: "User not found..!",
+          success: false,
+        });
+      } else {
+        const resetOtp = await User.updateOne(
+          { email: email },
+          { $set: { accountOtp: myOtp } }
+        );
+        if (resetOtp) {
+          const msg = {
+            from: "veenavijayan38@gmail.com",
+            to: email,
+            subject: "OTP for reset your password",
+
+            html:`This is the One Time Password to reset your password.<br><br><b><u><h1> ${myOtp} </h1></b></u><br><br>Thank You..`
+             
+          };
+          nodemailer
+            .createTransport({
+              service: "gmail",
+              auth: {
+                user: "veenavijayan38@gmail.com",
+                pass: "rqdpilsciczoskpw",
+              },
+              port: 465,
+              host: "smtp.gmail.com",
+              from: "veenavijayan38@gmail.com",
+            })
+            .sendMail(msg, (err) => {
+              if (err) {
+                return res.status(404).send({
+                  data: [err],
+                  message: "Error in sending mail",
+                  success: false,
+                });
+              } else {
+                res.status(200).send({
+                  data: [],
+                  message:
+                    "OTP Sent Successfully ..please wait for otp verification!",
+                  success: true,
+                });
+              }
+            });
+        }
+      }
+    } catch (error) {
+      console.log("error", error);
+      return res.status(404).send({
+        data: [],
+        message: `error ${error.message}`,
+        status: false,
+      });
+    }
+  },
+ verifyResetPasswordOtp: async (req, res) => {
+    try {
+      const {email,otp } = req.body;
+      const user = await User.findOne(
+        {
+          email: req.body.email,
+        },
+        { password: 0 }
+      );
+     if (!user) {
+        res.status(404).send({
+          data: [],
+          message: "No user found..!",
+          success: false,
+        });
+      }
+      else{
+        if (user.accountOtp !== otp) {
+          res.status(404).send({
+            data: [],
+            message: "OTP mismatch..!",
+            success: false,
+          });
+        }
+        else{
+          res.status(200).send({
+            data: user,
+            message:
+              "OTP verified successfully...",
+            success: true,
+          });
+          const expireOtp = await User.updateOne(
+            { email: email },
+            { $set: { accountOtp: null } }
+          );
+        }
+      }       
+    } catch (error) {
+      console.log("error", error);
+      return res.status(404).send({
+        data: [],
+        message: `error ${error.message}`,
+        status: false,
+      });
+    }
+  },
+
 };

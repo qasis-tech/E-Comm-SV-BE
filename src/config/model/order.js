@@ -1,5 +1,4 @@
-const { string } = require("joi");
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const orderSchema = mongoose.Schema({
   product: {
     type: Array,
@@ -19,7 +18,8 @@ const orderSchema = mongoose.Schema({
   },
 },
   {
-    timestamps: true
+    timestamps: true,
   }
+
  );
- module.exports = mongoose.model("order", orderSchema);
+ export default mongoose.model("order", orderSchema);
