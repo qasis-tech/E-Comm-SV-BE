@@ -1,22 +1,14 @@
 import mongoose from "mongoose";
 const dealSchema = mongoose.Schema({
   startDate: {
-    type: String,
+    type: Date,
     required: true,
   },
   endDate: {
-    type: String,
+    type: Date,
     required: true,
   },
-  startTime: {
-    type: String,
-    required: true,
-  },
-  endTime: {
-    type: String,
-    required: true,
-  },
-  dealImage: {
+   dealImage: {
     type: String,
     required: true,
   },

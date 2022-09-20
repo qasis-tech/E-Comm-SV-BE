@@ -188,20 +188,8 @@ export default {
               success: false,
             });
           }
-          if (!req.body.startTime) {
-            return res.status(200).send({
-              data: [],
-              message: "Start time required!",
-              success: false,
-            });
-          }
-          if (!req.body.endTime) {
-            return res.status(200).send({
-              data: [],
-              message: "End time required!",
-              success: false,
-            });
-          }
+       
+        
           if (req?.file?.path === undefined) {
             return res.status(200).send({
               data: [],
@@ -212,8 +200,6 @@ export default {
           const newDeal = new Deal({
             startDate: req.body.startDate,
             endDate: req.body.endDate,
-            startTime: req.body.startTime,
-            endTime: req.body.endTime,
             dealImage: `http://${hostname}/${req.file.path.replaceAll(
               "\\",
               "/"
