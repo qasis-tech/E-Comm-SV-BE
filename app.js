@@ -3,6 +3,10 @@ const app = express();
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import adminRouter from "./src/routes/adminRouter.js";
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 // import dbCon from "./src/config/connections/connection.js";
 import cors from "cors";
 app.use(cors({ origin: true, credentials: true }));
@@ -24,8 +28,9 @@ app.use(
   })
 );
 app.use(bodyParser.json());
-app.use(express.static("public"));
-app.use("/uploads", express.static("uploads"));
+// app.use(express.static("public"));
+// app.use("/uploads", express.static("uploads"));
+app.use(express.static(__dirname + '/public/uploads'));
 app.use("/", adminRouter);
 const port = process.env.PORT || 7000;
 app.listen(port, () => {
