@@ -8,20 +8,18 @@ const Storage = multer.diskStorage({
     cb(null, imageURL);
   },
   filename: (req, file, cb) => {
-    let newName = file.originalname    
-    if(file.fieldname==="image"){
-    let category=req.body.label
-    let originalname=(category)+path.extname(newName)
-    originalname=originalname.split(' ').join('_')
+    let newName = file.originalname;
+    if (file.fieldname === "image") {
+      let category = req.body.label;
+      let originalname = category + path.extname(newName);
+      originalname = originalname.split(" ").join("_");
+      cb(null, originalname);
+    } else {
+      let field = file.fieldname;
+      let originalname = field + path.extname(newName);
+      originalname = originalname.split(" ").join("_");
       cb(null, originalname);
     }
-    else{
-      let field=file.fieldname
-      let originalname=(field)+path.extname(newName)
-    originalname=originalname.split(' ').join('_')
-      cb(null, originalname);
-    }
-     
   },
 });
 const upload = multer({
@@ -68,13 +66,14 @@ export default {
             success: false,
           });
         }
-        
+
         const subCategory = req?.files
           ?.filter((fl) => fl?.fieldname !== "image")
           .map((image) => {
             // console.log('file',req.files)
-            let newSub=image.fieldname+path.extname(req?.files[0].originalname)
-            newSub=newSub.split(' ').join('_')
+            let newSub =
+              image.fieldname + path.extname(req?.files[0].originalname);
+            newSub = newSub.split(" ").join("_");
             return {
               label: image.fieldname,
               subCategoryImage: `http://${host}/${newSub.replaceAll(
@@ -122,14 +121,12 @@ export default {
                   }
                 });
               } else {
-                let newFilename=req.body.label+path.extname(req?.files[0].originalname)
-                newFilename=newFilename.split(' ').join('_')
+                let newFilename =
+                  req.body.label + path.extname(req?.files[0].originalname);
+                newFilename = newFilename.split(" ").join("_");
                 const newCategory = new Category({
                   label: req.body.label,
-                  image: `http://${host}/${newFilename.replaceAll(
-                    "\\",
-                    "/"
-                  )}`,
+                  image: `http://${host}/${newFilename.replaceAll("\\", "/")}`,
                   subCategory: subCategory,
                 });
                 newCategory
@@ -175,14 +172,12 @@ export default {
                 success: false,
               });
             } else {
-              let newFilename=req.body.label+path.extname(req?.files[0].originalname)
-              newFilename=newFilename.split(' ').join('_')
+              let newFilename =
+                req.body.label + path.extname(req?.files[0].originalname);
+              newFilename = newFilename.split(" ").join("_");
               const newCategory = new Category({
                 label: req.body.label,
-                image: `http://${host}/${newFilename.replaceAll(
-                  "\\",
-                  "/"
-                )}`,
+                image: `http://${host}/${newFilename.replaceAll("\\", "/")}`,
                 subCategory: subCategory,
               });
               newCategory
@@ -325,8 +320,9 @@ export default {
               const subCategory = req?.files
                 ?.filter((fl) => fl?.fieldname !== "image")
                 .map((image) => {
-                  let newSub=image.fieldname+path.extname(req?.files[0].originalname)
-                  newSub=newSub.split(' ').join('_')
+                  let newSub =
+                    image.fieldname + path.extname(req?.files[0].originalname);
+                  newSub = newSub.split(" ").join("_");
                   return {
                     label: image.fieldname,
                     subCategoryImage: `http://${host}/${newSub.replaceAll(
@@ -374,8 +370,10 @@ export default {
                         }
                       });
                     } else {
-                      let newFilename=req.body.label+path.extname(req?.files[0].originalname)
-                      newFilename=newFilename.split(' ').join('_')
+                      let newFilename =
+                        req.body.label +
+                        path.extname(req?.files[0].originalname);
+                      newFilename = newFilename.split(" ").join("_");
                       if (req?.files[0]?.path) {
                         Category.findByIdAndUpdate(
                           req.params.id,
@@ -433,8 +431,9 @@ export default {
                       success: false,
                     });
                   } else {
-                    let newFilename=req.body.label+path.extname(req?.files[0].originalname)
-                    newFilename=newFilename.split(' ').join('_')
+                    let newFilename =
+                      req.body.label + path.extname(req?.files[0].originalname);
+                    newFilename = newFilename.split(" ").join("_");
                     Category.findByIdAndUpdate(
                       req.params.id,
                       {

@@ -8,7 +8,13 @@ const Storage = multer.diskStorage({
     cb(null, imageURL);
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
+    // console.log('file',file)
+      let newName = file.originalname;
+      let category = req.body.name+req.body.category+req.body.subCategory;
+      let originalname = category + path.extname(newName);
+      originalname = originalname.split(" ").join("_");
+      cb(null, originalname);
+    
   },
  });
 const upload = multer({
@@ -18,12 +24,13 @@ const upload = multer({
     file.mimetype=="image/jpg" ||
     file.mimetype=="image/jpeg" ||
     file.mimetype=="image/svg" ||
-    file.mimetype=="video/mp4"
+    file.mimetype=="video/mp4" ||
+    file.mimetype=="video/avi"
     ){
       cb(null,true)
     }else{
       cb(null,false)
-      return cb(new Error("Only .png,.jpg,.jpeg and .svg format allowed for images , mp4 for videos"))
+      return cb(new Error("Only .png,.jpg,.jpeg and .svg format allowed for images , mp4,avi for videos"))
     }
   }
 });
@@ -180,12 +187,19 @@ export default {
                 const imgResult = [];
                  req.files.forEach((file) => {
                   if (file.fieldname === "productImage") {
+                    let pfilName=req.body.name+req.body.category+req.body.subCategory
+                    let newFilename =pfilName + path.extname(file.originalname);
+                    newFilename = newFilename.split(" ").join("_");
                     imageArray.push({
-                      image:`http://${hostname}/${file.path.replaceAll("\\","/")}`
+                      image:`http://${hostname}/${newFilename.replaceAll("\\","/")}`
                        });
                   } else {
+                    let pfilName=req.body.name+req.body.category+req.body.subCategory
+                    let newFilename =pfilName + path.extname(file.originalname);
+                    newFilename = newFilename.split(" ").join("_");
+                   
                     videoArray.push({
-                      video:`http://${hostname}/${file.path.replaceAll("\\","/")}`
+                      video:`http://${hostname}/${newFilename.replaceAll("\\","/")}`
                     });
                   }
                 });
@@ -510,12 +524,18 @@ export default {
               const videoArray = [];
               req?.files?.forEach((file) => {
                 if (file.fieldname === "productImage") {
+                  let pfilName=req.body.name+req.body.category+req.body.subCategory
+                  let newFilename =pfilName + path.extname(file.originalname);
+                  newFilename = newFilename.split(" ").join("_");
                   imageArray.push({
-                    image:`http://${hostname}/${file.path.replaceAll("\\","/")}`
+                    image:`http://${hostname}/${newFilename.replaceAll("\\","/")}`
                   });
                 } else {
+                  let pfilName=req.body.name+req.body.category+req.body.subCategory
+                  let newFilename =pfilName + path.extname(file.originalname);
+                  newFilename = newFilename.split(" ").join("_");
                   videoArray.push({
-                    video:`http://${hostname}/${file.path.replaceAll("\\","/")}`
+                    video:`http://${hostname}/${newFilename.replaceAll("\\","/")}`
                    });
                 }
               });
