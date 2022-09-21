@@ -149,12 +149,12 @@ export default {
             $match: {
               $or: [
                 { "product.category": { $in: categoryArray } },
-                // {
-                //   createdAt: {
-                //     $gte: new Date(new Date(startDate).setHours(00, 00, 00)),
-                //     $lt: new Date(new Date(endDate).setHours(23, 59, 59)),
-                //   },
-                // },
+                {
+                  createdAt: {
+                    $gte: new Date(new Date(startDate).setHours('00', '00', '00')),
+                    $lt: new Date(new Date(endDate).setHours('23', '59', '59')),
+                  },
+                },
                 { "product.subCategory": { $in: subCategoryArray } },
                 { orderId: { $in: searchArray } },
                 {
