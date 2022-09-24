@@ -9,7 +9,10 @@ const Storage = multer.diskStorage({
     cb(null, imageURL);
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
+    let originalname = file.originalname;
+    originalname = originalname.split(" ").join("_");
+    cb(null, originalname);
+  
   },
 });
 const upload = multer({
@@ -75,8 +78,9 @@ export default {
           }
           const imageArray = [];
           req.files.forEach((file) => {
+          let newFilename = file.originalname.split(" ").join("_");
             imageArray.push({
-              image: `http://${hostname}/${file.path.replaceAll("\\", "/")}`,
+              image: `http://${hostname}/${newFilename.replaceAll("\\", "/")}`,
             });
           });
           const newSlider = new Slider({
@@ -197,10 +201,11 @@ export default {
               success: false,
             });
           }
+          let newFilename = req?.file?.originalname.split(" ").join("_");
           const newDeal = new Deal({
             startDate: req.body.startDate,
             endDate: req.body.endDate,
-            dealImage: `http://${hostname}/${req.file.path.replaceAll(
+            dealImage: `http://${hostname}/${newFilename.replaceAll(
               "\\",
               "/"
             )}`,
